@@ -1,7 +1,15 @@
 package pl.envelo.moovelo.entity.actors;
 
+import lombok.*;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public abstract class Person {
-    String firstname;
-    String lastname;
-    String email;
+    private String firstname;
+    private String lastname;
+    private String email;
 }
+
