@@ -10,7 +10,6 @@ import java.io.File;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class Attachment {
 
@@ -18,7 +17,7 @@ public class Attachment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private File file;
+    private String filePath;
 
     @ManyToOne
     private EventInfo eventInfo;

@@ -3,6 +3,7 @@ package pl.envelo.moovelo.entity.categories;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 
 import javax.persistence.*;
@@ -10,7 +11,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class CategoryProposal {
     @Id
@@ -24,5 +24,6 @@ public class CategoryProposal {
 
     private String description;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime date;
 }

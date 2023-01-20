@@ -12,7 +12,6 @@ import java.util.List;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class EventSurvey {
 
@@ -21,7 +20,7 @@ public class EventSurvey {
     private Long id;
 
     @OneToMany
-    private List<BasicUser> surveys;
+    private List<BasicUser> surveyees;
 
     @ManyToOne
     private Event event;
@@ -30,6 +29,6 @@ public class EventSurvey {
 
     private String question;
 
-    @OneToMany(mappedBy = "eventSurvey")
+    @OneToMany(mappedBy = "eventSurvey", cascade = CascadeType.ALL)
     private List<Answer> answers;
 }

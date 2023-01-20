@@ -15,7 +15,6 @@ import java.util.Set;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class Event {
 
@@ -38,6 +37,9 @@ public class Event {
     private List<EventSurvey> eventSurveys;
 
     @OneToMany
+    private List<BasicUser> usersWithAccess;
+
+    @OneToMany
     private Set<BasicUser> acceptedStatusUsers;
 
     @OneToMany
@@ -46,7 +48,7 @@ public class Event {
     @OneToMany
     private Set<BasicUser> rejectedStatusUsers;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "events_hashtags",
             joinColumns = @JoinColumn(name = "event_id"),

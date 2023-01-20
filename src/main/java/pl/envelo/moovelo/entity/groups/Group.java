@@ -3,6 +3,7 @@ package pl.envelo.moovelo.entity.groups;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.InternalEvent;
 
@@ -12,7 +13,6 @@ import java.util.List;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "api_group")
 public class Group {
@@ -38,5 +38,6 @@ public class Group {
     @OneToMany(mappedBy = "group")
     private List<InternalEvent> events;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime creationDate;
 }

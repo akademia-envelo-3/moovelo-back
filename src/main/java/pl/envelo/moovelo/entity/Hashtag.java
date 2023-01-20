@@ -11,7 +11,6 @@ import java.util.List;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class Hashtag {
 
@@ -25,14 +24,6 @@ public class Hashtag {
 
     @ManyToMany
     private List<Event> events;
-
-    @ManyToMany
-    @JoinTable(
-            name = "comments_hashtags",
-            joinColumns = @JoinColumn(name = "hashtag_id"),
-            inverseJoinColumns = @JoinColumn(name = "comment_id")
-    )
-    private List<Comment> comments;
 
     private int occurrences;
 }

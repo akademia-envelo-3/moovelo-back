@@ -1,9 +1,6 @@
 package pl.envelo.moovelo.entity.actors;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import pl.envelo.moovelo.entity.categories.CategoryProposal;
 
 import javax.persistence.DiscriminatorValue;
@@ -15,13 +12,6 @@ import java.util.List;
 @DiscriminatorValue(value = "ADMIN")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Admin extends User {
-
-    public Admin() {
-    }
-
-    public Admin(String firstname, String lastname, String email,
-                 String login, String password, Role role) {
-        super(firstname, lastname, email, login, password, role);
-    }
 }

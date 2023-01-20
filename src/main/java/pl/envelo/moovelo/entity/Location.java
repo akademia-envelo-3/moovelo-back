@@ -6,30 +6,30 @@ import lombok.NoArgsConstructor;
 import pl.envelo.moovelo.entity.events.EventInfo;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
-    @OneToOne
-    EventInfo eventInfo;
+    @OneToMany(mappedBy = "location")
+    private List<EventInfo> eventsInfos;
 
-    Double altitude;
+    private Double altitude;
 
-    Double latitude;
+    private Double latitude;
 
-    String postcode;
+    private String postcode;
 
-    String city;
+    private String city;
 
-    String street;
+    private String street;
 
-    String streetNumber;
+    private String streetNumber;
 
-    String apartmentNumber;
+    private String apartmentNumber;
 }

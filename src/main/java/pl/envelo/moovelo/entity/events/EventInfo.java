@@ -3,6 +3,7 @@ package pl.envelo.moovelo.entity.events;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import pl.envelo.moovelo.entity.Attachment;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.categories.Category;
@@ -13,7 +14,6 @@ import java.util.List;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class EventInfo {
 
@@ -28,14 +28,15 @@ public class EventInfo {
 
     private String description;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime startDate;
 
-    @OneToOne(mappedBy = "eventInfo")
+    @ManyToOne
     private Location location;
 
     private Boolean isConfirmationRequired;
 
-    @OneToOne
+    @ManyToOne
     private Category category;
 
     @OneToMany

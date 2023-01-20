@@ -1,6 +1,8 @@
 package pl.envelo.moovelo.entity.events;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.Hashtag;
@@ -16,6 +18,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class ExternalEvent extends Event {
 
     @ManyToMany(cascade = CascadeType.ALL)
@@ -25,16 +28,4 @@ public class ExternalEvent extends Event {
             inverseJoinColumns = @JoinColumn(name = "visitor_id")
     )
     private List<Visitor> visitors;
-
-    public ExternalEvent() {
-    }
-
-    public ExternalEvent(Long id, EventOwner eventOwner, EventInfo eventInfo, int limitedPlaces,
-                         List<Comment> comments, List<EventSurvey> eventSurveys,
-                         Set<BasicUser> acceptedStatusUsers, Set<BasicUser> pendingStatusUsers,
-                         Set<BasicUser> rejectedStatusUsers, List<Hashtag> hashtags,
-                         List<Visitor> visitors) {
-        super(id, eventOwner, eventInfo, limitedPlaces, comments, eventSurveys, acceptedStatusUsers, pendingStatusUsers, rejectedStatusUsers, hashtags);
-        this.visitors = visitors;
-    }
 }

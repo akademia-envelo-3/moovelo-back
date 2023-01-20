@@ -13,22 +13,17 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Table(name = "api_user")
+@NoArgsConstructor
 public abstract class User extends Person {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String login;
+
     private String password;
+
+    @Enumerated(EnumType.STRING)
     private Role role;
-
-    public User() {
-    }
-
-    public User(String firstname, String lastname, String email,
-                String login, String password, Role role) {
-        super(firstname, lastname, email);
-        this.login = login;
-        this.password = password;
-        this.role = role;
-    }
 }

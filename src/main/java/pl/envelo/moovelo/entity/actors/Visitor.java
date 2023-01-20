@@ -1,6 +1,5 @@
 package pl.envelo.moovelo.entity.actors;
 
-import liquibase.pro.packaged.I;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,10 +10,9 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
 public class Visitor extends Person {
 
     @Id
