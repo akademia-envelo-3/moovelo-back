@@ -1,4 +1,4 @@
-package pl.envelo.moovelo.controller.dto.user;
+package pl.envelo.moovelo.controller.dto.actor;
 
 import lombok.Builder;
 

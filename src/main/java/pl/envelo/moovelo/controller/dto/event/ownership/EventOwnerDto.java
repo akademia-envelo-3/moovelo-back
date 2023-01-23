@@ -1,4 +1,4 @@
-package pl.envelo.moovelo.controller.dto.event.eventownership;
+package pl.envelo.moovelo.controller.dto.event.ownership;
 
 import lombok.Builder;
 import pl.envelo.moovelo.controller.dto.event.EventResponseDto;

@@ -1,9 +1,9 @@
-package pl.envelo.moovelo.controller.dto.event.eventownership;
+package pl.envelo.moovelo.controller.dto.event.ownership;
 
 import lombok.Builder;
 
 @Builder
 public class EventOwnershipRequestDto {
-    private long id;
+    private long eventId;
     private long newOwnerId;
 }

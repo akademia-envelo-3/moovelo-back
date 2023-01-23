@@ -2,11 +2,12 @@ package pl.envelo.moovelo.controller.dto.event;
 
 import lombok.Builder;
 import pl.envelo.moovelo.controller.dto.*;
-import pl.envelo.moovelo.controller.dto.category.CommentDto;
-import pl.envelo.moovelo.controller.dto.event.eventownership.EventOwnerDto;
+import pl.envelo.moovelo.controller.dto.CommentDto;
+import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerDto;
+import pl.envelo.moovelo.controller.dto.event.participation.EventParticipationStatsDto;
 import pl.envelo.moovelo.controller.dto.group.GroupDto;
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;
-import pl.envelo.moovelo.controller.dto.user.BasicUserDto;
+import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 
 import java.util.List;
 

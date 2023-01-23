@@ -5,7 +5,7 @@ import pl.envelo.moovelo.controller.dto.group.GroupInfoDto;
 
 @Builder
 public class GroupOwnershipRequestDto {
-    private long id;
+    private long groupId;
     private long newOwnerId;
     private GroupInfoDto groupInfo;
 }
