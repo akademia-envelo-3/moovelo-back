@@ -1,6 +1,7 @@
-package pl.envelo.moovelo.controller.dto;
+package pl.envelo.moovelo.controller.dto.survey;
 
 import lombok.Builder;
+import pl.envelo.moovelo.controller.dto.survey.AnswerResponseDto;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package pl.envelo.moovelo.controller.dto;
+package pl.envelo.moovelo.controller.dto.survey;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package pl.envelo.moovelo.controller.dto;
+package pl.envelo.moovelo.controller.dto.category;
 
 import lombok.Builder;
 

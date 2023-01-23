@@ -1,5 +1,5 @@
 
-package pl.envelo.moovelo.controller.dto;
+package pl.envelo.moovelo.controller.dto.location.geocoding;
 
 import java.util.List;
 import javax.annotation.Generated;

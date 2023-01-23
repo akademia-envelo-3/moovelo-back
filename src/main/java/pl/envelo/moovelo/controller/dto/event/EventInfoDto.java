@@ -1,6 +1,9 @@
-package pl.envelo.moovelo.controller.dto;
+package pl.envelo.moovelo.controller.dto.event;
 
 import lombok.Builder;
+import pl.envelo.moovelo.controller.dto.AttachmentDto;
+import pl.envelo.moovelo.controller.dto.category.CategoryDto;
+import pl.envelo.moovelo.controller.dto.location.LocationDto;
 
 import java.util.List;
 

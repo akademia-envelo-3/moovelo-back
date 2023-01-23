@@ -1,5 +1,5 @@
 
-package pl.envelo.moovelo.controller.dto;
+package pl.envelo.moovelo.controller.dto.location.geocoding;
 
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;

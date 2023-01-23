@@ -1,4 +1,4 @@
-package pl.envelo.moovelo.controller.dto;
+package pl.envelo.moovelo.controller.dto.user;
 
 import pl.envelo.moovelo.entity.actors.Role;
 
