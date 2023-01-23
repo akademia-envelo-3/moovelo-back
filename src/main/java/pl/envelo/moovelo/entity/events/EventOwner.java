@@ -1,6 +1,5 @@
 package pl.envelo.moovelo.entity.events;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

@@ -1,6 +1,5 @@
 package pl.envelo.moovelo.entity.categories;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
