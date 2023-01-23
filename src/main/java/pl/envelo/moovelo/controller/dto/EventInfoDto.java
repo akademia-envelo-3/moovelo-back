@@ -1,7 +1,8 @@
 package pl.envelo.moovelo.controller.dto;
 
 import lombok.Builder;
-import pl.envelo.moovelo.entity.categories.Category;
+
+import java.util.List;
 
 @Builder
 public class EventInfoDto {
@@ -13,6 +14,5 @@ public class EventInfoDto {
     private String startDate;
     private boolean isConfirmationRequired;
     private LocationDto location;
-    private List<AttachementDto> attachments;
-
+    private List<AttachmentDto> attachments;
 }

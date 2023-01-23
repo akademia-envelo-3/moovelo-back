@@ -3,6 +3,8 @@ package pl.envelo.moovelo.controller.dto;
 import lombok.Builder;
 import pl.envelo.moovelo.entity.Attachment;
 
+import java.util.List;
+
 @Builder
 public class CommentDto {
     private long id;
