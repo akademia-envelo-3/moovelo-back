@@ -10,7 +10,7 @@ public class EventSurveyDto {
     private long eventId;
     private String question;
     private boolean isMultipleChoice;
-    private List<AnswerDto> answers;
+    private List<AnswerResponseDto> answers;
     private List<Long> yourAnswerIds;
 
 }
