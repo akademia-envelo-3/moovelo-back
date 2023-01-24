@@ -1,8 +1,7 @@
 package pl.envelo.moovelo.entity.events;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.actors.BasicUser;
@@ -14,7 +13,8 @@ import java.util.Set;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class Event {
 

@@ -1,8 +1,6 @@
 package pl.envelo.moovelo.entity.categories;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 
@@ -10,7 +8,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class CategoryProposal {
     @Id

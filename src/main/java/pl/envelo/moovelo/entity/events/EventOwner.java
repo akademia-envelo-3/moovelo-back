@@ -1,14 +1,14 @@
 package pl.envelo.moovelo.entity.events;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class EventOwner {
 
@@ -18,6 +18,7 @@ public class EventOwner {
 
     private Long basicUserId;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "eventOwner")
     private List<Event> events;
 }

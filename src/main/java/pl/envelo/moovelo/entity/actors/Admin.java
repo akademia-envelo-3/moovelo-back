@@ -9,9 +9,9 @@ import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
-@DiscriminatorValue(value = "ADMIN")
 @Getter
 @Setter
 @NoArgsConstructor
+@DiscriminatorValue(value = "ADMIN")
 public class Admin extends User {
 }

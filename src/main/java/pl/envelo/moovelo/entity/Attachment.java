@@ -1,15 +1,14 @@
 package pl.envelo.moovelo.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pl.envelo.moovelo.entity.events.EventInfo;
 
 import javax.persistence.*;
 import java.io.File;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class Attachment {
 

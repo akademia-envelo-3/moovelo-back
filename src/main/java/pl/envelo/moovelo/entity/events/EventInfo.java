@@ -1,8 +1,7 @@
 package pl.envelo.moovelo.entity.events;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import pl.envelo.moovelo.entity.Attachment;
 import pl.envelo.moovelo.entity.Location;
@@ -13,7 +12,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class EventInfo {
 
@@ -21,8 +21,7 @@ public class EventInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "eventInfo")
-    private Event event;
+    //private Event event;
 
     private String name;
 
