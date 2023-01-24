@@ -1,11 +1,16 @@
 package pl.envelo.moovelo.controller.dto.group.groupownership;
 
-import lombok.Builder;
-import pl.envelo.moovelo.controller.dto.group.GroupInfoDto;
+import lombok.Getter;
 
-@Builder
+@Getter
 public class GroupOwnershipRequestDto {
     private long groupId;
+    private long userId;
     private long newOwnerId;
-    private GroupInfoDto groupInfo;
+
+    public GroupOwnershipRequestDto(long groupId, long userId, long newOwnerId) {
+        this.groupId = groupId;
+        this.userId = userId;
+        this.newOwnerId = newOwnerId;
+    }
 }

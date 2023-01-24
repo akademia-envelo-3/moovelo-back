@@ -1,8 +1,10 @@
 package pl.envelo.moovelo.controller.dto;
 
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class HashtagDto {
     private long id;
     private long eventId;

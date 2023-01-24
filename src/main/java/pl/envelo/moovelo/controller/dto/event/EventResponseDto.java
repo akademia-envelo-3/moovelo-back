@@ -1,6 +1,7 @@
 package pl.envelo.moovelo.controller.dto.event;
 
 import lombok.Builder;
+import lombok.Getter;
 import pl.envelo.moovelo.controller.dto.*;
 import pl.envelo.moovelo.controller.dto.CommentDto;
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerDto;
@@ -12,6 +13,7 @@ import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import java.util.List;
 
 @Builder
+@Getter
 public class EventResponseDto {
     private long id;
     private EventOwnerDto eventOwner;

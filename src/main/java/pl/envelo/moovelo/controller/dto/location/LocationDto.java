@@ -1,8 +1,10 @@
 package pl.envelo.moovelo.controller.dto.location;
 
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class LocationDto {
     private long id;
     private double altitude;
