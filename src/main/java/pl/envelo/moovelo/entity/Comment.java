@@ -1,11 +1,9 @@
 package pl.envelo.moovelo.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import pl.envelo.moovelo.entity.actors.BasicUser;
-import pl.envelo.moovelo.entity.Attachment;
 import pl.envelo.moovelo.entity.events.Event;
 
 import javax.persistence.*;
