@@ -11,7 +11,7 @@ import java.util.List;
 
 @Builder
 @Getter
-public class EventCreateDto {
+public class EventRequestDto {
     private boolean isPrivate;
     private GroupDto group;
     private EventInfoDto eventInfo;
@@ -19,4 +19,7 @@ public class EventCreateDto {
     private int limitedPlaces;
     private List<HashtagDto> hashtags;
     private List<AttachmentDto> attachments;
+    private List<Long> invited;
+    private int frequencyInDays;
+    private int numberOfRepeats;
 }
