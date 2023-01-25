@@ -1,7 +1,6 @@
 package pl.envelo.moovelo.entity.groups;
 
 import lombok.*;
-import pl.envelo.moovelo.entity.groups.Group;
 
 import javax.persistence.*;
 import java.util.List;

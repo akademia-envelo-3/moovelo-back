@@ -1,6 +1,5 @@
 package pl.envelo.moovelo.entity.events;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.Hashtag;

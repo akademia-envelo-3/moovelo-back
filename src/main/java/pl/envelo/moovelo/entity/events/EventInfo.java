@@ -1,6 +1,5 @@
 package pl.envelo.moovelo.entity.events;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import pl.envelo.moovelo.entity.Attachment;
@@ -20,8 +19,6 @@ public class EventInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    //private Event event;
 
     private String name;
 

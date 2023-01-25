@@ -1,7 +1,6 @@
 package pl.envelo.moovelo.entity;
 
 import lombok.*;
-import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.events.Event;
 
 import javax.persistence.*;

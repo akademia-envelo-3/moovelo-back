@@ -4,10 +4,11 @@ import lombok.*;
 
 import javax.persistence.MappedSuperclass;
 
+@MappedSuperclass
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@MappedSuperclass
 public abstract class Person {
     private String firstname;
     private String lastname;

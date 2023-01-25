@@ -3,7 +3,6 @@ package pl.envelo.moovelo.entity.surveys;
 import lombok.*;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.Event;
-import pl.envelo.moovelo.entity.surveys.Answer;
 
 import javax.persistence.*;
 import java.util.List;
