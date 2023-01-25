@@ -6,16 +6,11 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
-@Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(
-        name = "USER_TYPE",
-        discriminatorType = DiscriminatorType.STRING
-)
+@Entity(name = "app_user")
+@Inheritance(strategy = InheritanceType.JOINED)
+@NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "api_user")
-@NoArgsConstructor
 public abstract class User extends Person {
 
     @Id

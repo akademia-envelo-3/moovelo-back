@@ -8,9 +8,8 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
-@DiscriminatorValue(value = "ADMIN")
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 public class Admin extends User {
 }

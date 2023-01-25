@@ -9,9 +9,9 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 public class Visitor extends Person {
 
     @Id
