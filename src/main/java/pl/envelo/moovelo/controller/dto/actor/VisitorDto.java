@@ -6,8 +6,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class VisitorDto {
-    private long id;
-    private long eventId;
     private String firstname;
     private String lastname;
     private String email;
