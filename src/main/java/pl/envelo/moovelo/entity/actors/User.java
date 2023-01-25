@@ -6,7 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
-@Entity(name = "app_user")
+@Entity(name = "api_user")
 @Inheritance(strategy = InheritanceType.JOINED)
 @NoArgsConstructor
 @Getter

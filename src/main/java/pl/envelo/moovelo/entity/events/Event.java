@@ -54,4 +54,7 @@ public class Event {
             inverseJoinColumns = @JoinColumn(name = "hashtag_id")
     )
     private List<Hashtag> hashtags;
+
+    @Enumerated(value = EnumType.STRING)
+    private EventType eventType;
 }

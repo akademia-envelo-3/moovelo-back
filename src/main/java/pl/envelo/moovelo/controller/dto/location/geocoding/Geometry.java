@@ -18,7 +18,6 @@ public class Geometry {
     @JsonProperty("location")
     private Coordinates coordinates;
 
-
     @JsonProperty("location")
     public Coordinates getLocation() {
         return coordinates;
