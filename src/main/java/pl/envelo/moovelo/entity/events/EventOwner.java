@@ -15,7 +15,7 @@ public class EventOwner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long basicUserId;
+    private Long userId;
 
     @OneToMany(mappedBy = "eventOwner")
     private List<Event> events;

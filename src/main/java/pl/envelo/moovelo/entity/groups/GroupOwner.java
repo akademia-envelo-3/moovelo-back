@@ -15,7 +15,7 @@ public class GroupOwner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long basicUserId;
+    private Long userId;
 
     @OneToMany(mappedBy = "groupOwner")
     private List<Group> groups;
