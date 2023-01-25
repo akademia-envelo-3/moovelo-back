@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Getter;
 import pl.envelo.moovelo.controller.dto.*;
 import pl.envelo.moovelo.controller.dto.CommentDto;
-import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerDto;
 import pl.envelo.moovelo.controller.dto.event.participation.EventParticipationStatsDto;
 import pl.envelo.moovelo.controller.dto.group.GroupDto;
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;

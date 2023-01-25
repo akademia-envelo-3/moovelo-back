@@ -1,7 +1,7 @@
 package pl.envelo.moovelo.controller.mapper.event;
 
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
-import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerDto;
+import pl.envelo.moovelo.controller.dto.event.EventOwnerDto;
 import pl.envelo.moovelo.entity.events.EventOwner;
 
 import java.util.stream.Collectors;
@@ -17,8 +17,10 @@ public class EventOwnerMapper {
                 .events(eventOwner.getEvents().stream().map(EventMapper::mapEventToEventIdDto).collect(Collectors.toList()))
                 .build();
     }
-//todo - sprawdzić, czy potrzebna metoda
-//    public static EventOwner mapEventOwnerDtoToEventOwner(EventOwnerDto eventOwnerDto) {
 
-
-}
+    public static EventOwner mapEventOwnerDtoToEventOwner(EventOwnerDto eventOwnerDto) {
+        EventOwner eventOwner = new EventOwner();
+        eventOwner.setUserId(eventOwner.getUserId());
+        return eventOwner;
+    }
+    }
