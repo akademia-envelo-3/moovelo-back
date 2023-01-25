@@ -13,12 +13,14 @@ class VisitorMapperTest {
     @Test
     void map() {
         Visitor entity = new Visitor();
+        entity.setId(1L);
         entity.setFirstname("John");
         entity.setLastname("Doe");
         entity.setEmail("email@envelo.pl");
 
         VisitorDto dto = VisitorMapper.map(entity);
 
+        assertEquals(dto.getId(), entity.getId());
         assertEquals(dto.getFirstname(), entity.getFirstname());
         assertEquals(dto.getLastname(), entity.getLastname());
         assertEquals(dto.getEmail(), entity.getEmail());
