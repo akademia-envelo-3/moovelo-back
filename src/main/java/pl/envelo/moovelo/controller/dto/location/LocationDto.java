@@ -26,4 +26,17 @@ public class LocationDto {
     private String streetNumber;
 
     private String apartmentNumber;
+
+    @Override
+    public String toString() {
+        return "LocationDto{" +
+                "altitude=" + altitude +
+                ", latitude=" + latitude +
+                ", postCode='" + postCode + '\'' +
+                ", city='" + city + '\'' +
+                ", street='" + street + '\'' +
+                ", streetNumber='" + streetNumber + '\'' +
+                ", apartmentNumber='" + apartmentNumber + '\'' +
+                '}';
+    }
 }

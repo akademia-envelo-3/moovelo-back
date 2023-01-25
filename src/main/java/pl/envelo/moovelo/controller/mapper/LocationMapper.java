@@ -1,6 +1,7 @@
 package pl.envelo.moovelo.controller.mapper;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import pl.envelo.moovelo.controller.dto.location.LocationDto;
 import pl.envelo.moovelo.entity.Location;
@@ -9,7 +10,7 @@ import pl.envelo.moovelo.entity.Location;
 @AllArgsConstructor
 public class LocationMapper {
 
-    public static Location mapToLocationEntity(LocationDto locationDto) {
+    public static Location mapFromLocationDtoToLocationEntity(LocationDto locationDto) {
 
         Location location = Location.builder()
                 .id(locationDto.getId())
@@ -25,7 +26,7 @@ public class LocationMapper {
         return location;
     }
 
-    public static LocationDto mapToLocationDto(Location location) {
+    public static LocationDto mapFromLocationEntityToLocationDto(Location location) {
 
         LocationDto locationDto = LocationDto.builder()
                 .id(location.getId())
@@ -40,4 +41,6 @@ public class LocationMapper {
 
         return locationDto;
     }
+
+
 }
