@@ -1,6 +1,5 @@
 package pl.envelo.moovelo.entity.events;
 
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import pl.envelo.moovelo.entity.Attachment;
@@ -12,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Data
 @NoArgsConstructor
 public class EventInfo {
 
