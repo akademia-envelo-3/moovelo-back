@@ -2,15 +2,14 @@ package pl.envelo.moovelo.controller.dto.category;
 
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
+import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 
 @Builder
 @Getter
 public class CategoryProposalDto {
     private long id;
-    private long basicUserId;
+    private BasicUserDto basicUser;
     private String name;
     private String description;
-    private LocalDateTime date;
+    private String date;
 }
