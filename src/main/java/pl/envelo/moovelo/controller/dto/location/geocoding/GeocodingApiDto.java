@@ -19,7 +19,6 @@ public class GeocodingApiDto {
     @JsonProperty("results")
     private List<Result> results;
 
-
     @JsonProperty("results")
     public List<Result> getResults() {
         return results;

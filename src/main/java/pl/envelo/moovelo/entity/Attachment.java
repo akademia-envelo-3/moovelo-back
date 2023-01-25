@@ -1,13 +1,15 @@
 package pl.envelo.moovelo.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 import pl.envelo.moovelo.entity.events.EventInfo;
 
 import javax.persistence.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class Attachment {
 
@@ -27,6 +29,5 @@ public class Attachment {
     }
 
     public Attachment(Comment comment) {
-
     }
 }
