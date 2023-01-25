@@ -35,14 +35,40 @@ public class LocationTests {
                 .apartmentNumber("23")
                 .build();
 
-        //when
-
-
         //then
-
 
         assertTrue(location.equals(LocationMapper.mapFromLocationDtoToLocationEntity(locationDto)));
 
+    }
+
+
+    @Test
+    void mapppingFromLocationEntityToLocationDtoTest() {
+        //given
+
+        LocationDto locationDto = LocationDto.builder()
+                .altitude(20.32)
+                .latitude(43.11)
+                .postCode("02-765")
+                .city("Warsaw")
+                .street("Cybernetyki")
+                .streetNumber("17C")
+                .apartmentNumber("23")
+                .build();
+
+        Location location = Location.builder()
+                .altitude(20.32)
+                .latitude(43.11)
+                .postcode("02-765")
+                .city("Warsaw")
+                .street("Cybernetyki")
+                .streetNumber("17C")
+                .apartmentNumber("23")
+                .build();
+
+        //then
+
+        assertTrue(locationDto.equals(LocationMapper.mapFromLocationEntityToLocationDto(location)));
 
     }
 }
