@@ -1,12 +1,11 @@
 package pl.envelo.moovelo.entity;
 
 import lombok.*;
+import pl.envelo.moovelo.entity.events.EventInfo;
 
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
-import pl.envelo.moovelo.entity.events.EventInfo;
-
 
 @Entity
 @Getter
