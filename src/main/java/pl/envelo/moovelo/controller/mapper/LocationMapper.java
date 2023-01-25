@@ -42,5 +42,4 @@ public class LocationMapper {
         return locationDto;
     }
 
-
 }
