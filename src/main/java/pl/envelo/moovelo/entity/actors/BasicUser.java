@@ -16,10 +16,9 @@ import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
-@DiscriminatorValue(value = "BASIC_USER")
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 public class BasicUser extends User {
 
     @OneToMany
