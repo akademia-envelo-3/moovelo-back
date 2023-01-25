@@ -8,6 +8,7 @@ class MooveloApplicationTests {
 
 	@Test
 	void contextLoads() {
+
 	}
 
 }
