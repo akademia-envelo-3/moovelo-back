@@ -1,6 +1,5 @@
 package pl.envelo.moovelo.entity.actors;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,9 +9,9 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 public class Visitor extends Person {
 
     @Id

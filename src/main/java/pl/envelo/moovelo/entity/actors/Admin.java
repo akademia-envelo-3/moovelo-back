@@ -1,17 +1,15 @@
 package pl.envelo.moovelo.entity.actors;
 
-import lombok.*;
-import pl.envelo.moovelo.entity.categories.CategoryProposal;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import java.util.List;
 
 @Entity
-@DiscriminatorValue(value = "ADMIN")
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 public class Admin extends User {
 }

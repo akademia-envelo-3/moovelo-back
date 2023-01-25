@@ -2,7 +2,10 @@ package pl.envelo.moovelo.entity.actors;
 
 import lombok.*;
 
-@Data
+import javax.persistence.MappedSuperclass;
+
+@MappedSuperclass
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
