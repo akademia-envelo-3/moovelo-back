@@ -1,9 +1,9 @@
 package pl.envelo.moovelo.entity.events;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 import pl.envelo.moovelo.entity.Attachment;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.categories.Category;
@@ -27,15 +27,15 @@ public class EventInfo {
 
     private String description;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startDate;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Location location;
 
     private Boolean isConfirmationRequired;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Category category;
 
     @OneToMany

@@ -1,5 +1,6 @@
 package pl.envelo.moovelo.service.event;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,17 +10,13 @@ import pl.envelo.moovelo.repository.event.EventRepository;
 
 import java.util.List;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Service
 @Slf4j
 public class EventService {
 
-    private EventRepository eventRepository;
 
-    @Autowired
-    public EventService(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
-    }
+    private EventRepository<Event> eventRepository;
 
     public List<? extends Event> getAllEvents() {
         log.info("EventService - getAllEvents()");
@@ -27,5 +24,9 @@ public class EventService {
 
         log.info("EventService - getAllEvents() return {}", allEvents.toString());
         return allEvents;
+    }
+
+    public void createNewEvent(Event event) {
+        eventRepository.save(event);
     }
 }

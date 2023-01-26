@@ -16,37 +16,40 @@ import java.util.Set;
 @Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter
-@NoArgsConstructor
 public class Event {
+
+    public Event() {
+        this.eventType = EventType.EVENT;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private EventOwner eventOwner;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private EventInfo eventInfo;
 
     private int limitedPlaces;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<EventSurvey> eventSurveys;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<BasicUser> usersWithAccess;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<BasicUser> acceptedStatusUsers;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<BasicUser> pendingStatusUsers;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<BasicUser> rejectedStatusUsers;
 
     @ManyToMany(cascade = CascadeType.ALL)
