@@ -29,7 +29,7 @@ public class InternalEventController {
     }
 
     @GetMapping("/internalEvents")
-    public ResponseEntity<List<EventListResponseDto>> getAllEvents() {
+    public ResponseEntity<List<EventListResponseDto>> getAllInternalEvents() {
         log.info("InternalEventController - getAllInternalEvents()");
         List<? extends Event> allInternalEvents = internalEventService.getAllInternalEvents();
 
