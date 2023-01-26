@@ -11,8 +11,6 @@ import java.util.List;
 public class LocationDto {
     private long id;
 
-    private List<EventInfo> eventsInfos;
-
     private double altitude;
 
     private double latitude;

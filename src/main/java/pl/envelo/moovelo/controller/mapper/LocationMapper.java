@@ -10,10 +10,10 @@ import pl.envelo.moovelo.entity.Location;
 @AllArgsConstructor
 public class LocationMapper {
 
-    public static Location mapFromLocationDtoToLocationEntity(LocationDto locationDto) {
+    public static Location mapFromLocationDtoToLocationEntity(long id, LocationDto locationDto) {
 
         Location location = Location.builder()
-                .id(locationDto.getId())
+                .id(id)
                 .altitude(locationDto.getAltitude())
                 .latitude(locationDto.getLatitude())
                 .postcode(locationDto.getPostCode())
