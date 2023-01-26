@@ -24,10 +24,9 @@ public class EventInfoMapper {
 
     }
 
-    public static EventInfo mapEventInfoDtoToEventInfo(EventInfoDto eventInfoDto, Event event) {
+    public static EventInfo mapEventInfoDtoToEventInfo(EventInfoDto eventInfoDto) {
         EventInfo eventInfo = new EventInfo();
         eventInfo.setId(eventInfoDto.getId());
-        eventInfo.setEvent(event);
         eventInfo.setDescription(eventInfoDto.getDescription());
         eventInfo.setStartDate(LocalDateTime.parse(eventInfoDto.getStartDate(), DATE_FORMAT));
         //   eventInfo.setLocation(LocationMapper.mapLocationDtoToLocation(eventInfoDto.getLocation()));
