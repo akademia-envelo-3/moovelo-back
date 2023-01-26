@@ -1,7 +1,6 @@
 package pl.envelo.moovelo.entity.events;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.actors.BasicUser;
@@ -13,7 +12,8 @@ import java.util.Set;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class Event {
 
@@ -54,4 +54,7 @@ public class Event {
             inverseJoinColumns = @JoinColumn(name = "hashtag_id")
     )
     private List<Hashtag> hashtags;
+
+    @Enumerated(value = EnumType.STRING)
+    private EventType eventType;
 }
