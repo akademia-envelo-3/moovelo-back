@@ -7,6 +7,7 @@ import pl.envelo.moovelo.entity.events.ExternalEvent;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @NoArgsConstructor
@@ -20,4 +21,17 @@ public class Visitor extends Person {
 
     @ManyToMany(mappedBy = "visitors")
     private List<ExternalEvent> events;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Visitor visitor = (Visitor) o;
+        return Objects.equals(id, visitor.id) && Objects.equals(events, visitor.events);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, events);
+    }
 }

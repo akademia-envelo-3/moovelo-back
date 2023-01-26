@@ -7,7 +7,7 @@ public class EventOwnerListResponseMapper {
 
     public static EventOwnerListResponseDto mapEventOwnerToEventOwnerListResponseDto(EventOwner eventOwner) {
         return EventOwnerListResponseDto.builder()
-                .userId(eventOwner.getBasicUserId())
+                .userId(eventOwner.getUserId())
                 .build();
     }
 }

@@ -35,9 +35,11 @@ public class EventController {
         List<EventListResponseDto> eventsDto = allBasicEvents.stream().map(event -> {
             return switch (event.getEventType()) {
                 case EVENT -> EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
-                case INTERNAL_EVENT -> EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
+                case INTERNAL_EVENT ->
+                        EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
                 case CYCLIC_EVENT -> EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) event);
-                case EXTERNAL_EVENT -> EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
+                case EXTERNAL_EVENT ->
+                        EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
                 default -> throw new IllegalEventException("Event does not contain EvenType property");
             };
         }).toList();
