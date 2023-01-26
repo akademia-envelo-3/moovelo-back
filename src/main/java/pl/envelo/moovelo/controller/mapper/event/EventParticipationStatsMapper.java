@@ -5,6 +5,7 @@ import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.actor.VisitorMapper;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
+
 import java.util.stream.Collectors;
 
 public class EventParticipationStatsMapper {

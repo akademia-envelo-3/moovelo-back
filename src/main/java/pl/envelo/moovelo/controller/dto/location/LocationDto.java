@@ -2,9 +2,6 @@ package pl.envelo.moovelo.controller.dto.location;
 
 import lombok.Builder;
 import lombok.Getter;
-import pl.envelo.moovelo.entity.events.EventInfo;
-
-import java.util.List;
 
 @Builder
 @Getter

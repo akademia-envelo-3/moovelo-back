@@ -1,6 +1,8 @@
 package pl.envelo.moovelo.entity.surveys;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 
 import javax.persistence.*;

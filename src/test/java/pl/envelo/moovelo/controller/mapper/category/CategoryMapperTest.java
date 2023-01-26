@@ -1,11 +1,11 @@
 package pl.envelo.moovelo.controller.mapper.category;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import pl.envelo.moovelo.controller.dto.category.CategoryDto;
 import pl.envelo.moovelo.entity.categories.Category;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class CategoryMapperTest {
 

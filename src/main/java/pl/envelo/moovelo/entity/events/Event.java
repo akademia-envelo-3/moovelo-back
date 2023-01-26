@@ -1,6 +1,8 @@
 package pl.envelo.moovelo.entity.events;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.actors.BasicUser;

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BasicUserMapperTest {
 

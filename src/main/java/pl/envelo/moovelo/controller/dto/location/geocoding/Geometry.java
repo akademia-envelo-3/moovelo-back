@@ -1,4 +1,3 @@
-
 package pl.envelo.moovelo.controller.dto.location.geocoding;
 
 import com.fasterxml.jackson.annotation.JsonInclude;

@@ -3,16 +3,12 @@ package pl.envelo.moovelo.controller.mapper.category;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import pl.envelo.moovelo.controller.dto.category.CategoryProposalDto;
-import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.categories.CategoryProposal;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class CategoryProposalMapperTest {
 

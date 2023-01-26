@@ -3,8 +3,8 @@ package pl.envelo.moovelo.controller.mapper.category;
 import pl.envelo.moovelo.controller.dto.category.CategoryProposalDto;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.entity.categories.CategoryProposal;
+
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 import static pl.envelo.moovelo.Constants.DATE_FORMAT;
 
