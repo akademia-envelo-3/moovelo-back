@@ -1,12 +1,10 @@
 package pl.envelo.moovelo.controller.mapper.actor;
 
 import org.junit.jupiter.api.Test;
-import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.actor.VisitorDto;
-import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.Visitor;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class VisitorMapperTest {
 

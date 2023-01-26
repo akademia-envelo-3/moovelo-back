@@ -1,6 +1,8 @@
 package pl.envelo.moovelo.entity.groups;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
@@ -15,7 +17,7 @@ public class GroupOwner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long basicUserId;
+    private Long userId;
 
     @OneToMany(mappedBy = "groupOwner")
     private List<Group> groups;

@@ -1,6 +1,8 @@
 package pl.envelo.moovelo.entity;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import pl.envelo.moovelo.entity.events.EventInfo;
 
 import javax.persistence.*;

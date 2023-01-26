@@ -13,6 +13,7 @@ import pl.envelo.moovelo.entity.events.CyclicEvent;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.entity.events.InternalEvent;
+import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.service.event.EventService;
 
 import java.util.List;

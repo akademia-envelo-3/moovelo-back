@@ -1,4 +1,3 @@
-
 package pl.envelo.moovelo.controller.dto.location.geocoding;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -10,8 +9,8 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "results",
-    "status"
+        "results",
+        "status"
 })
 @Generated("jsonschema2pojo")
 public class GeocodingApiDto {

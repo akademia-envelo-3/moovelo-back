@@ -7,6 +7,14 @@ public class BasicUserMapper {
 
     public static BasicUserDto map(BasicUser basicUser) {
 
-        return new BasicUserDto(basicUser.getFirstname(), basicUser.getLastname());
+        return new BasicUserDto(basicUser.getId(), basicUser.getFirstname(), basicUser.getLastname());
+    }
+
+    public static BasicUser map(BasicUserDto basicUserDto) {
+        BasicUser basicUser = new BasicUser();
+        basicUser.setId(basicUserDto.getId());
+        basicUser.setFirstname(basicUserDto.getFirstname());
+        basicUser.setLastname(basicUserDto.getLastname());
+        return basicUser;
     }
 }

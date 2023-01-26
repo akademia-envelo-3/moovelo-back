@@ -1,7 +1,6 @@
 package pl.envelo.moovelo.controller.mapper;
 
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import pl.envelo.moovelo.controller.dto.location.LocationDto;
 import pl.envelo.moovelo.entity.Location;
