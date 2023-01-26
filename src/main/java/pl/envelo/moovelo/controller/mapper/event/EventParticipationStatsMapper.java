@@ -1,6 +1,8 @@
 package pl.envelo.moovelo.controller.mapper.event;
 
 import pl.envelo.moovelo.controller.dto.event.participation.EventParticipationStatsDto;
+import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
+import pl.envelo.moovelo.controller.mapper.actor.VisitorMapper;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
 import java.util.stream.Collectors;
@@ -19,7 +21,7 @@ public class EventParticipationStatsMapper {
                 .accepted(externalEvent.getAcceptedStatusUsers().stream().map(BasicUserMapper::map).collect(Collectors.toList()))
                 .pending(externalEvent.getPendingStatusUsers().stream().map(BasicUserMapper::map).collect(Collectors.toList()))
                 .rejected(externalEvent.getRejectedStatusUsers().stream().map(BasicUserMapper::map).collect(Collectors.toList()))
-                .visitors(externalEvent.getVisitors().stream().map(visitor -> VisitorMapper.mapVisitorToVisitorDto(visitor)))
+                .visitors(externalEvent.getVisitors().stream().map(VisitorMapper::map).collect(Collectors.toList()))
                 .build();
     }
 }

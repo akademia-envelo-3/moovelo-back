@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CategoryMapperTest {
 
     @Test
-    void shouldMapCategoryToCategoryDto() {
+    void shouldMapCategoryToCategoryDtoWithAllFields() {
         //given
         Category category = new Category();
         category.setId(1L);
@@ -21,17 +21,27 @@ class CategoryMapperTest {
         CategoryDto categoryDto = CategoryMapper.mapCategoryToCategoryDto(category);
 
         //then
-        Assertions.assertEquals(category.getId(), categoryDto.getId());
-        Assertions.assertEquals(category.getName(), categoryDto.getName());
-        Assertions.assertEquals(category.getVisible(), categoryDto.isVisible());
+        assertEquals(category, CategoryMapper.mapCategoryDtoToCategory(categoryDto));
     }
 
     @Test
-    void shouldMapCategoryDtoToCategory() {
+    void shouldNotMapCategoryDtoToCategory() {
         //given
+        CategoryDto categoryDto = CategoryDto.builder()
+                .id(10L)
+                .name("Ogniskowanie")
+                .isVisible(false)
+                .build();
+
+        Category category = new Category();
+        category.setId(10L);
+        category.setName("Ogniskowanie");
+        category.setVisible(true);
 
         //when
+        Category categoryFromDto = CategoryMapper.mapCategoryDtoToCategory(categoryDto);
 
         //then
+        assertNotEquals(category, categoryFromDto);
     }
 }

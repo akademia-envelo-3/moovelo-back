@@ -14,6 +14,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @NoArgsConstructor
@@ -35,4 +36,17 @@ public class BasicUser extends User {
 
     @OneToMany
     private List<Event> acceptedEvents;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BasicUser basicUser = (BasicUser) o;
+        return Objects.equals(accessiblePrivateEvents, basicUser.accessiblePrivateEvents) && Objects.equals(categoryProposals, basicUser.categoryProposals) && Objects.equals(comments, basicUser.comments) && Objects.equals(groups, basicUser.groups) && Objects.equals(acceptedEvents, basicUser.acceptedEvents);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(accessiblePrivateEvents, categoryProposals, comments, groups, acceptedEvents);
+    }
 }

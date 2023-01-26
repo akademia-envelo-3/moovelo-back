@@ -6,6 +6,7 @@ import pl.envelo.moovelo.entity.actors.BasicUser;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -25,4 +26,17 @@ public class CategoryProposal {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime date;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CategoryProposal that = (CategoryProposal) o;
+        return Objects.equals(id, that.id) && Objects.equals(basicUser, that.basicUser) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(date, that.date);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, basicUser, name, description, date);
+    }
 }
