@@ -6,6 +6,7 @@ import pl.envelo.moovelo.controller.dto.group.groupownership.GroupOwnershipReque
 import pl.envelo.moovelo.controller.mapper.group.GroupMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.groups.Group;
+import pl.envelo.moovelo.entity.groups.GroupInfo;
 import pl.envelo.moovelo.entity.groups.GroupOwner;
 
 import java.util.List;
@@ -19,12 +20,7 @@ class GroupOwnerMapperTest {
     void map() {
         GroupOwner entity = new GroupOwner();
         entity.setId(1L);
-        entity.setBasicUserId(12L);
-        Group group1 = new Group();
-        group1.setId(10L);
-        Group group2 = new Group();
-        group2.setId(11L);
-        entity.setGroups(List.of(group1, group2));
+        entity.setUserId(12L);
         BasicUser user = new BasicUser();
         user.setFirstname("John");
         user.setLastname("Doe");
@@ -32,10 +28,9 @@ class GroupOwnerMapperTest {
         GroupOwnerDto dto = GroupOwnerMapper.map(entity, user);
 
         assertEquals(entity.getId(), dto.getId());
-        assertEquals(entity.getBasicUserId(), dto.getBasicUserId());
+        assertEquals(entity.getUserId(), dto.getBasicUserId());
         assertEquals(user.getFirstname(), dto.getFirstname());
         assertEquals(user.getLastname(), dto.getLastname());
-        assertEquals(entity.getGroups().stream().map(GroupMapper::map).collect(Collectors.toList()), dto.getGroups() );
 
 
     }
@@ -47,7 +42,7 @@ class GroupOwnerMapperTest {
 
         GroupOwner entity = GroupOwnerMapper.map(dto);
 
-        assertEquals(dto.getNewOwnerId(), entity.getBasicUserId());
+        assertEquals(dto.getNewOwnerId(), entity.getUserId());
 
     }
 }

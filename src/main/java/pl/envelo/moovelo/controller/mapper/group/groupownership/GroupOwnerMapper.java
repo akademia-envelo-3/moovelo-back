@@ -12,24 +12,22 @@ public class GroupOwnerMapper {
     public static GroupOwnerDto map(GroupOwner groupOwner, BasicUser basicUser) {
         return  GroupOwnerDto.builder()
                 .id(groupOwner.getId())
-                .basicUserId(groupOwner.getBasicUserId())
+                .basicUserId(groupOwner.getUserId())
                 .firstname(basicUser.getFirstname())
                 .lastname(basicUser.getLastname())
-                .groups(groupOwner.getGroups().stream().map(GroupMapper::map).collect(Collectors.toList()))
                 .build();
     }
 
     public static GroupOwnerDto map(GroupOwner groupOwner) {
         return  GroupOwnerDto.builder()
                 .id(groupOwner.getId())
-                .basicUserId(groupOwner.getBasicUserId())
-                .groups(groupOwner.getGroups().stream().map(GroupMapper::map).collect(Collectors.toList()))
+                .basicUserId(groupOwner.getUserId())
                 .build();
     }
 
     public static GroupOwner map(GroupOwnershipRequestDto groupOwnershipRequestDto) {
         GroupOwner groupOwner = new GroupOwner();
-        groupOwner.setBasicUserId(groupOwnershipRequestDto.getNewOwnerId());
+        groupOwner.setUserId(groupOwnershipRequestDto.getNewOwnerId());
 
         return groupOwner;
     }
