@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.repository.event.EventRepository;
-import pl.envelo.moovelo.repository.event.InternalEventRepository;
 
 import java.util.List;
 
@@ -15,8 +14,12 @@ import java.util.List;
 @Slf4j
 public class EventService {
 
-    @Autowired
     private EventRepository eventRepository;
+
+    @Autowired
+    public EventService(EventRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
 
     public List<? extends Event> getAllEvents() {
         log.info("EventService - getAllEvents()");
