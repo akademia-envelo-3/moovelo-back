@@ -22,7 +22,6 @@ public class AddressComponent {
     @JsonProperty("types")
     private List<String> types;
 
-
     @JsonProperty("long_name")
     public String getLongName() {
         return longName;
@@ -32,7 +31,6 @@ public class AddressComponent {
     public void setLongName(String longName) {
         this.longName = longName;
     }
-
 
     @JsonProperty("types")
     public List<String> getTypes() {

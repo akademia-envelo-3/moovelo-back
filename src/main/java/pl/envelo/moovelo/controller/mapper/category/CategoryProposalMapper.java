@@ -4,12 +4,12 @@ import pl.envelo.moovelo.controller.dto.category.CategoryProposalDto;
 import pl.envelo.moovelo.entity.categories.CategoryProposal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+
+import static pl.envelo.moovelo.Constants.DATE_FORMAT;
 
 class CategoryProposalMapper {
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static CategoryProposalDto mapCategoryToCategoryDto(CategoryProposal categoryProposal) {
+    public static CategoryProposalDto mapCategoryProposalToCategoryProposalDto(CategoryProposal categoryProposal) {
         return CategoryProposalDto.builder()
                 .id(categoryProposal.getId())
              //   .basicUser(BasicUserMapper.mapBasicUserToBasicUserDto(categoryProposal.getBasicUser())
@@ -21,6 +21,7 @@ class CategoryProposalMapper {
 
     public static CategoryProposal mapCategoryProposalDtoToCategoryProposal(CategoryProposalDto categoryProposalDto) {
         CategoryProposal categoryProposal = new CategoryProposal();
+        categoryProposal.setId(categoryProposalDto.getId());
   //      categoryProposal.setBasicUser(BasicUserMapper.mapBasicUserDtoToBasicUser(categoryProposalDto.getBasicUser()));
         categoryProposal.setName(categoryProposalDto.getName());
         categoryProposal.setDescription(categoryProposalDto.getDescription());

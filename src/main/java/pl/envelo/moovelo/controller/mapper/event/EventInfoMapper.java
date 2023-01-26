@@ -4,12 +4,10 @@ import pl.envelo.moovelo.controller.dto.event.EventInfoDto;
 import pl.envelo.moovelo.controller.mapper.category.CategoryMapper;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventInfo;
-
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import static pl.envelo.moovelo.Constants.DATE_FORMAT;
 
 public class EventInfoMapper {
-    private final static DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static EventInfoDto mapEventInfoToEventInfoDto(EventInfo eventInfo) {
         return EventInfoDto.builder()
@@ -26,15 +24,15 @@ public class EventInfoMapper {
 
     }
 
-    public static EventInfo mapEventInfoDtoToEventInfo(EventInfoDto eventInfoDto, long id, Event event) {
+    public static EventInfo mapEventInfoDtoToEventInfo(EventInfoDto eventInfoDto, Event event) {
         EventInfo eventInfo = new EventInfo();
-        eventInfo.setId(id);
+        eventInfo.setId(eventInfoDto.getId());
         eventInfo.setEvent(event);
         eventInfo.setDescription(eventInfoDto.getDescription());
         eventInfo.setStartDate(LocalDateTime.parse(eventInfoDto.getStartDate(), DATE_FORMAT));
         //   eventInfo.setLocation(LocationMapper.mapLocationDtoToLocation(eventInfoDto.getLocation()));
         eventInfo.setIsConfirmationRequired(eventInfoDto.isConfirmationRequired());
-        eventInfo.setCategory(CategoryMapper.mapCategoryDtoToCategory(eventInfoDto.getCategory(), eventInfoDto.getCategory().getId()));
+        eventInfo.setCategory(CategoryMapper.mapCategoryDtoToCategory(eventInfoDto.getCategory()));
         //    eventInfo.setFiles(eventInfoDto.getAttachments().stream().map(attachmentDto -> AttachmentMapper.mapAttachmentDtoToAttachment(attachmentDto)));
         return eventInfo;
     }

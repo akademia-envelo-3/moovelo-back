@@ -12,9 +12,9 @@ public class CategoryMapper {
                 .build();
     }
 
-    public static Category mapCategoryDtoToCategory(CategoryDto categoryDto, long id) {
+    public static Category mapCategoryDtoToCategory(CategoryDto categoryDto) {
         Category category = new Category();
-        category.setId(id);
+        category.setId(categoryDto.getId());
         category.setName(categoryDto.getName());
         category.setVisible(categoryDto.isVisible());
         return category;

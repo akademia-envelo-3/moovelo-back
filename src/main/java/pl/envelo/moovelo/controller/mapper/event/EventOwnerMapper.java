@@ -3,7 +3,6 @@ package pl.envelo.moovelo.controller.mapper.event;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.event.EventOwnerDto;
 import pl.envelo.moovelo.entity.events.EventOwner;
-
 import java.util.stream.Collectors;
 
 public class EventOwnerMapper {
@@ -23,4 +22,4 @@ public class EventOwnerMapper {
         eventOwner.setUserId(eventOwner.getUserId());
         return eventOwner;
     }
-    }
+}
