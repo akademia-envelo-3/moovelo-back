@@ -1,6 +1,5 @@
 package pl.envelo.moovelo.controller.dto.survey;
 
-import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;

@@ -38,7 +38,7 @@ public class LocationTests {
         //then
 
         assertTrue(location.equals(LocationMapper
-                .mapFromLocationDtoToLocationEntity(2,locationDto)));
+                .mapFromLocationDtoToLocationEntity(2, locationDto)));
 
     }
 

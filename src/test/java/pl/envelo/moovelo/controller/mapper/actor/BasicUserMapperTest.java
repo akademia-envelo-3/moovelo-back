@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BasicUserMapperTest {
 
@@ -12,11 +12,13 @@ class BasicUserMapperTest {
     void map() {
 
         BasicUser entity = new BasicUser();
+        entity.setId(2L);
         entity.setFirstname("John");
         entity.setLastname("Doe");
 
         BasicUserDto dto = BasicUserMapper.map(entity);
 
+        assertEquals(dto.getId(), entity.getId());
         assertEquals(dto.getFirstname(), entity.getFirstname());
         assertEquals(dto.getLastname(), entity.getLastname());
     }
