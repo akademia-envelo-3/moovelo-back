@@ -35,8 +35,8 @@ public class ExternalEventController {
         log.info("ExternalEventController - getAllExternalEvents()");
         List<? extends Event> allExternalEvents = externalEventService.getAllExternalEvents();
 
-        List<EventListResponseDto> externalEventsDto = allExternalEvents.stream().map(internalEvent ->
-                EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) internalEvent)).toList();
+        List<EventListResponseDto> externalEventsDto = allExternalEvents.stream().map(externalEvent ->
+                EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) externalEvent)).toList();
 
         log.info("ExternalEventController - getAllExternalEvents() return {}", externalEventsDto);
         return ResponseEntity.ok(externalEventsDto);
