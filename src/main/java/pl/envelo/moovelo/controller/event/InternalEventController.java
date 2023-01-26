@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
+import pl.envelo.moovelo.entity.events.CyclicEvent;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.InternalEvent;
+import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.service.event.InternalEventService;
 
 import java.util.List;
@@ -33,8 +35,11 @@ public class InternalEventController {
         log.info("InternalEventController - getAllInternalEvents()");
         List<? extends Event> allInternalEvents = internalEventService.getAllInternalEvents();
 
-        List<EventListResponseDto> internalEventsDto = allInternalEvents.stream().map(internalEvent ->
-                EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) internalEvent)).toList();
+        List<EventListResponseDto> internalEventsDto = allInternalEvents.stream().map(internalEvent -> switch (internalEvent.getEventType()) {
+            case INTERNAL_EVENT -> EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) internalEvent);
+            case CYCLIC_EVENT -> EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) internalEvent);
+            default -> throw new IllegalEventException("Unexpected value: " + internalEvent.getEventType());
+        }).toList();
 
         log.info("InternalEventController - getAllInternalEvents() return {}", internalEventsDto);
         return ResponseEntity.ok(internalEventsDto);

@@ -24,7 +24,7 @@ public class InternalEventService {
 
     public List<? extends Event> getAllInternalEvents() {
         log.info("InternalEventService - getAllInternalEvents()");
-        List<? extends Event> allInternalEvents = internalEventRepository.findAllByEventType(EventType.INTERNAL_EVENT);
+        List<? extends Event> allInternalEvents = internalEventRepository.findAll();
 
         log.info("InternalEventService - getAllInternalEvents() return {}", allInternalEvents.toString());
         return allInternalEvents;
