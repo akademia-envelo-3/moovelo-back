@@ -9,5 +9,7 @@ public class GroupInfoMapper {
         GroupInfo groupInfo = new GroupInfo();
         groupInfo.setName(groupInfoDto.getName());
         groupInfo.setDescription(groupInfoDto.getDescription());
+
+        return groupInfo;
     }
 }
