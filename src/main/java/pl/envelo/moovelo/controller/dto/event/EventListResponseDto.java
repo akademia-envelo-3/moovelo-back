@@ -1,10 +1,12 @@
 package pl.envelo.moovelo.controller.dto.event;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
-import pl.envelo.moovelo.controller.dto.HashtagDto;
-import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerDto;
-import pl.envelo.moovelo.controller.dto.group.GroupDto;
+import lombok.Value;
+import pl.envelo.moovelo.controller.dto.HashtagListResponseDto;
+import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerListResponseDto;
 
 import java.util.List;
 
@@ -13,10 +15,10 @@ import java.util.List;
 public class EventListResponseDto {
 
     private Long id;
-    private EventOwnerDto eventOwner;
-    private EventInfoDto eventInfo;
+    private EventOwnerListResponseDto eventOwner;
+    private EventInfoListResponseDto eventInfo;
     private String startDate;
-    private List<HashtagDto> hashtags;
+    private List<HashtagListResponseDto> hashtags;
     private boolean isConfirmationRequired;
     private boolean isPrivate;
     private boolean group;

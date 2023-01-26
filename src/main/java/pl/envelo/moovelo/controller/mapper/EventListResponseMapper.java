@@ -9,7 +9,7 @@ import pl.envelo.moovelo.entity.events.*;
 import java.util.List;
 import java.util.Set;
 
-public class EventMapper {
+public class EventListResponseMapper {
 
     public static EventListResponseDto mapBasicEventToEventListResponseDto(Event event) {
         return mapEventToEventListResponseDto(event.getId(), event.getEventOwner(), event.getEventInfo(),
@@ -19,14 +19,15 @@ public class EventMapper {
     public static EventListResponseDto mapInternalEventToEventListResponseDto(InternalEvent event) {
         return EventListResponseDto.builder()
                 .id(event.getId())
-                .eventOwner(EventOwnerMapper.mapEventOwnerToEventOwnerDto(event.getEventOwner()))
-                .eventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(event.getEventInfo()))
+                .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()))
+                .eventInfo(EventInfoListResponseMapper.mapEventInfoToEventInfoListResponseDto(event.getEventInfo()))
                 .hashtags(event.getHashtags().stream()
-                        .map(HashtagMapper::mapHashtagToHashtagDto)
+                        .map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
                         .toList())
+                .startDate(event.getEventInfo().getStartDate().toString())
                 .isConfirmationRequired(event.getEventInfo().getIsConfirmationRequired())
                 .isPrivate(event.isPrivate())
-                .group(ObjectUtils.isEmpty(event.getGroup()))
+                .group(!ObjectUtils.isEmpty(event.getGroup()))
                 .isCyclic(false)
                 .city(event.getEventInfo().getLocation().getCity())
                 .acceptedStatusUsers(event.getAcceptedStatusUsers().size())
@@ -36,14 +37,15 @@ public class EventMapper {
     public static EventListResponseDto mapCyclicEventToEventListResponseDto(CyclicEvent event) {
         return EventListResponseDto.builder()
                 .id(event.getId())
-                .eventOwner(EventOwnerMapper.mapEventOwnerToEventOwnerDto(event.getEventOwner()))
-                .eventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(event.getEventInfo()))
+                .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()))
+                .eventInfo(EventInfoListResponseMapper.mapEventInfoToEventInfoListResponseDto(event.getEventInfo()))
                 .hashtags(event.getHashtags().stream()
-                        .map(HashtagMapper::mapHashtagToHashtagDto)
+                        .map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
                         .toList())
+                .startDate(event.getEventInfo().getStartDate().toString())
                 .isConfirmationRequired(event.getEventInfo().getIsConfirmationRequired())
                 .isPrivate(event.isPrivate())
-                .group(ObjectUtils.isEmpty(event.getGroup()))
+                .group(!ObjectUtils.isEmpty(event.getGroup()))
                 .isCyclic(event.getNumberOfRepeats() > 0)
                 .city(event.getEventInfo().getLocation().getCity())
                 .acceptedStatusUsers(event.getAcceptedStatusUsers().size())
@@ -60,11 +62,12 @@ public class EventMapper {
             List<Hashtag> hashtags, Set<BasicUser> acceptedStatusUsers, Event event) {
         return EventListResponseDto.builder()
                 .id(id)
-                .eventOwner(EventOwnerMapper.mapEventOwnerToEventOwnerDto(eventOwner))
-                .eventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(eventInfo))
+                .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(eventOwner))
+                .eventInfo(EventInfoListResponseMapper.mapEventInfoToEventInfoListResponseDto(eventInfo))
                 .hashtags(hashtags.stream()
-                        .map(HashtagMapper::mapHashtagToHashtagDto)
+                        .map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
                         .toList())
+                .startDate(event.getEventInfo().getStartDate().toString())
                 .isConfirmationRequired(eventInfo.getIsConfirmationRequired())
                 .isPrivate(false)
                 .group(false)
