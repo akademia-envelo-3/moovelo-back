@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventType;
+import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.repository.event.ExternalEventRepository;
 
 import java.util.List;
@@ -22,9 +23,9 @@ public class ExternalEventService {
         this.externalEventRepository = externalEventRepository;
     }
 
-    public List<? extends Event> getAllExternalEvents() {
+    public List<ExternalEvent> getAllExternalEvents() {
         log.info("ExternalEventService - getAllExternalEvents()");
-        List<? extends Event> allExternalEvents = externalEventRepository.findAllByEventType(EventType.EXTERNAL_EVENT);
+        List<ExternalEvent> allExternalEvents = externalEventRepository.findAll();
 
         log.info("ExternalEventService - getAllExternalEvents() return {}", allExternalEvents.toString());
         return allExternalEvents;

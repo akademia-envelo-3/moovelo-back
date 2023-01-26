@@ -33,10 +33,10 @@ public class CyclicEventController {
     @GetMapping("/cyclicEvents")
     public ResponseEntity<List<EventListResponseDto>> getAllCyclicEvents() {
         log.info("CyclicEventController - getAllCyclicEvents()");
-        List<? extends Event> allCyclicEvents = cyclicEventService.getAllCyclicEvents();
+        List<CyclicEvent> allCyclicEvents = cyclicEventService.getAllCyclicEvents();
 
-        List<EventListResponseDto> cyclicEventsDto = allCyclicEvents.stream().map(cyclicEvent ->
-                EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) cyclicEvent)).toList();
+        List<EventListResponseDto> cyclicEventsDto = allCyclicEvents.stream()
+                .map(EventListResponseMapper::mapCyclicEventToEventListResponseDto).toList();
 
         log.info("CyclicEventController - getAllCyclicEvents() return {}", cyclicEventsDto);
         return ResponseEntity.ok(cyclicEventsDto);

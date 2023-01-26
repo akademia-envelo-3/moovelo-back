@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.envelo.moovelo.entity.events.CyclicEvent;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.repository.event.CyclicEventRepository;
@@ -22,9 +23,9 @@ public class CyclicEventService {
         this.cyclicEventRepository = cyclicEventRepository;
     }
 
-    public List<? extends Event> getAllCyclicEvents() {
+    public List<CyclicEvent> getAllCyclicEvents() {
         log.info("CyclicEventService - getAllCyclicEvents()");
-        List<? extends Event> allCyclicEvents = cyclicEventRepository.findAllByEventType(EventType.CYCLIC_EVENT);
+        List<CyclicEvent> allCyclicEvents = cyclicEventRepository.findAll();
 
         log.info("CyclicEventService - getAllCyclicEvents() return {}", allCyclicEvents.toString());
         return allCyclicEvents;

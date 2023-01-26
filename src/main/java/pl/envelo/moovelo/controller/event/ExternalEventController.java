@@ -33,10 +33,10 @@ public class ExternalEventController {
     @GetMapping("/externalEvents")
     public ResponseEntity<List<EventListResponseDto>> getAllExternalEvents() {
         log.info("ExternalEventController - getAllExternalEvents()");
-        List<? extends Event> allExternalEvents = externalEventService.getAllExternalEvents();
+        List<ExternalEvent> allExternalEvents = externalEventService.getAllExternalEvents();
 
-        List<EventListResponseDto> externalEventsDto = allExternalEvents.stream().map(externalEvent ->
-                EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) externalEvent)).toList();
+        List<EventListResponseDto> externalEventsDto = allExternalEvents.stream()
+                .map(EventListResponseMapper::mapExternalEventToEventListResponseDto).toList();
 
         log.info("ExternalEventController - getAllExternalEvents() return {}", externalEventsDto);
         return ResponseEntity.ok(externalEventsDto);
