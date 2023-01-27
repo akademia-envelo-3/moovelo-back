@@ -22,7 +22,7 @@ public class Hashtag {
 
     private Boolean visible;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "hashtags")
     private List<Event> events;
 
     private int occurrences;

@@ -24,27 +24,26 @@ import java.util.List;
 @Slf4j
 public class EventController {
 
-    @Autowired
     private EventService eventService;
+
+    @Autowired
+    public EventController(EventService eventService) {
+        this.eventService = eventService;
+    }
 
     @GetMapping("/events")
     public ResponseEntity<List<EventListResponseDto>> getAllEvents() {
         log.info("EventController - getAllEvents()");
-        List<? extends Event> allBasicEvents = eventService.getAllEvents();
+        List<? extends Event> allEvents = eventService.getAllEvents();
 
-        List<EventListResponseDto> eventsDto = allBasicEvents.stream().map(event -> {
-            return switch (event.getEventType()) {
-                case EVENT -> EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
-                case INTERNAL_EVENT ->
-                        EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
-                case CYCLIC_EVENT -> EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) event);
-                case EXTERNAL_EVENT ->
-                        EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
-                default -> throw new IllegalEventException("Event does not contain EvenType property");
-            };
+        List<EventListResponseDto> eventsDto = allEvents.stream().map(event -> switch (event.getEventType()) {
+            case EVENT -> EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
+            case INTERNAL_EVENT -> EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
+            case CYCLIC_EVENT -> EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) event);
+            case EXTERNAL_EVENT -> EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
         }).toList();
 
-        log.info("EventController - getAllEvents() return {}", eventsDto.toString());
+        log.info("EventController - getAllEvents() return {}", eventsDto);
         return ResponseEntity.ok(eventsDto);
     }
 }

@@ -14,8 +14,12 @@ import java.util.List;
 @Slf4j
 public class EventService {
 
-    @Autowired
     private EventRepository eventRepository;
+
+    @Autowired
+    public EventService(EventRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
 
     public List<? extends Event> getAllEvents() {
         log.info("EventService - getAllEvents()");

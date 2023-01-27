@@ -22,4 +22,19 @@ public class EventListResponseDto {
     private boolean isCyclic;
     private String city;
     private int acceptedStatusUsers;
+
+    @JsonProperty(value = "isConfirmationRequired")
+    public boolean isConfirmationRequired() {
+        return isConfirmationRequired;
+    }
+
+    @JsonProperty(value = "isPrivate")
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    @JsonProperty(value = "isCyclic")
+    public boolean isCyclic() {
+        return isCyclic;
+    }
 }
