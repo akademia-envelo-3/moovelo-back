@@ -1,11 +1,13 @@
 package pl.envelo.moovelo.controller.dto.event;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 import pl.envelo.moovelo.controller.dto.AttachmentDto;
 import pl.envelo.moovelo.controller.dto.category.CategoryDto;
 import pl.envelo.moovelo.controller.dto.location.LocationDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder

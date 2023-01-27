@@ -29,7 +29,7 @@ public class Event {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private EventOwner eventOwner;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private EventInfo eventInfo;
 
     private int limitedPlaces;

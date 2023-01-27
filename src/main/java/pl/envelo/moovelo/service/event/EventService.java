@@ -15,7 +15,6 @@ import java.util.List;
 @Slf4j
 public class EventService {
 
-
     private EventRepository<Event> eventRepository;
 
     public List<? extends Event> getAllEvents() {

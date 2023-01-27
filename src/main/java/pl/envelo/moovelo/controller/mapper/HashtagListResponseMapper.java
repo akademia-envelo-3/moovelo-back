@@ -1,8 +1,10 @@
 package pl.envelo.moovelo.controller.mapper;
 
+import pl.envelo.moovelo.controller.dto.HashtagDto;
 import pl.envelo.moovelo.controller.dto.HashtagListResponseDto;
 import pl.envelo.moovelo.entity.Hashtag;
 
+//TODO zmienci nazwe HashtagMapper?
 public class HashtagListResponseMapper {
 
     public static HashtagListResponseDto mapHashtagToHashtagListResponseDto(Hashtag hashtag) {
@@ -11,4 +13,14 @@ public class HashtagListResponseMapper {
                 .value(hashtag.getHashtagValue())
                 .build();
     }
+
+    //TODO w ktoryms miejscu trzeba zweryfikowac z repo
+    public static Hashtag mapHashTagDtoToHashtag(HashtagDto hashtagDto) {
+        Hashtag hashtag = new Hashtag();
+        hashtag.setHashtagValue(hashtagDto.getValue());
+        hashtag.setVisible(true);
+        return hashtag;
+    }
+
+
 }

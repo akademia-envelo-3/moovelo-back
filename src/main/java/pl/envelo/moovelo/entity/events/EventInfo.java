@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 import pl.envelo.moovelo.entity.Attachment;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.categories.Category;
@@ -27,7 +28,7 @@ public class EventInfo {
 
     private String description;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startDate;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
+import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
-import pl.envelo.moovelo.entity.events.CyclicEvent;
-import pl.envelo.moovelo.entity.events.Event;
-import pl.envelo.moovelo.entity.events.ExternalEvent;
-import pl.envelo.moovelo.entity.events.InternalEvent;
+import pl.envelo.moovelo.controller.mapper.event.EventMapper;
+import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
+import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.service.event.EventService;
 
@@ -26,7 +26,10 @@ public class EventController {
     private EventService eventService;
 
     @PostMapping("/events")
-    public void createNewEvent(@RequestBody Event event){
+    public  void createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
+        EventMapperInterface eventMapper = new EventMapper();
+        Event event = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.EVENT);
+
         eventService.createNewEvent(event);
     }
 
