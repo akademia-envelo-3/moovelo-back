@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class CategoryDto {
-    private long id;
+    private Long id;
     private String name;
     private boolean isVisible;
 }

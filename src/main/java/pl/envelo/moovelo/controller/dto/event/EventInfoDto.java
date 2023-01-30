@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @Getter
 public class EventInfoDto {
-    private long id;
+    private Long id;
     private long eventId;
     private String name;
     private String description;

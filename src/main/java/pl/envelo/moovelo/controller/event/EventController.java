@@ -26,7 +26,7 @@ public class EventController {
     private EventService eventService;
 
     @PostMapping("/events")
-    public  void createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
+    public void createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
         EventMapperInterface eventMapper = new EventMapper();
         Event event = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.EVENT);
 

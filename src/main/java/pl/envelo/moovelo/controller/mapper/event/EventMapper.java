@@ -1,6 +1,5 @@
 package pl.envelo.moovelo.controller.mapper.event;
 
-import pl.envelo.moovelo.controller.dto.HashtagListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventIdDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.mapper.HashtagListResponseMapper;
@@ -16,8 +15,6 @@ public class EventMapper implements EventMapperInterface {
         return new EventIdDto(event.getId());
     }
 
-
-    //TODO uzupelnic jak bedzie wiecej danych -> Glownie event ovner
     @Override
     public <T extends Event> T mapEventRequestDtoToEventByEventType(EventRequestDto eventRequestDto, EventType eventType) {
         T event = createEventByEventType(eventType);
@@ -33,9 +30,7 @@ public class EventMapper implements EventMapperInterface {
                 .map(HashtagListResponseMapper::mapHashTagDtoToHashtag)
                 .collect(Collectors.toList())
         );
-
         return event;
-
     }
 
     private <T extends Event> T createEventByEventType(EventType eventType) {
@@ -47,7 +42,5 @@ public class EventMapper implements EventMapperInterface {
         };
         return (T) event;
     }
-
-
 }
 
