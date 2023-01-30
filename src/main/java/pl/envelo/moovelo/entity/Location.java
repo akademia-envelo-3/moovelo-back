@@ -2,6 +2,7 @@ package pl.envelo.moovelo.entity;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.envelo.moovelo.entity.events.EventInfo;
 
@@ -12,7 +13,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
-@Builder
+@NoArgsConstructor
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

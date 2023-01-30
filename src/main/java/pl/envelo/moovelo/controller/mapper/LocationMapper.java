@@ -11,16 +11,15 @@ public class LocationMapper {
 
     public static Location mapFromLocationDtoToLocationEntity(long id, LocationDto locationDto) {
 
-        Location location = Location.builder()
-                .id(id)
-                .altitude(locationDto.getAltitude())
-                .latitude(locationDto.getLatitude())
-                .postcode(locationDto.getPostCode())
-                .city(locationDto.getCity())
-                .street(locationDto.getStreet())
-                .streetNumber(locationDto.getStreetNumber())
-                .apartmentNumber(locationDto.getApartmentNumber())
-                .build();
+        Location location = new Location();
+        location.setId(id);
+        location.setAltitude(locationDto.getAltitude());
+        location.setLatitude(locationDto.getLatitude());
+        location.setPostcode(locationDto.getPostCode());
+        location.setCity(locationDto.getCity());
+        location.setStreet(locationDto.getStreet());
+        location.setStreetNumber(locationDto.getStreetNumber());
+        location.setApartmentNumber(locationDto.getApartmentNumber());
 
         return location;
     }

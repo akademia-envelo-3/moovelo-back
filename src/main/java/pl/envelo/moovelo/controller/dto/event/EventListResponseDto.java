@@ -1,5 +1,6 @@
 package pl.envelo.moovelo.controller.dto.event;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import pl.envelo.moovelo.controller.dto.HashtagListResponseDto;
@@ -22,4 +23,19 @@ public class EventListResponseDto {
     private boolean isCyclic;
     private String city;
     private int acceptedStatusUsers;
+
+    @JsonProperty(value = "isConfirmationRequired")
+    public boolean isConfirmationRequired() {
+        return isConfirmationRequired;
+    }
+
+    @JsonProperty(value = "isPrivate")
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    @JsonProperty(value = "isCyclic")
+    public boolean isCyclic() {
+        return isCyclic;
+    }
 }
