@@ -54,14 +54,14 @@ public class EventController {
         log.info("EventController - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
 
         //TODO: Sprawdzić zachowanie po ogarnięciu Spring Security w aplikacji
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        /*Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("BASIC_USER"))) {
             BasicUser user = (BasicUser) auth.getPrincipal();
 
             if (!user.getId().equals(basicUserId)) {
-                throw new UnauthorizedRequestException("The ID you passed does not belong to you");
+                throw new UnauthorizedRequestException("The ID you passed does not belong to your account");
             }
-        }
+        }*/
 
         List<? extends Event> allEvents = eventService.getAllEventsByEventOwnerBasicUserId(basicUserId);
 
