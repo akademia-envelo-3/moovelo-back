@@ -28,4 +28,12 @@ public class EventService {
         log.info("EventService - getAllEvents() return {}", allEvents.toString());
         return allEvents;
     }
+
+    public List<? extends Event> getAllEventsByEventNameContains(String name) {
+        log.info("EventService - getAllEventsByEventNameContains(String name)");
+        List<? extends Event> eventsByNameContains = eventRepository.findByEventInfoNameContainsIgnoreCase(name);
+
+        log.info("EventService - getAllEventsByEventNameContains(String name)", eventsByNameContains.toString());
+        return eventsByNameContains;
+    }
 }

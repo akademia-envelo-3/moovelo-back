@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
@@ -44,6 +45,21 @@ public class EventController {
         }).toList();
 
         log.info("EventController - getAllEvents() return {}", eventsDto);
+        return ResponseEntity.ok(eventsDto);
+    }
+
+    @GetMapping("/events/search")
+    public ResponseEntity<List<EventListResponseDto>> getAllEventsByEventNameContains(@RequestParam String name) {
+        log.info("EventController - getAllEventsByEventNameContains(String name)");
+        List<? extends Event> allEventsByName = eventService.getAllEventsByEventNameContains(name);
+
+        List<EventListResponseDto> eventsDto = allEventsByName.stream().map(event -> switch (event.getEventType()) {
+            case EVENT -> EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
+            case INTERNAL_EVENT -> EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
+            case CYCLIC_EVENT -> EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) event);
+            case EXTERNAL_EVENT -> EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
+        }).toList();
+
         return ResponseEntity.ok(eventsDto);
     }
 }
