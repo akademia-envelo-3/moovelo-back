@@ -30,7 +30,7 @@ public class EventInfo {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime startDate;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     private Location location;
 
     private Boolean isConfirmationRequired;
@@ -38,7 +38,7 @@ public class EventInfo {
     @ManyToOne
     private Category category;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Attachment> files;
 
     @Override

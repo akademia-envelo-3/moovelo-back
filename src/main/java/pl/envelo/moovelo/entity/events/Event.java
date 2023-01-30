@@ -26,27 +26,27 @@ public class Event {
     @ManyToOne
     private EventOwner eventOwner;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private EventInfo eventInfo;
 
     private int limitedPlaces;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<EventSurvey> eventSurveys;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<BasicUser> usersWithAccess;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<BasicUser> acceptedStatusUsers;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<BasicUser> pendingStatusUsers;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<BasicUser> rejectedStatusUsers;
 
     @ManyToMany(cascade = CascadeType.ALL)
