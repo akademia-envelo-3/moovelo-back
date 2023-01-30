@@ -9,6 +9,4 @@ import lombok.Getter;
 public class GroupResponseDto {
     private long id;
     private String name;
-
-
 }
