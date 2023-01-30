@@ -7,6 +7,7 @@ import pl.envelo.moovelo.controller.dto.event.EventResponseDto;
 import pl.envelo.moovelo.controller.dto.group.groupownership.GroupOwnerDto;
 
 import java.util.List;
+import java.util.Objects;
 
 @Builder
 @Getter
@@ -21,4 +22,20 @@ public class GroupDto {
     private List<BasicUserDto> groupMembers;
     private List<EventResponseDto> events;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        GroupDto groupDto = (GroupDto) o;
+        return id == groupDto.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
