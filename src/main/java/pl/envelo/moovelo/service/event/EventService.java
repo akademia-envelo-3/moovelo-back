@@ -1,7 +1,9 @@
 package pl.envelo.moovelo.service.event;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.repository.actors.UserRepository;
@@ -10,6 +12,8 @@ import pl.envelo.moovelo.service.actors.EventOwnerService;
 
 import javax.persistence.EntityExistsException;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -39,6 +43,17 @@ public class EventService {
             eventRepository.save(eventAfterFieldValidation);
         }
     }
+
+    public Event getEventById(Long id) {
+        log.info("EventService - getEventById()");
+        Optional<? extends Event> eventOptional = eventRepository.findById(id);
+        if (eventOptional.isEmpty()) {
+            throw new NoSuchElementException("No event with id: " + id);
+        }
+        log.info("EventService - getEventById() return {}", eventOptional.get());
+        return eventOptional.get();
+    }
+}
 
     private boolean checkIfEntityExist(Event event) {
         if (event.getId() == null) {
