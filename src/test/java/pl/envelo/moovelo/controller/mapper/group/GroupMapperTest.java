@@ -32,7 +32,6 @@ class GroupMapperTest {
 
         BasicUser basicUser1 = new BasicUser();
         basicUser1.setId(3L);
-
         BasicUser basicUser2 = new BasicUser();
         basicUser2.setId(4L);
 
@@ -53,20 +52,17 @@ class GroupMapperTest {
         entity.setEvents(List.of(event1, event2));
 
 
-
-        GroupDto dto = GroupMapper.map(entity);
-
+        GroupDto dto = GroupMapper.mapGroupToGroupDto(entity);
 
 
         assertEquals(entity.getId(), dto.getId());
         assertEquals(entity.getGroupInfo().getName(), dto.getName());
         assertEquals(entity.getGroupInfo().getDescription(), dto.getDescription());
-        assertEquals(GroupOwnerMapper.map(entity.getGroupOwner()), dto.getGroupOwner());
+        assertEquals(GroupOwnerMapper.mapGroupOwnerToGroupOwnerDto(entity.getGroupOwner()), dto.getGroupOwner());
         assertEquals(entity.getMembers().size(), dto.getNumberOfMembers());
         assertEquals(entity.getMembers().stream().map(BasicUserMapper::map).collect(Collectors.toList()), dto.getGroupMembers());
         //TODO: after merging method: EventResponseDto map(Event) in class EventMapper
 //        assertEquals(entity.getEvents().stream().map(EventMapper::map).collect(Collectors.toList()), dto.getEvents());
-
 
     }
 }

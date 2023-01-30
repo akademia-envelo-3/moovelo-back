@@ -15,7 +15,7 @@ class GroupInfoMapperTest {
                 .description("nauka Javy")
                 .build();
 
-        GroupInfo entity = GroupInfoMapper.map(dto);
+        GroupInfo entity = GroupInfoMapper.mapGroupInfoDtoToGroupInfo(dto);
 
         assertEquals(entity.getName(), dto.getName());
         assertEquals(entity.getDescription(), dto.getDescription());

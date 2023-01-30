@@ -9,13 +9,13 @@ import pl.envelo.moovelo.entity.groups.Group;
 import java.util.stream.Collectors;
 
 public class GroupMapper {
-    public static GroupDto map(Group group) {
+    public static GroupDto mapGroupToGroupDto(Group group) {
         return GroupDto
                 .builder()
                 .id(group.getId())
                 .name(group.getGroupInfo().getName())
                 .description(group.getGroupInfo().getDescription())
-                .groupOwner(GroupOwnerMapper.map(group.getGroupOwner()))
+                .groupOwner(GroupOwnerMapper.mapGroupOwnerToGroupOwnerDto(group.getGroupOwner()))
                 .numberOfMembers(group.getMembers().size())
                 .groupMembers(group.getMembers()
                         .stream()

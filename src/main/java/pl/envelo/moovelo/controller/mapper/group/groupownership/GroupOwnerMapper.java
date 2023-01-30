@@ -9,7 +9,7 @@ import pl.envelo.moovelo.entity.groups.GroupOwner;
 import java.util.stream.Collectors;
 
 public class GroupOwnerMapper {
-    public static GroupOwnerDto map(GroupOwner groupOwner, BasicUser basicUser) {
+    public static GroupOwnerDto mapGroupOwnerToGroupOwnerDto(GroupOwner groupOwner, BasicUser basicUser) {
         return  GroupOwnerDto.builder()
                 .id(groupOwner.getId())
                 .basicUserId(groupOwner.getUserId())
@@ -18,14 +18,14 @@ public class GroupOwnerMapper {
                 .build();
     }
 
-    public static GroupOwnerDto map(GroupOwner groupOwner) {
+    public static GroupOwnerDto mapGroupOwnerToGroupOwnerDto(GroupOwner groupOwner) {
         return  GroupOwnerDto.builder()
                 .id(groupOwner.getId())
                 .basicUserId(groupOwner.getUserId())
                 .build();
     }
 
-    public static GroupOwner map(GroupOwnershipRequestDto groupOwnershipRequestDto) {
+    public static GroupOwner mapGroupOwnershipRequestDtoToGroupOwner(GroupOwnershipRequestDto groupOwnershipRequestDto) {
         GroupOwner groupOwner = new GroupOwner();
         groupOwner.setUserId(groupOwnershipRequestDto.getNewOwnerId());
 

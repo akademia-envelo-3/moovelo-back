@@ -18,8 +18,12 @@ public class GroupOwnerDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         GroupOwnerDto that = (GroupOwnerDto) o;
         return id == that.id;
     }

@@ -24,8 +24,12 @@ public class GroupDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         GroupDto groupDto = (GroupDto) o;
         return id == groupDto.id;
     }

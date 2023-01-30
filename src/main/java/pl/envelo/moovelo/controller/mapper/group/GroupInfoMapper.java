@@ -5,7 +5,7 @@ import pl.envelo.moovelo.entity.groups.GroupInfo;
 
 public class GroupInfoMapper {
 
-    public static GroupInfo map(GroupInfoDto groupInfoDto) {
+    public static GroupInfo mapGroupInfoDtoToGroupInfo(GroupInfoDto groupInfoDto) {
         GroupInfo groupInfo = new GroupInfo();
         groupInfo.setName(groupInfoDto.getName());
         groupInfo.setDescription(groupInfoDto.getDescription());

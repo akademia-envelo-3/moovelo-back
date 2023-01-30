@@ -3,10 +3,7 @@ package pl.envelo.moovelo.controller.mapper.group.groupownership;
 import org.junit.jupiter.api.Test;
 import pl.envelo.moovelo.controller.dto.group.groupownership.GroupOwnerDto;
 import pl.envelo.moovelo.controller.dto.group.groupownership.GroupOwnershipRequestDto;
-import pl.envelo.moovelo.controller.mapper.group.GroupMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;
-import pl.envelo.moovelo.entity.groups.Group;
-import pl.envelo.moovelo.entity.groups.GroupInfo;
 import pl.envelo.moovelo.entity.groups.GroupOwner;
 
 import java.util.List;
@@ -25,13 +22,12 @@ class GroupOwnerMapperTest {
         user.setFirstname("John");
         user.setLastname("Doe");
 
-        GroupOwnerDto dto = GroupOwnerMapper.map(entity, user);
+        GroupOwnerDto dto = GroupOwnerMapper.mapGroupOwnerToGroupOwnerDto(entity, user);
 
         assertEquals(entity.getId(), dto.getId());
         assertEquals(entity.getUserId(), dto.getBasicUserId());
         assertEquals(user.getFirstname(), dto.getFirstname());
         assertEquals(user.getLastname(), dto.getLastname());
-
 
     }
 
@@ -40,7 +36,7 @@ class GroupOwnerMapperTest {
 
         GroupOwnershipRequestDto dto = new GroupOwnershipRequestDto(10, 11, 13);
 
-        GroupOwner entity = GroupOwnerMapper.map(dto);
+        GroupOwner entity = GroupOwnerMapper.mapGroupOwnershipRequestDtoToGroupOwner(dto);
 
         assertEquals(dto.getNewOwnerId(), entity.getUserId());
 
