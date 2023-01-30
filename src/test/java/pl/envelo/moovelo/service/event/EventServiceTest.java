@@ -27,4 +27,22 @@ class EventServiceTest {
         assertFalse(allEvents.isEmpty());
         assertEquals(allEvents.get(0).getEventType(), EventType.EVENT);
     }
+
+    @Test
+    void getAllEventsByEventNameContainsTest() {
+
+        //GIVEN
+        String name = "ex";
+
+        //WHEN
+        List<? extends Event> eventsByNameContains = eventService.getAllEventsByEventNameContains(name);
+
+        System.out.println("tests print");
+        System.out.println(eventService.getAllEvents());
+        System.out.println(eventService.getAllEventsByEventNameContains(name));
+
+        //THEN
+        assertFalse(eventsByNameContains.isEmpty());
+        assertEquals(eventsByNameContains.size(), 1);
+    }
 }
