@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 
 import javax.transaction.Transactional;
@@ -58,5 +59,28 @@ class EventControllerTest {
         assertTrue(result.hasBody());
         assertEquals(result.getStatusCode(), HttpStatus.OK);
         assertTrue(Objects.requireNonNull(result.getBody()).size() > 0);
+    }
+
+    @Test
+    void getEventByIdPositiveTest() throws Exception {
+        mvc.perform(get("/api/v1/events/{eventId}", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.eventOwner.userId", is(1)))
+                .andExpect(jsonPath("$.eventInfo.name", is("Testowy Internal event")));
+    }
+
+    @Test
+    @Transactional
+    void getEventByIdUnitTest() {
+        //given
+
+        //when
+        ResponseEntity<DisplayEventResponseDto> result = eventController.getEventById(1L);
+
+        //then
+        assertTrue(result.hasBody());
+        assertEquals(result.getStatusCode(), HttpStatus.OK);
     }
 }
