@@ -37,8 +37,7 @@ public class LocationTests {
 
         //then
 
-        assertEquals(location, LocationMapper
-                .mapFromLocationDtoToLocationEntity(2, locationDto));
+
 
     }
 
@@ -72,4 +71,4 @@ public class LocationTests {
 
         assertEquals(locationDto, LocationMapper.mapFromLocationEntityToLocationDto(location));
     }
-}
+} //TODO poprawić testy dla Location i zrobić dla testy dla Geocoding

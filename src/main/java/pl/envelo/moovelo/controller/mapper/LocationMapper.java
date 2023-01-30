@@ -9,7 +9,7 @@ import pl.envelo.moovelo.entity.Location;
 @AllArgsConstructor
 public class LocationMapper {
 
-    public static Location mapFromLocationDtoToLocationEntity(long id, LocationDto locationDto) {
+    public static Location mapFromLocationDtoToLocationEntity(Long id, LocationDto locationDto) {
 
         Location location = new Location();
         location.setId(id);
