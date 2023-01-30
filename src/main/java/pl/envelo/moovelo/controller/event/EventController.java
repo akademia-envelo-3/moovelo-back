@@ -3,14 +3,13 @@ package pl.envelo.moovelo.controller.event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
+import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.entity.events.CyclicEvent;
@@ -56,14 +55,15 @@ public class EventController {
         log.info("EventController - getEventById()");
         Event eventById = eventService.getEventById(eventId);
         DisplayEventResponseDto displayEventResponseDto = null;
-                switch (eventById.getEventType()) {
-                    case EVENT,EXTERNAL_EVENT ->
-                       displayEventResponseDto = EventMapper.mapEventToEventResponseDto(eventById);
-                    case INTERNAL_EVENT ->
-                        displayEventResponseDto = EventMapper.mapInternalEventToEventResponseDto((InternalEvent) eventById);
-                    case CYCLIC_EVENT ->
-                        displayEventResponseDto = EventMapper.mapCyclicEventToEventResponseDto((CyclicEvent) eventById);
-                };
-        return ResponseEntity.ok(displayEventResponseDto);
+        switch (eventById.getEventType()) {
+            case EVENT -> displayEventResponseDto = EventMapper.mapEventToEventResponseDto(eventById);
+            case EXTERNAL_EVENT ->  displayEventResponseDto = EventMapper.mapExternalEventToEventResponseDto((ExternalEvent) eventById);
+            case INTERNAL_EVENT ->
+                    displayEventResponseDto = EventMapper.mapInternalEventToEventResponseDto((InternalEvent) eventById);
+            case CYCLIC_EVENT ->
+                    displayEventResponseDto = EventMapper.mapCyclicEventToEventResponseDto((CyclicEvent) eventById);
+        }
+        log.info("EventController - getEventById() return {}", displayEventResponseDto);
+        return displayEventResponseDto == null ? ResponseEntity.badRequest().build() : ResponseEntity.ok(displayEventResponseDto);
     }
 }

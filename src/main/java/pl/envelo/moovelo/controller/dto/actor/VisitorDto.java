@@ -19,7 +19,8 @@ public class VisitorDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         VisitorDto that = (VisitorDto) o;
-        return Objects.equals(id, that.id) && Objects.equals(firstname, that.firstname) && Objects.equals(lastname, that.lastname) && Objects.equals(email, that.email);
+        return Objects.equals(id, that.id) && Objects.equals(firstname, that.firstname)
+                && Objects.equals(lastname, that.lastname) && Objects.equals(email, that.email);
     }
 
     @Override

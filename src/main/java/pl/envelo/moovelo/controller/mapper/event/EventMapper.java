@@ -1,13 +1,14 @@
 package pl.envelo.moovelo.controller.mapper.event;
 
-import pl.envelo.moovelo.controller.dto.event.EventIdDto;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
+import pl.envelo.moovelo.controller.dto.event.EventIdDto;
 import pl.envelo.moovelo.controller.dto.group.groupownership.GroupResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventOwnerListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.HashtagListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.group.GroupResponseMapper;
 import pl.envelo.moovelo.entity.events.CyclicEvent;
 import pl.envelo.moovelo.entity.events.Event;
+import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.entity.groups.Group;
 
@@ -27,6 +28,7 @@ public class EventMapper {
                 .limitedPlaces(event.getLimitedPlaces())
                 .eventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(event))
                 .isPrivate(false)
+                .isCyclic(false)
                 .group(null)
                 .frequencyInDays(0)
                 .numberOfRepeats(0)
@@ -43,6 +45,7 @@ public class EventMapper {
                 .limitedPlaces(internalEvent.getLimitedPlaces())
                 .eventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(internalEvent))
                 .isPrivate(internalEvent.isPrivate())
+                .isCyclic(false)
                 .group(getGroupResponseDto(internalEvent.getGroup()))
                 .frequencyInDays(0)
                 .numberOfRepeats(0)
@@ -53,7 +56,7 @@ public class EventMapper {
 
     private static GroupResponseDto getGroupResponseDto(Group group) {
         return group != null ? GroupResponseMapper.mapGroupToGroupResponseMapper(group) : null;
-}
+    }
 
     public static DisplayEventResponseDto mapCyclicEventToEventResponseDto(CyclicEvent cyclicEvent) {
         return DisplayEventResponseDto.builder()
@@ -63,10 +66,28 @@ public class EventMapper {
                 .limitedPlaces(cyclicEvent.getLimitedPlaces())
                 .eventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(cyclicEvent))
                 .isPrivate(cyclicEvent.isPrivate())
+                .isCyclic(true)
                 .group(GroupResponseMapper.mapGroupToGroupResponseMapper(cyclicEvent.getGroup()))
                 .frequencyInDays(cyclicEvent.getFrequencyInDays())
                 .numberOfRepeats(cyclicEvent.getNumberOfRepeats())
                 .hashtags(cyclicEvent.getHashtags().stream().map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    public static DisplayEventResponseDto mapExternalEventToEventResponseDto(ExternalEvent externalEvent) {
+        return DisplayEventResponseDto.builder()
+                .id(externalEvent.getId())
+                .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(externalEvent.getEventOwner()))
+                .eventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(externalEvent.getEventInfo()))
+                .limitedPlaces(externalEvent.getLimitedPlaces())
+                .eventParticipationStats(EventParticipationStatsMapper.mapExternalEventToEventParticipationStatsDto(externalEvent))
+                .isPrivate(false)
+                .isCyclic(false)
+                .group(null)
+                .frequencyInDays(0)
+                .numberOfRepeats(0)
+                .hashtags(externalEvent.getHashtags().stream().map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
                         .collect(Collectors.toList()))
                 .build();
     }
