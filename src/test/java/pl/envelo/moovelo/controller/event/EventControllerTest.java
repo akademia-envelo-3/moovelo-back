@@ -83,4 +83,21 @@ class EventControllerTest {
         assertTrue(result.hasBody());
         assertEquals(result.getStatusCode(), HttpStatus.OK);
     }
+
+    //TODO: stworzyć test dla removeEvent kiedy ogarniemy Spring security
+
+    @Test
+    @Disabled
+    void removeEventByIdPositiveTest() {
+    }
+
+    @Test
+    @Disabled
+    void removeEventByIdNegativeTest() {
+    }
+
+    @Test
+    @Disabled
+    void removeEventByIdUnitTest() {
+    }
 }

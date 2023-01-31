@@ -5,8 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventType;
+import pl.envelo.moovelo.exception.NoContentException;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,5 +29,31 @@ class EventServiceTest {
         // THEN
         assertFalse(allEvents.isEmpty());
         assertEquals(allEvents.get(0).getEventType(), EventType.EVENT);
+    }
+
+    @Test
+    @Transactional
+    void removeEventByIdTest() {
+        // GIVEN
+        long eventId = 1;
+
+        // WHEN
+        eventService.removeEventById(eventId);
+
+        // THEN
+        assertThrows(NoSuchElementException.class, () -> eventService.getEventById(eventId));
+    }
+
+    @Test
+    @Transactional
+    void removeEventByIdWhenEventDoesNotExistTest() {
+        // GIVEN
+        long eventId = 1;
+
+        // WHEN
+        eventService.removeEventById(eventId);
+
+        // THEN
+        assertThrows(NoContentException.class, () -> eventService.removeEventById(eventId));
     }
 }
