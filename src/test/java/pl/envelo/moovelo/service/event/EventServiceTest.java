@@ -56,4 +56,16 @@ class EventServiceTest {
         // THEN
         assertThrows(NoContentException.class, () -> eventService.removeEventById(eventId));
     }
+
+    void getAllEventsByEventOwnerBasicUserIdTest() {
+        // GIVEN
+        Long userId = 1L;
+
+        // WHEN
+        List<? extends Event> allEventOwnerEvents = eventService.getAllEventsByEventOwnerBasicUserId(userId);
+
+        // THEN
+        assertFalse(allEventOwnerEvents.isEmpty());
+        assertEquals(allEventOwnerEvents.get(0).getEventOwner().getUserId(), userId);
+    }
 }
