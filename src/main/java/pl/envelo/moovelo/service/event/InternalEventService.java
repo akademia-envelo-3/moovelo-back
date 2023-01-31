@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventType;
+import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.repository.event.InternalEventRepository;
 
 import java.util.List;
@@ -27,6 +28,14 @@ public class InternalEventService {
         List<? extends Event> allInternalEvents = internalEventRepository.findAll();
 
         log.info("InternalEventService - getAllInternalEvents() return {}", allInternalEvents.toString());
+        return allInternalEvents;
+    }
+
+    List <? extends Event> getAllInternalEventsByGroupId(Long id){
+        log.info("InternalEventService - getAllInternalEventsByGroupId()");
+        List<? extends Event> allInternalEvents = internalEventRepository.findByGroupId(id);
+
+        log.info("InternalEventService - getAllInternalEventsByGroupId() return {}", allInternalEvents.toString());
         return allInternalEvents;
     }
 }
