@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.repository.event.EventRepository;
+import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 
 import javax.persistence.EntityExistsException;
@@ -20,6 +21,7 @@ public class EventService {
     private EventRepository<Event> eventRepository;
     private final EventInfoService eventInfoService;
     private final EventOwnerService eventOwnerService;
+    private final HashTagService hashTagService;
 
     public List<? extends Event> getAllEvents() {
         log.info("EventService - getAllEvents()");
@@ -59,13 +61,14 @@ public class EventService {
     private Event checkIfAggregatedEntitiesExistInDatabase(Event event, Long userId) {
         Event eventWithFieldsAfterValidation = new Event();
         eventWithFieldsAfterValidation
-                .setEventInfo(eventInfoService.getEventInfoWithLocationCoordinates(event.getEventInfo()));
-        eventWithFieldsAfterValidation
                 .setEventOwner(eventOwnerService.createNewEventOwner(userId));
+        eventWithFieldsAfterValidation
+                .setEventInfo(eventInfoService.getEventInfoWithLocationCoordinates(event.getEventInfo()));
         eventWithFieldsAfterValidation.setLimitedPlaces(event.getLimitedPlaces());
-//        eventWithFieldsAfterValidation.setHashtags();
+        eventWithFieldsAfterValidation.setHashtags(hashTagService.validateHashtags(event.getHashtags()));
         return eventWithFieldsAfterValidation;
     }
+
 }
 
 

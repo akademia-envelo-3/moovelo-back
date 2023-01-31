@@ -15,6 +15,7 @@ public class GeocodingApiClient {
     public static final char ADDRESS_SEPARATOR = '%';
 
     public GeocodingApiDto getGeolocationInfoForAddress(Location locationBeforeRequest) {
+
         final String address = createAddressFromLocationFields(locationBeforeRequest);
 
         return restTemplate.getForObject(GEOLOCATION_API_BASE_URL + DATA_FORMAT + "?address={address}&key={apiKey}",
@@ -22,13 +23,11 @@ public class GeocodingApiClient {
     }
 
     private String createAddressFromLocationFields(Location location) {
-        StringBuilder addressBuilder = new StringBuilder();
-        return addressBuilder
-                .append(location.getStreet())
-                .append(ADDRESS_SEPARATOR)
-                .append(location.getStreetNumber())
-                .append(ADDRESS_SEPARATOR)
-                .append(location.getCity())
-                .toString();
+        String addressBuilder = location.getStreet() +
+                ADDRESS_SEPARATOR +
+                location.getStreetNumber() +
+                ADDRESS_SEPARATOR +
+                location.getCity();
+        return addressBuilder;
     }
 }

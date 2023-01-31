@@ -19,9 +19,13 @@ public class LocationService {
     }
 
     public Location getLocationFromGeocodingApi(Location locationBeforeApiRequest) {
-        GeocodingApiDto geocodingApiResponse = geocodingApiClient.getGeolocationInfoForAddress(locationBeforeApiRequest);
+        GeocodingApiDto geocodingApiResponse = sendGeolocationApiRequest(locationBeforeApiRequest);
         LocationDto locationDtoAfterGeolocationApiRequest = GeocodingApiDtoToGeolocationDtoMapper.map(geocodingApiResponse);
         return LocationMapper.mapFromLocationDtoToLocationEntity(null, locationDtoAfterGeolocationApiRequest);
+    }
+
+    private GeocodingApiDto sendGeolocationApiRequest(Location locationBeforeApiRequest) {
+        return geocodingApiClient.getGeolocationInfoForAddress(locationBeforeApiRequest);
     }
 
 }

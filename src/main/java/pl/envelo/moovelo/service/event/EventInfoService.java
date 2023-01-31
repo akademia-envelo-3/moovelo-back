@@ -12,8 +12,8 @@ public class EventInfoService {
     private final LocationService locationService;
 
     public EventInfo getEventInfoWithLocationCoordinates(EventInfo eventInfo) {
-        Location locationBeforeApiRequest = eventInfo.getLocation();
-        Location locationAfterGeocodingApiRequest = locationService.getLocationFromGeocodingApi(locationBeforeApiRequest);
+        Location locationBeforeGeocodingApiRequest = eventInfo.getLocation();
+        Location locationAfterGeocodingApiRequest = locationService.getLocationFromGeocodingApi(locationBeforeGeocodingApiRequest);
         eventInfo.setLocation(locationAfterGeocodingApiRequest);
         return eventInfo;
     }
