@@ -40,6 +40,7 @@ public class LocationTests {
         assertEquals(location, LocationMapper
                 .mapFromLocationDtoToLocationEntity(2L, locationDto));
 
+
     }
 
 
@@ -48,7 +49,7 @@ public class LocationTests {
         //given
 
         LocationDto locationDto = LocationDto.builder()
-                .id(2)
+                .id(2L)
                 .altitude(20.32)
                 .latitude(43.11)
                 .postCode("02-765")
