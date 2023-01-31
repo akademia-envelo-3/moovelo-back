@@ -13,7 +13,6 @@ import pl.envelo.moovelo.entity.events.CyclicEvent;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.entity.events.InternalEvent;
-import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.service.event.EventService;
 
 import java.util.List;
@@ -51,9 +50,8 @@ public class EventController {
     @PreAuthorize("hasRole('BASIC_USER')")
     public ResponseEntity removeEventById(@PathVariable long eventId) {
         log.info("EventController - removeEventById() - eventId = {}", eventId);
-
         eventService.removeEventById(eventId);
-
+        log.info("EventController - removeEventById() - event with eventId = {} removed", eventId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

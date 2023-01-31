@@ -4,12 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.events.Event;
+import pl.envelo.moovelo.entity.events.EventOwner;
+import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.LocationService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -38,6 +42,18 @@ public class EventService {
     }
 
     public void removeEventById(long id) {
-        eventRepository.deleteById(id);
+        log.info("EventService - removeEventById() - id = {}", id);
+        Optional<Event> eventOptional = eventRepository.findById(id);
+        if (eventOptional.isEmpty()) {
+            throw new NoContentException("Event with id = " + id + " doesn't exist!");
+        } else {
+            Event event = eventOptional.get();
+            Location location = event.getEventInfo().getLocation();
+            EventOwner eventOwner = event.getEventOwner();
+            eventRepository.delete(event);
+            locationService.checkIfLocationContainsEvents(location);
+            eventOwnerService.checkIfEventOwnerContainsEvents(eventOwner);
+        }
+        log.info("EventService - removeEventById() - event with id = {} removed", id);
     }
 }
