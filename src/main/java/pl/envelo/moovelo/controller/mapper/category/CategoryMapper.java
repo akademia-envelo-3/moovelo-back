@@ -1,6 +1,7 @@
 package pl.envelo.moovelo.controller.mapper.category;
 
 import pl.envelo.moovelo.controller.dto.category.CategoryDto;
+import pl.envelo.moovelo.controller.dto.category.CategoryListResponseDto;
 import pl.envelo.moovelo.entity.categories.Category;
 
 public class CategoryMapper {
@@ -17,6 +18,14 @@ public class CategoryMapper {
         category.setId(categoryDto.getId());
         category.setName(categoryDto.getName());
         category.setVisible(categoryDto.isVisible());
+        return category;
+    }
+
+    public static Category mapCategoryResponseDtoToCategory(CategoryListResponseDto categoryListResponseDto) {
+        Category category = new Category();
+        category.setId(categoryListResponseDto.getId());
+        category.setName(categoryListResponseDto.getName());
+        category.setVisible(true);
         return category;
     }
 }

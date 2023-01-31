@@ -11,8 +11,8 @@ import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.LocationService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
-
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -39,6 +39,16 @@ public class EventService {
 
         log.info("EventService - getAllEvents() return {}", allEvents.toString());
         return allEvents;
+    }
+
+    public Event getEventById(Long id) {
+        log.info("EventService - getEventById()");
+        Optional<? extends Event> eventOptional = eventRepository.findById(id);
+        if (eventOptional.isEmpty()) {
+            throw new NoSuchElementException("No event with id: " + id);
+        }
+        log.info("EventService - getEventById() return {}", eventOptional.get());
+        return eventOptional.get();
     }
 
     public void removeEventById(long id) {

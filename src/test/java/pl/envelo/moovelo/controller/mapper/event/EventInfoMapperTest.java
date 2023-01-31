@@ -20,16 +20,15 @@ class EventInfoMapperTest {
         category.setId(20L);
         category.setName("kuligowanie");
         category.setVisible(true);
-        Location location = Location.builder()
-                .id(10L)
-                .altitude(20.0)
-                .latitude(40.0)
-                .postcode("20-670")
-                .city("Sosnowiec")
-                .street("Kubusia Puchatka")
-                .streetNumber("40")
-                .apartmentNumber("10")
-                .build();
+        Location location = new Location();
+        location.setId(10L);
+        location.setAltitude(20.0);
+        location.setLatitude(40.0);
+        location.setPostcode("20-670");
+        location.setCity("Sosnowiec");
+        location.setStreet("Kubusia Puchatka");
+        location.setStreetNumber("40");
+        location.setApartmentNumber("10");
         EventInfo eventInfo = new EventInfo();
         eventInfo.setId(5L);
         eventInfo.setName("kulig bez śniegu");
