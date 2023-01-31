@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,35 @@ public class EventController {
         log.info("EventController - getAllEvents()");
         List<? extends Event> allEvents = eventService.getAllEvents();
 
+        List<EventListResponseDto> eventsDto = mapEventToEventListResponseDto(allEvents);
+
+        log.info("EventController - getAllEvents() return {}", eventsDto);
+        return ResponseEntity.ok(eventsDto);
+    }
+
+    @GetMapping("events/eventOwners/{userId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BASIC_USER')")
+    public ResponseEntity<List<EventListResponseDto>> getAllEventsByEventOwnerBasicUserId(@PathVariable("userId") Long basicUserId) {
+        log.info("EventController - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
+
+        //TODO: Sprawdzić zachowanie po ogarnięciu Spring Security w aplikacji
+        /*Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("BASIC_USER"))) {
+            BasicUser user = (BasicUser) auth.getPrincipal();
+
+            if (!user.getId().equals(basicUserId)) {
+                throw new UnauthorizedRequestException("The ID you passed does not belong to your account");
+            }
+        }*/
+
+        List<? extends Event> allEvents = eventService.getAllEventsByEventOwnerBasicUserId(basicUserId);
+
+        List<EventListResponseDto> eventsDto = mapEventToEventListResponseDto(allEvents);
+
+        return ResponseEntity.ok(eventsDto);
+    }
+
+    private List<EventListResponseDto> mapEventToEventListResponseDto(List<? extends Event> allEvents) {
         List<EventListResponseDto> eventsDto = allEvents.stream().map(event -> switch (event.getEventType()) {
             case EVENT -> EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
             case INTERNAL_EVENT ->
@@ -46,8 +76,7 @@ public class EventController {
             case EXTERNAL_EVENT ->
                     EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
         }).toList();
-        log.info("EventController - getAllEvents() return {}", eventsDto);
-        return ResponseEntity.ok(eventsDto);
+        return eventsDto;
     }
 
     @GetMapping("/events/{eventId}")

@@ -27,4 +27,17 @@ class EventServiceTest {
         assertFalse(allEvents.isEmpty());
         assertEquals(allEvents.get(0).getEventType(), EventType.EVENT);
     }
+
+    @Test
+    void getAllEventsByEventOwnerBasicUserIdTest() {
+        // GIVEN
+        Long userId = 1L;
+
+        // WHEN
+        List<? extends Event> allEventOwnerEvents = eventService.getAllEventsByEventOwnerBasicUserId(userId);
+
+        // THEN
+        assertFalse(allEventOwnerEvents.isEmpty());
+        assertEquals(allEventOwnerEvents.get(0).getEventOwner().getUserId(), userId);
+    }
 }
