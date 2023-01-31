@@ -9,6 +9,7 @@ public enum AddressComponentTypes {
     COUNTRY("country");
 
     private final String description;
+
     AddressComponentTypes(String description) {
         this.description = description;
     }

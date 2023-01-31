@@ -1,6 +1,5 @@
 package pl.envelo.moovelo.repository.event;
 
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Repository;
 import pl.envelo.moovelo.entity.events.CyclicEvent;
 

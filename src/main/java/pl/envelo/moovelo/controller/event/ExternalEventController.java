@@ -9,11 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
-import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
-import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.service.event.ExternalEventService;
-import pl.envelo.moovelo.service.event.InternalEventService;
 
 import java.util.List;
 

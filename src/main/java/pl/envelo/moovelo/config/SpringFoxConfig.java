@@ -1,4 +1,4 @@
-package pl.envelo.moovelo.entity.actors.config;
+package pl.envelo.moovelo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,7 +1,6 @@
 package pl.envelo.moovelo.entity.events;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.Hashtag;
@@ -29,7 +28,7 @@ public class Event {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private EventOwner eventOwner;
 
-    @OneToOne (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private EventInfo eventInfo;
 
     private int limitedPlaces;

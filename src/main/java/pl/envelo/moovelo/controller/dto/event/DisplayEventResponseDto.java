@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import pl.envelo.moovelo.controller.dto.HashtagListResponseDto;
-import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.participation.EventParticipationStatsDto;
 import pl.envelo.moovelo.controller.dto.group.groupownership.GroupResponseDto;
