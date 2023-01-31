@@ -31,7 +31,7 @@ public class InternalEventService {
         return allInternalEvents;
     }
 
-    List <? extends Event> getAllInternalEventsByGroupId(Long id){
+    public List <? extends Event> getAllInternalEventsByGroupId(Long id){
         log.info("InternalEventService - getAllInternalEventsByGroupId()");
         List<? extends Event> allInternalEvents = internalEventRepository.findByGroupId(id);
 

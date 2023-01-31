@@ -44,4 +44,20 @@ public class InternalEventController {
         log.info("InternalEventController - getAllInternalEvents() return {}", internalEventsDto);
         return ResponseEntity.ok(internalEventsDto);
     }
-}
+
+        @GetMapping("/internalEvents/groups/{groupId}")
+        public ResponseEntity<List<EventListResponseDto>> getAllInternalEventsByGroupId(Long groupId) {
+            log.info("InternalEventController - getAllInternalEventsByGroupId()");
+            List<? extends Event> allInternalEvents = internalEventService.getAllInternalEventsByGroupId(groupId);
+
+            List<EventListResponseDto> internalEventsDto = allInternalEvents.stream().map(internalEvent -> switch (internalEvent.getEventType()) {
+                case INTERNAL_EVENT -> EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) internalEvent);
+                case CYCLIC_EVENT -> EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) internalEvent);
+                default -> throw new IllegalEventException("Unexpected value: " + internalEvent.getEventType());
+            }).toList();
+
+            log.info("InternalEventController - getAllInternalEventsByGroupId() return {}", internalEventsDto);
+            return ResponseEntity.ok(internalEventsDto);
+        }
+    }
+
