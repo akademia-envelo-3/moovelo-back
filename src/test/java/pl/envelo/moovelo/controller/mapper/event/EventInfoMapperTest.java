@@ -29,7 +29,6 @@ class EventInfoMapperTest {
         location.setStreet("Kubusia Puchatka");
         location.setStreetNumber("40");
         location.setApartmentNumber("10");
-
         EventInfo eventInfo = new EventInfo();
         eventInfo.setId(5L);
         eventInfo.setName("kulig bez śniegu");

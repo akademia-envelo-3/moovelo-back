@@ -29,6 +29,16 @@ public class EventService {
         return allEvents;
     }
 
+    public Event getEventById(Long id) {
+        log.info("EventService - getEventById()");
+        Optional<? extends Event> eventOptional = eventRepository.findById(id);
+        if (eventOptional.isEmpty()) {
+            throw new NoSuchElementException("No event with id: " + id);
+        }
+        log.info("EventService - getEventById() return {}", eventOptional.get());
+        return eventOptional.get();
+    }
+
     public List<? extends Event> getAllEventsByEventNameContains(String name) {
         log.info("EventService - getAllEventsByEventNameContains(String name)");
         List<? extends Event> eventsByNameContains = eventRepository.findByEventInfoNameContainsIgnoreCase(name);
