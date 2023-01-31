@@ -1,6 +1,7 @@
 package pl.envelo.moovelo.controller.mapper.event;
 
 import pl.envelo.moovelo.controller.dto.event.EventInfoDto;
+import pl.envelo.moovelo.controller.mapper.CategoryListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.LocationMapper;
 import pl.envelo.moovelo.controller.mapper.category.CategoryMapper;
 import pl.envelo.moovelo.entity.events.EventInfo;
@@ -17,7 +18,7 @@ public class EventInfoMapper {
                 .eventId(eventInfo.getId())
                 .name(eventInfo.getName())
                 .description(eventInfo.getDescription())
-                .category(CategoryMapper.mapCategoryToCategoryDto(eventInfo.getCategory()))
+                .category(CategoryListResponseMapper.mapCategoryToCategoryListResponseDto(eventInfo.getCategory()))
                 .startDate(eventInfo.getStartDate().format(DATE_FORMAT))
                 .isConfirmationRequired(eventInfo.getIsConfirmationRequired())
                 .location(LocationMapper.mapFromLocationEntityToLocationDto(eventInfo.getLocation()))
@@ -35,7 +36,7 @@ public class EventInfoMapper {
         eventInfo.setStartDate(LocalDateTime.parse(eventInfoDto.getStartDate(), DATE_FORMAT));
         eventInfo.setLocation(LocationMapper.mapFromLocationDtoToLocationEntity(eventInfoDto.getLocation().getId(), eventInfoDto.getLocation()));
         eventInfo.setIsConfirmationRequired(eventInfoDto.isConfirmationRequired());
-        eventInfo.setCategory(CategoryMapper.mapCategoryDtoToCategory(eventInfoDto.getCategory()));
+        eventInfo.setCategory(CategoryMapper.mapCategoryResponseDtoToCategory(eventInfoDto.getCategory()));
         /// TODO: 26.01.2023
         //    eventInfo.setFiles(eventInfoDto.getAttachments().stream().map(attachmentDto -> AttachmentMapper.mapAttachmentDtoToAttachment(attachmentDto)));
         return eventInfo;
