@@ -10,6 +10,7 @@ import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.entity.groups.Group;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
@@ -34,7 +35,7 @@ public class BasicUser extends User {
     @ManyToMany
     private List<Group> groups;
 
-    @OneToMany
+    @ManyToMany(mappedBy = "acceptedStatusUsers")
     private List<Event> acceptedEvents;
 
     @Override

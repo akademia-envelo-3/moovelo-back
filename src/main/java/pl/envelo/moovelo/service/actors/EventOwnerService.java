@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.repository.event.EventOwnerRepository;
 
@@ -24,11 +23,11 @@ public class EventOwnerService {
      * Method check if location is assigned to any EventInfo. If list of EventInfos is empty,
      * then location entity is remove from database.
      */
-    public void checkIfEventOwnerContainsEvents(EventOwner eventOwner) {
-        log.info("EventOwnerService - checkIfEventOwnerContainsEvents() - eventOwner = {}", eventOwner);
+    public void removeEventOwnerWithNoEvents(EventOwner eventOwner) {
+        log.info("EventOwnerService - removeEventOwnerWithNoEvents() - eventOwner = {}", eventOwner);
         if (eventOwner.getEvents().isEmpty()) {
             eventOwnerRepository.delete(eventOwner);
-            log.info("EventOwnerService - checkIfEventOwnerContainsEvents() - eventOwner removed");
+            log.info("EventOwnerService - removeEventOwnerWithNoEvents() - eventOwner removed");
         }
     }
 }

@@ -37,19 +37,19 @@ public class Event {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<EventSurvey> eventSurveys;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.DETACH)
     private List<BasicUser> usersWithAccess;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.DETACH)
     private Set<BasicUser> acceptedStatusUsers;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.DETACH)
     private Set<BasicUser> pendingStatusUsers;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.DETACH)
     private Set<BasicUser> rejectedStatusUsers;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
             name = "events_hashtags",
             joinColumns = @JoinColumn(name = "event_id"),

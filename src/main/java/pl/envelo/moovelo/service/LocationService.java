@@ -23,11 +23,11 @@ public class LocationService {
      * Method check if location is assigned to any EventInfo. If list of EventInfos is empty,
      * then location entity is remove from database.
      */
-    public void checkIfLocationContainsEvents(Location location) {
-        log.info("LocationService - checkIfLocationContainsEvents() - location = {}", location);
+    public void removeLocationWithNoEvents(Location location) {
+        log.info("LocationService - removeLocationWithNoEvents() - location = {}", location);
         if (location.getEventsInfos().isEmpty()) {
             locationRepository.delete(location);
-            log.info("LocationService - checkIfLocationContainsEvents() - location removed");
+            log.info("LocationService - removeLocationWithNoEvents() - location removed");
         }
     }
 }
