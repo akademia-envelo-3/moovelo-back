@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 
@@ -82,5 +83,29 @@ class EventControllerTest {
         //then
         assertTrue(result.hasBody());
         assertEquals(result.getStatusCode(), HttpStatus.OK);
+    }
+
+    @Test
+    @Transactional
+    void getUsersWithAccessUnitTest() {
+        //given
+        Long eventId = 1L;
+
+        //when
+        ResponseEntity<List<BasicUserDto>> result = eventController.getUsersWithAccess(eventId);
+
+        //then
+        assertTrue(result.hasBody());
+        assertEquals(result.getStatusCode(), HttpStatus.OK);
+
+    }
+
+    @Test
+    void getUsersWithAccessPositiveTest() throws Exception {
+        mvc.perform(get("/api/v1/events/{eventId}/users", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].lastname", is("Bananek")));
     }
 }

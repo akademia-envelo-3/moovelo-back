@@ -47,7 +47,8 @@ public class EventService {
         log.info("EventService - getUsersWithAccess()");
         Event event = getEventById(eventId);
 
-        log.info("EventService - getUsersWithAccess() return {}", event.getUsersWithAccess());
-        return event.getUsersWithAccess();
+        List<BasicUser> userWithAccess = event.getUsersWithAccess();
+        log.info("EventService - getUsersWithAccess() return {}", userWithAccess);
+        return userWithAccess;
     }
 }
