@@ -8,10 +8,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
+import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
+import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.CyclicEvent;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
@@ -19,6 +22,7 @@ import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.service.event.EventService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -65,5 +69,16 @@ public class EventController {
         }
         log.info("EventController - getEventById() return {}", displayEventResponseDto);
         return displayEventResponseDto == null ? ResponseEntity.badRequest().build() : ResponseEntity.ok(displayEventResponseDto);
+    }
+
+    @GetMapping("/events/{eventId}/users")
+    public ResponseEntity<List<BasicUserDto>> getUsersWithAccess(@PathVariable Long eventId) {
+        log.info("EventController - getUsersWithAccess");
+        List<BasicUser> usersWithAccess = eventService.getUsersWithAccess(eventId);
+
+        List<BasicUserDto> usersWithAccessDto = usersWithAccess.stream().map(BasicUserMapper::map).toList();
+
+        log.info("EventController - getUsersWithAccess() return {}", usersWithAccessDto);
+        return ResponseEntity.ok(usersWithAccessDto);
     }
 }

@@ -37,7 +37,12 @@ public class Event {
     @OneToMany(mappedBy = "event")
     private List<EventSurvey> eventSurveys;
 
-    @OneToMany
+    @ManyToMany
+    @JoinTable(
+            name = "events_usersWithAccess",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private List<BasicUser> usersWithAccess;
 
     @OneToMany
