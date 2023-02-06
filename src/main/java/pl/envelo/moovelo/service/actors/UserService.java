@@ -28,4 +28,14 @@ public class UserService implements UserDetailsService {
 
         return userOptional.get();
     }
+
+    public User getUserByEmail(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+
+        if (userOptional.isEmpty()) {
+            throw new UsernameNotFoundException("Not found!");
+        }
+
+        return userOptional.get();
+    }
 }
