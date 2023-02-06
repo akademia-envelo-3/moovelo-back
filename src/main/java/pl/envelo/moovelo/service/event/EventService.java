@@ -33,6 +33,14 @@ public class EventService {
         return allEvents;
     }
 
+    public List<? extends Event> getAllEventsByEventOwnerBasicUserId(Long basicUserId) {
+        log.info("EventService - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
+        List<? extends Event> events = eventRepository.findByEventOwner_UserId(basicUserId);
+
+        log.info("EventService - getAllEventsByEventOwnerBasicUserId() return {}", events);
+        return events;
+    }
+
     public Event getEventById(Long id) {
         log.info("EventService - getEventById()");
         Optional<? extends Event> eventOptional = eventRepository.findById(id);
