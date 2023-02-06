@@ -4,13 +4,13 @@ import lombok.Builder;
 import lombok.Getter;
 import pl.envelo.moovelo.entity.actors.Role;
 
+import java.util.Set;
+
 @Getter
 @Builder
 public class UserDto {
     private long id;
     private String email;
     private String password;
-    private Role role;
-
-
+    private Set<Role> role;
 }
