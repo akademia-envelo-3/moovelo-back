@@ -5,7 +5,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -19,6 +21,7 @@ public class EventOwner {
 
     private Long userId;
 
-    @OneToMany(mappedBy = "eventOwner")
-    private List<Event> events;
+    @OneToMany(mappedBy = "eventOwner", cascade = CascadeType.ALL)
+    private Set<Event> events;
+
 }

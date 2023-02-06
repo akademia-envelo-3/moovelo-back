@@ -10,8 +10,6 @@ import pl.envelo.moovelo.controller.mapper.group.GroupResponseMapper;
 import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.entity.groups.Group;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.stream.Collectors;
 
 public class EventMapper implements EventMapperInterface {
@@ -26,11 +24,11 @@ public class EventMapper implements EventMapperInterface {
         event.setEventOwner(new EventOwner());
         event.setEventInfo(EventInfoMapper.mapEventInfoDtoToEventInfo(eventRequestDto.getEventInfo()));
         event.setLimitedPlaces(eventRequestDto.getLimitedPlaces());
-        event.setComments(new ArrayList<>());
-        event.setUsersWithAccess(new ArrayList<>());
-        event.setAcceptedStatusUsers(new HashSet<>());
-        event.setRejectedStatusUsers(new HashSet<>());
-        event.setPendingStatusUsers(new HashSet<>());
+//        event.setComments(new ArrayList<>());
+//        event.setUsersWithAccess(new ArrayList<>());
+//        event.setAcceptedStatusUsers(new HashSet<>());
+//        event.setRejectedStatusUsers(new HashSet<>());
+//        event.setPendingStatusUsers(new HashSet<>());
         event.setHashtags(eventRequestDto.getHashtags().stream()
                 .map(HashtagListResponseMapper::mapHashTagDtoToHashtag)
                 .collect(Collectors.toList())

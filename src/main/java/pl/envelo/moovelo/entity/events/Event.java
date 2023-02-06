@@ -25,7 +25,7 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL)
     private EventOwner eventOwner;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -61,4 +61,22 @@ public class Event {
 
     @Enumerated(value = EnumType.STRING)
     private EventType eventType;
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", eventOwner=" + eventOwner +
+                ", eventInfo=" + eventInfo +
+                ", limitedPlaces=" + limitedPlaces +
+                ", comments=" + comments +
+                ", eventSurveys=" + eventSurveys +
+                ", usersWithAccess=" + usersWithAccess +
+                ", acceptedStatusUsers=" + acceptedStatusUsers +
+                ", pendingStatusUsers=" + pendingStatusUsers +
+                ", rejectedStatusUsers=" + rejectedStatusUsers +
+                ", hashtags=" + hashtags +
+                ", eventType=" + eventType +
+                '}';
+    }
 }

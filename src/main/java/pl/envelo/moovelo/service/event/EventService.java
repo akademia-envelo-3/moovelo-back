@@ -2,12 +2,17 @@ package pl.envelo.moovelo.service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.entity.events.Event;
+import pl.envelo.moovelo.repository.event.EventOwnerRepository;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityExistsException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -17,6 +22,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class EventService {
+    private final EventOwnerRepository eventOwnerRepository;
     private final static String EVENT_EXIST_MESSAGE = "Entity exists in Database";
     private EventRepository<Event> eventRepository;
     private final EventInfoService eventInfoService;
@@ -31,13 +37,14 @@ public class EventService {
         return allEvents;
     }
 
-    public void createNewEvent(Event event, Long userId) {
+    @Transactional
+    public Event createNewEvent(Event event, Long userId) {
         log.info("EventService - createNewEvent()");
         if (checkIfEntityExist(event)) {
             throw new EntityExistsException(EVENT_EXIST_MESSAGE);
         } else {
-            Event eventAfterFieldValidation = checkIfAggregatedEntitiesExistInDatabase(event, userId);
-            eventRepository.save(eventAfterFieldValidation);
+            Event eventAfterFieldValidation = validateAggregatedEntities(event, userId);
+            return eventRepository.save(eventAfterFieldValidation);
         }
     }
 
@@ -58,17 +65,15 @@ public class EventService {
         return eventRepository.findById(event.getId()).isPresent();
     }
 
-    private Event checkIfAggregatedEntitiesExistInDatabase(Event event, Long userId) {
+    private Event validateAggregatedEntities(Event event, Long userId) {
         Event eventWithFieldsAfterValidation = new Event();
-        eventWithFieldsAfterValidation
-                .setEventOwner(eventOwnerService.createNewEventOwner(userId));
+        eventWithFieldsAfterValidation.setEventOwner(eventOwnerService.assignEventOwnerToCurrentEvent(userId));
         eventWithFieldsAfterValidation
                 .setEventInfo(eventInfoService.getEventInfoWithLocationCoordinates(event.getEventInfo()));
         eventWithFieldsAfterValidation.setLimitedPlaces(event.getLimitedPlaces());
         eventWithFieldsAfterValidation.setHashtags(hashTagService.validateHashtags(event.getHashtags()));
         return eventWithFieldsAfterValidation;
     }
-
 }
 
 

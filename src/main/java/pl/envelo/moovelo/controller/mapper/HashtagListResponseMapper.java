@@ -15,12 +15,11 @@ public class HashtagListResponseMapper {
     }
 
     //TODO w ktoryms miejscu trzeba zweryfikowac z repo
+    //TODO Edit: Nigdy nie stworzymy hasztaga bez Eventu?
     public static Hashtag mapHashTagDtoToHashtag(HashtagDto hashtagDto) {
         Hashtag hashtag = new Hashtag();
         hashtag.setHashtagValue(hashtagDto.getValue());
-        hashtag.setVisible(true);
+//        hashtag.setVisible(true);  TODO nie powinno sie tego ustawiac?
         return hashtag;
     }
-
-
 }

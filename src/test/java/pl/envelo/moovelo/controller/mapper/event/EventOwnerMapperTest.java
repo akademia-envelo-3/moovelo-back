@@ -7,6 +7,7 @@ import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventOwner;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -26,7 +27,7 @@ class EventOwnerMapperTest {
         event.setId(40L);
         Event event1 = new Event();
         event1.setId(50L);
-        eventOwner.setEvents(List.of(event, event1));
+        eventOwner.setEvents(Set.of(event, event1));
         EventOwnerDto eventOwnerExpectedDto = EventOwnerDto.builder()
                 .id(10L)
                 .firstname("John")

@@ -8,12 +8,16 @@ import pl.envelo.moovelo.repository.event.EventOwnerRepository;
 @AllArgsConstructor
 @Service
 public class EventOwnerService {
-
     private final EventOwnerRepository eventOwnerRepository;
 
-    public EventOwner createNewEventOwner(Long userId) {
-        EventOwner eventOwnerBasedOnBasicUser = createEventOwnerBasedOnExistingUser(userId);
-        eventOwnerRepository.save(eventOwnerBasedOnBasicUser);
+    public EventOwner assignEventOwnerToCurrentEvent(Long userId) {
+        EventOwner eventOwnerBasedOnBasicUser;
+
+        if (eventOwnerRepository.findEventOwnerByUserId(userId) == null) {
+            eventOwnerBasedOnBasicUser = createEventOwnerBasedOnExistingUser(userId);
+        } else {
+            eventOwnerBasedOnBasicUser = assignExistingEventOwnerBasedOnUser(userId);
+        }
         return eventOwnerBasedOnBasicUser;
     }
 
@@ -21,5 +25,9 @@ public class EventOwnerService {
         EventOwner eventOwner = new EventOwner();
         eventOwner.setUserId(userId);
         return eventOwner;
+    }
+
+    private EventOwner assignExistingEventOwnerBasedOnUser(Long userId) {
+        return eventOwnerRepository.findEventOwnerByUserId(userId);
     }
 }

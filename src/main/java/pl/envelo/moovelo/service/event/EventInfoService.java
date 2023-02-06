@@ -13,7 +13,8 @@ public class EventInfoService {
 
     public EventInfo getEventInfoWithLocationCoordinates(EventInfo eventInfo) {
         Location locationBeforeGeocodingApiRequest = eventInfo.getLocation();
-        Location locationAfterGeocodingApiRequest = locationService.getLocationFromGeocodingApi(locationBeforeGeocodingApiRequest);
+        Location locationAfterGeocodingApiRequest =
+                locationService.getLocationFromGeocodingApi(locationBeforeGeocodingApiRequest);
         eventInfo.setLocation(locationAfterGeocodingApiRequest);
         return eventInfo;
     }

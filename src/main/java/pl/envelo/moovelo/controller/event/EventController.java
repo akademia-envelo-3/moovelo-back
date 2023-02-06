@@ -1,8 +1,11 @@
 package pl.envelo.moovelo.controller.event;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
@@ -12,21 +15,29 @@ import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
 import pl.envelo.moovelo.entity.events.*;
+import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.event.EventService;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @RestController
 @RequestMapping("api/v1")
 @Slf4j
 public class EventController {
 
     //    TODO : Tymaczasowa imitacja ID usera wyciaganego z contextu
-    private final static Long USER_ID = 1L;
-
-    @Autowired
+    private final static Long USER_ID = 2L;
     private EventService eventService;
+    private EventRepository<Event> eventRepository;
+
+    @GetMapping(("/eventsByEventOwnerId"))
+    public void findAllEventsByEventOwner() {
+        for (Event event : eventRepository.findAllByEventOwnerId(2L)) {
+            System.out.println(event);
+        }
+    }
 
     @PostMapping("/events")
     public void createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
