@@ -1,11 +1,7 @@
 package pl.envelo.moovelo.controller.event;
 
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
@@ -18,7 +14,6 @@ import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.event.EventService;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 @AllArgsConstructor
@@ -40,11 +35,13 @@ public class EventController {
     }
 
     @PostMapping("/events")
-    public void createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
+    public DisplayEventResponseDto createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
         log.info("EventController - createNewEvent()");
         EventMapperInterface eventMapper = new EventMapper();
         Event event = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.EVENT);
-        eventService.createNewEvent(event, USER_ID);
+        Event newEvent = eventService.createNewEvent(event, USER_ID);
+
+        return EventMapper.mapEventToEventResponseDto(newEvent);
     }
 
     @GetMapping("/events")

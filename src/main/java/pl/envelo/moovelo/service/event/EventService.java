@@ -7,6 +7,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.entity.events.Event;
+import pl.envelo.moovelo.repository.actors.BasicUserRepository;
+import pl.envelo.moovelo.repository.actors.UserRepository;
 import pl.envelo.moovelo.repository.event.EventOwnerRepository;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.HashTagService;
@@ -22,6 +24,8 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class EventService {
+    private final UserRepository userRepository;
+    private final BasicUserRepository basicUserRepository;
     private final EventOwnerRepository eventOwnerRepository;
     private final static String EVENT_EXIST_MESSAGE = "Entity exists in Database";
     private EventRepository<Event> eventRepository;
@@ -70,7 +74,9 @@ public class EventService {
         eventWithFieldsAfterValidation.setEventOwner(eventOwnerService.assignEventOwnerToCurrentEvent(userId));
         eventWithFieldsAfterValidation
                 .setEventInfo(eventInfoService.getEventInfoWithLocationCoordinates(event.getEventInfo()));
+        eventWithFieldsAfterValidation.setEventInfo(eventInfoService.checkIfCategoryExists(event.getEventInfo()));
         eventWithFieldsAfterValidation.setLimitedPlaces(event.getLimitedPlaces());
+//        eventWithFieldsAfterValidation.setUsersWithAccess(basicUserRepository.findAll());
         eventWithFieldsAfterValidation.setHashtags(hashTagService.validateHashtags(event.getHashtags()));
         return eventWithFieldsAfterValidation;
     }

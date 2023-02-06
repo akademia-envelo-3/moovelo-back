@@ -52,7 +52,8 @@ public class EventMapper implements EventMapperInterface {
                 .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()))
                 .eventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(event.getEventInfo()))
                 .limitedPlaces(event.getLimitedPlaces())
-                .eventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(event))
+                //TODO Wysypuje blad
+//                .eventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(event))
                 .isPrivate(false)
                 .isCyclic(false)
                 .group(null)

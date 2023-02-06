@@ -9,7 +9,6 @@ import java.util.List;
 
 @Builder
 @Getter
-
 public class EventParticipationStatsDto {
     private List<BasicUserDto> accepted;
     private List<BasicUserDto> pending;

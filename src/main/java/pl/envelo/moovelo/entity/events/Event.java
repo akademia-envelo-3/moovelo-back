@@ -40,15 +40,15 @@ public class Event {
     private List<EventSurvey> eventSurveys;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<BasicUser> usersWithAccess;
+    private Set<BasicUser> usersWithAccess;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<BasicUser> acceptedStatusUsers;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<BasicUser> pendingStatusUsers;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<BasicUser> rejectedStatusUsers;
 
     @ManyToMany(cascade = CascadeType.ALL)
