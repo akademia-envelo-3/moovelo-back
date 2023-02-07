@@ -83,10 +83,12 @@ public class EventController {
 
     @DeleteMapping("/events/{eventId}")
     @PreAuthorize("hasRole('BASIC_USER')")
-    public ResponseEntity removeEventById(@PathVariable long eventId) throws IllegalAccessException {
+    public ResponseEntity<?> removeEventById(@PathVariable long eventId) throws IllegalAccessException {
         log.info("EventController - removeEventById() - eventId = {}", eventId);
 
         //TODO: Do sprawdzenia przy spring security
+        //TODO: Uswuwanie usuwa również grupy!
+        //TODO: Po zmianie struktury encji zmienić sposób usuwania
         /*Event event = eventService.getEventById(eventId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         BasicUser basicUser = (BasicUser) authentication.getPrincipal();

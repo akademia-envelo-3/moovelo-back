@@ -49,7 +49,7 @@ public class Event {
     @OneToMany(cascade = CascadeType.DETACH)
     private Set<BasicUser> rejectedStatusUsers;
 
-    @ManyToMany(cascade = CascadeType.DETACH)
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
     @JoinTable(
             name = "events_hashtags",
             joinColumns = @JoinColumn(name = "event_id"),
