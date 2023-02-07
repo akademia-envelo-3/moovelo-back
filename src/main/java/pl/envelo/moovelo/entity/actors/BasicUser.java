@@ -6,7 +6,6 @@ import lombok.Setter;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.categories.CategoryProposal;
 import pl.envelo.moovelo.entity.events.Event;
-import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.entity.groups.Group;
 
 import javax.persistence.Entity;
@@ -21,9 +20,6 @@ import java.util.Objects;
 @Setter
 public class BasicUser extends User {
 
-//    @OneToMany
-//    private List<InternalEvent> accessiblePrivateEvents;
-
     @OneToMany(mappedBy = "basicUser")
     private List<CategoryProposal> categoryProposals;
 
@@ -32,11 +28,13 @@ public class BasicUser extends User {
 
     @ManyToMany
     private List<Group> groups;
+    @ManyToMany(mappedBy = "usersWithAccess")
+    private List<Event> accessibleEvents;
 
     @OneToMany
     private List<Event> acceptedEvents;
-    private List<Event> acceptedEvents;
-    private List<Event> acceptedEvents;
+//    private List<Event> acceptedEvents;
+//    private List<Event> acceptedEvents;
 
     @Override
     public boolean equals(Object o) {
