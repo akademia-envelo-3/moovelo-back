@@ -1,4 +1,4 @@
-package pl.envelo.moovelo.service.group;
+package pl.envelo.moovelo.controller.group;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

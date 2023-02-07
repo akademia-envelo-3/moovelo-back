@@ -9,10 +9,6 @@ import java.util.List;
 @Builder
 @Getter
 public class CommentDto {
-    private long id;
-    private long commentId;
     private BasicUserDto user;
-    private String date;
     private String text;
-    private List<AttachmentDto> attachments;
 }

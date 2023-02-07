@@ -3,10 +3,15 @@ package pl.envelo.moovelo.service.event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import pl.envelo.moovelo.entity.Comment;
+import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.Event;
+import pl.envelo.moovelo.repository.CommentRepository;
 import pl.envelo.moovelo.repository.event.EventRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -17,10 +22,12 @@ import java.util.Optional;
 public class EventService {
 
     private EventRepository eventRepository;
+    private CommentRepository commentRepository;
 
     @Autowired
-    public EventService(EventRepository eventRepository) {
+    public EventService(EventRepository eventRepository, CommentRepository commentRepository) {
         this.eventRepository = eventRepository;
+        this.commentRepository = commentRepository;
     }
 
     public List<? extends Event> getAllEvents() {
@@ -47,5 +54,18 @@ public class EventService {
         }
         log.info("EventService - getEventById() return {}", eventOptional.get());
         return eventOptional.get();
+    }
+
+    public List<Comment> getAllComments(Event event){
+        log.info("EventService - getAllComments()");
+        List<Comment> comments = commentRepository.findAllByEvent(event);
+
+        if (comments.isEmpty()) {
+            throw new NoSuchElementException("No comments for Event with id: " + event.getId());
+        }
+
+        log.info("EventService - getAllComments() return {}", comments);
+        return comments;
+
     }
 }

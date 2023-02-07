@@ -5,20 +5,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+import pl.envelo.moovelo.controller.dto.CommentDto;
+import pl.envelo.moovelo.controller.dto.EventDto;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
+import pl.envelo.moovelo.controller.mapper.CommentMapper;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
+import pl.envelo.moovelo.entity.Comment;
+import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.CyclicEvent;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.entity.events.InternalEvent;
+import pl.envelo.moovelo.service.CommentService;
 import pl.envelo.moovelo.service.event.EventService;
+import springfox.documentation.spi.service.contexts.SecurityContext;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -28,11 +35,14 @@ import java.util.List;
 public class EventController {
 
     private EventService eventService;
+    private CommentService commentService;
 
     @Autowired
-    public EventController(EventService eventService) {
+    public EventController(EventService eventService, CommentService commentService) {
         this.eventService = eventService;
+        this.commentService = commentService;
     }
+
 
     @GetMapping("/events")
     public ResponseEntity<List<EventListResponseDto>> getAllEvents() {
@@ -94,5 +104,31 @@ public class EventController {
         }
         log.info("EventController - getEventById() return {}", displayEventResponseDto);
         return displayEventResponseDto == null ? ResponseEntity.badRequest().build() : ResponseEntity.ok(displayEventResponseDto);
+    }
+
+    @GetMapping("/events/{eventId}/comments")
+    public ResponseEntity<List<Comment>> getAllComments(@PathVariable Long eventId){
+        log.info("EventController - getAllComments()");
+        Event eventById = eventService.getEventById(eventId);
+
+        List<Comment> comments = eventService.getAllComments(eventById);
+        return ResponseEntity.ok(comments);
+    }
+
+    @PostMapping("/events/{eventId}/comments")
+    public ResponseEntity<?> addCommentWithoutAttachmentToEvent(@PathVariable Long eventId, CommentDto commentDto){
+        log.info("EventController - addCommentToEvent()");
+        Event eventById = eventService.getEventById(eventId);
+        BasicUser basicUser = (BasicUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Comment comment = new Comment();
+        comment.setEvent(eventById);
+        comment.setBasicUser(basicUser);
+        comment.setText(commentDto.getText());
+        comment.setDate(LocalDateTime.now());
+
+        Comment savedComment = commentService.addComment(comment);
+        CommentDto newCommentDto = CommentMapper.mapFromCommentToCommentDto(savedComment);
+
+        return ResponseEntity.ok(newCommentDto);
     }
 }
