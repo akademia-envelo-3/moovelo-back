@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import pl.envelo.moovelo.Constants;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -36,7 +37,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 try {
                     String token = authorizationHeader.substring("Bearer ".length());
-                    Algorithm algorithm = Algorithm.HMAC256("moovelo".getBytes());
+                    Algorithm algorithm = Algorithm.HMAC256(Constants.SECRET_KEY_FOR_JWT_ALGORITHM.getBytes());
                     JWTVerifier verifier = JWT.require(algorithm).build();
                     DecodedJWT decodedJwt = verifier.verify(token);
                     String username = decodedJwt.getSubject();
@@ -53,7 +54,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     Map<String, String> error = new HashMap<>();
                     error.put("error_message", exception.getMessage());
-                    response.setContentType("Application/json");
+                    response.setContentType(Constants.RESPONSE_CONTENT_TYPE);
                     new ObjectMapper().writeValue(response.getOutputStream(), error);
                 }
             } else {

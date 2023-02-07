@@ -26,6 +26,6 @@ class UserMapperTest {
         assertEquals(dto.getId(), entity.getId());
         assertEquals(dto.getEmail(), entity.getEmail());
         assertEquals(dto.getPassword(), entity.getPassword());
-        assertEquals(dto.getRole(), entity.getRole());
+        assertEquals(dto.getRole(), entity.getRoles());
     }
 }

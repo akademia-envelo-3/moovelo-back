@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,10 +15,12 @@ import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
+import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.CyclicEvent;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.entity.events.InternalEvent;
+import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.event.EventService;
 
 import java.util.List;
@@ -46,19 +50,18 @@ public class EventController {
     }
 
     @GetMapping("events/eventOwners/{userId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('BASIC_USER')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<List<EventListResponseDto>> getAllEventsByEventOwnerBasicUserId(@PathVariable("userId") Long basicUserId) {
         log.info("EventController - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
 
-        //TODO: Sprawdzić zachowanie po ogarnięciu Spring Security w aplikacji
-        /*Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("BASIC_USER"))) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
             BasicUser user = (BasicUser) auth.getPrincipal();
 
             if (!user.getId().equals(basicUserId)) {
                 throw new UnauthorizedRequestException("The ID you passed does not belong to your account");
             }
-        }*/
+        }
 
         List<? extends Event> allEvents = eventService.getAllEventsByEventOwnerBasicUserId(basicUserId);
 
