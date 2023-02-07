@@ -8,8 +8,6 @@ import java.util.Objects;
 @Getter
 @Builder
 public class VisitorDto {
-
-    private Long id;
     private String firstname;
     private String lastname;
     private String email;
@@ -19,12 +17,13 @@ public class VisitorDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         VisitorDto that = (VisitorDto) o;
-        return Objects.equals(id, that.id) && Objects.equals(firstname, that.firstname)
-                && Objects.equals(lastname, that.lastname) && Objects.equals(email, that.email);
+        return Objects.equals(firstname, that.firstname)
+                && Objects.equals(lastname, that.lastname)
+                && Objects.equals(email, that.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstname, lastname, email);
+        return Objects.hash(firstname, lastname, email);
     }
 }

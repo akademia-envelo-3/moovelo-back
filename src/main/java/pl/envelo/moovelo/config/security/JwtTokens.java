@@ -23,7 +23,7 @@ public class JwtTokens {
     public static String createRefreshToken(User user, HttpServletRequest request, Algorithm algorithm) {
         return JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + Constants.ACCESS_TOKEN_DURATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Constants.RESET_TOKEN_DURATION_TIME))
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
     }
