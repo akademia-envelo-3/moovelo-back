@@ -2,19 +2,15 @@ package pl.envelo.moovelo.service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.entity.events.Event;
-import pl.envelo.moovelo.repository.actors.BasicUserRepository;
-import pl.envelo.moovelo.repository.actors.UserRepository;
 import pl.envelo.moovelo.repository.event.EventOwnerRepository;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.HashTagService;
+import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.EntityExistsException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -24,14 +20,13 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class EventService {
-    private final UserRepository userRepository;
-    private final BasicUserRepository basicUserRepository;
     private final EventOwnerRepository eventOwnerRepository;
     private final static String EVENT_EXIST_MESSAGE = "Entity exists in Database";
     private EventRepository<Event> eventRepository;
     private final EventInfoService eventInfoService;
     private final EventOwnerService eventOwnerService;
     private final HashTagService hashTagService;
+    private final BasicUserService basicUserService;
 
     public List<? extends Event> getAllEvents() {
         log.info("EventService - getAllEvents()");
@@ -76,7 +71,7 @@ public class EventService {
                 .setEventInfo(eventInfoService.getEventInfoWithLocationCoordinates(event.getEventInfo()));
         eventWithFieldsAfterValidation.setEventInfo(eventInfoService.checkIfCategoryExists(event.getEventInfo()));
         eventWithFieldsAfterValidation.setLimitedPlaces(event.getLimitedPlaces());
-//        eventWithFieldsAfterValidation.setUsersWithAccess(basicUserRepository.findAll());
+        eventWithFieldsAfterValidation.setUsersWithAccess(basicUserService.getAllBasicUsers());
         eventWithFieldsAfterValidation.setHashtags(hashTagService.validateHashtags(event.getHashtags()));
         return eventWithFieldsAfterValidation;
     }

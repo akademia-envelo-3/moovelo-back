@@ -8,6 +8,8 @@ import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.surveys.EventSurvey;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -40,7 +42,8 @@ public class Event {
     private List<EventSurvey> eventSurveys;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<BasicUser> usersWithAccess;
+    @JoinColumn(name = "event_id")
+    private List<BasicUser> usersWithAccess = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL)
     private Set<BasicUser> acceptedStatusUsers;

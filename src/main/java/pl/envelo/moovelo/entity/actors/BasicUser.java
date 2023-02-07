@@ -35,6 +35,8 @@ public class BasicUser extends User {
 
     @OneToMany
     private List<Event> acceptedEvents;
+    private List<Event> acceptedEvents;
+    private List<Event> acceptedEvents;
 
     @Override
     public boolean equals(Object o) {

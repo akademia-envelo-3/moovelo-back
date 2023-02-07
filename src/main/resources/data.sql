@@ -1,6 +1,8 @@
 INSERT INTO API_USER(EMAIL, FIRSTNAME, LASTNAME, LOGIN, PASSWORD, ROLE)
 VALUES ( 'jan.bananek@test.pl', 'Jan', 'Bananek', 'JBananek', 'okon', 'BASIC_USER');
 
+
+
 INSERT INTO BASIC_USER(ID) VALUES ( 1 );
 
 INSERT INTO CATEGORY(NAME, VISIBLE) VALUES ('Sport', true);
