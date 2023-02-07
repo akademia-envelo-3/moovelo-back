@@ -27,9 +27,9 @@ class EventParticipationStatsMapperTest {
         event.setPendingStatusUsers(createPending());
         event.setRejectedStatusUsers(createRejected());
         EventParticipationStatsDto expectedEventParticipationStatsDto = EventParticipationStatsDto.builder()
-                .accepted(createAccepted().stream().map(BasicUserMapper::map).collect(Collectors.toList()))
-                .pending(createPending().stream().map(BasicUserMapper::map).collect(Collectors.toList()))
-                .rejected(createRejected().stream().map(BasicUserMapper::map).collect(Collectors.toList()))
+                .accepted(createAccepted().stream().map(BasicUserMapper::map).collect(Collectors.toSet()))
+                .pending(createPending().stream().map(BasicUserMapper::map).collect(Collectors.toSet()))
+                .rejected(createRejected().stream().map(BasicUserMapper::map).collect(Collectors.toSet()))
                 .build();
 
         //when

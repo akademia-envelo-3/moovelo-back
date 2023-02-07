@@ -42,6 +42,7 @@ public class EventService {
         if (checkIfEntityExist(event)) {
             throw new EntityExistsException(EVENT_EXIST_MESSAGE);
         } else {
+            //TODO Stworzonych hasztagow nie chcemy zwracac?
             Event eventAfterFieldValidation = validateAggregatedEntities(event, userId);
             return eventRepository.save(eventAfterFieldValidation);
         }

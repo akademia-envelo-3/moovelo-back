@@ -13,35 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 @Service
 public class HashTagService {
+    private static final int INCREMENT_HASHTAG_OCCURRENCE = 1;
     private final HashtagRepository hashtagRepository;
 
-    private static final int INCREMENT_HASHTAG_OCCURRENCE = 1;
-
-    @EventListener(ApplicationReadyEvent.class)
-    public void createData() {
-        Hashtag hashtag1 = new Hashtag();
-        hashtag1.setHashtagValue("Kultura");
-        hashtag1.setVisible(true);
-        hashtag1.setOccurrences(1);
-
-        Hashtag hashtag2 = new Hashtag();
-        hashtag2.setHashtagValue("Picie Wódki");
-        hashtag2.setVisible(false);
-
-        Hashtag hashtag3 = new Hashtag();
-        hashtag3.setHashtagValue("Najebmy się");
-        hashtag3.setVisible(false);
-
-        Hashtag hashtag4 = new Hashtag();
-        hashtag4.setHashtagValue("Spotkanie");
-        hashtag4.setVisible(true);
-        hashtag4.setOccurrences(1);
-
-        hashtagRepository.save(hashtag1);
-        hashtagRepository.save(hashtag2);
-        hashtagRepository.save(hashtag3);
-        hashtagRepository.save(hashtag4);
-    }
 
     public List<Hashtag> getAllVisibleHashtags() {
         return hashtagRepository.findHashtagsByVisibleIsTrue();

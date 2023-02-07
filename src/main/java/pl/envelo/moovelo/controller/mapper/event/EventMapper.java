@@ -6,6 +6,7 @@ import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.dto.group.groupownership.GroupResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventOwnerListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.HashtagListResponseMapper;
+import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.group.GroupResponseMapper;
 import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.entity.groups.Group;
@@ -20,7 +21,7 @@ public class EventMapper implements EventMapperInterface {
 
     @Override
     public <T extends Event> T mapEventRequestDtoToEventByEventType(EventRequestDto eventRequestDto, EventType eventType) {
-        T event = createEventByEventType(eventType);
+        T event = getEventByEventType(eventType);
         event.setEventOwner(new EventOwner());
         event.setEventInfo(EventInfoMapper.mapEventInfoDtoToEventInfo(eventRequestDto.getEventInfo()));
         event.setLimitedPlaces(eventRequestDto.getLimitedPlaces());
@@ -36,7 +37,7 @@ public class EventMapper implements EventMapperInterface {
         return event;
     }
 
-    private <T extends Event> T createEventByEventType(EventType eventType) {
+    private <T extends Event> T getEventByEventType(EventType eventType) {
         Event event = switch (eventType) {
             case EVENT -> new Event();
             case EXTERNAL_EVENT -> new ExternalEvent();
@@ -52,8 +53,9 @@ public class EventMapper implements EventMapperInterface {
                 .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()))
                 .eventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(event.getEventInfo()))
                 .limitedPlaces(event.getLimitedPlaces())
+                .usersWithAccess(event.getUsersWithAccess().stream().map(BasicUserMapper::map).collect(Collectors.toList()))
                 //TODO Wysypuje blad
-//                .eventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(event))
+                .eventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(event))
                 .isPrivate(false)
                 .isCyclic(false)
                 .group(null)

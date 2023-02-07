@@ -1,9 +1,14 @@
 package pl.envelo.moovelo.controller.event;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
@@ -14,6 +19,7 @@ import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.event.EventService;
 
+import java.net.URI;
 import java.util.List;
 
 @AllArgsConstructor
@@ -22,7 +28,7 @@ import java.util.List;
 @Slf4j
 public class EventController {
 
-    //    TODO : Tymaczasowa imitacja ID usera wyciaganego z contextu
+    //    TODO : Tymaczasowa imitacja ID usera wyciaganego z security
     private final static Long USER_ID = 2L;
     private EventService eventService;
     private EventRepository<Event> eventRepository;
@@ -35,13 +41,23 @@ public class EventController {
     }
 
     @PostMapping("/events")
-    public DisplayEventResponseDto createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
+    public ResponseEntity<DisplayEventResponseDto> createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
         log.info("EventController - createNewEvent()");
+        //TODO do powalczenia z wyborem Rodzaju eventu? albo usunac
         EventMapperInterface eventMapper = new EventMapper();
         Event event = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.EVENT);
         Event newEvent = eventService.createNewEvent(event, USER_ID);
+        DisplayEventResponseDto displayEventResponseDto = EventMapper.mapEventToEventResponseDto(newEvent);
 
-        return EventMapper.mapEventToEventResponseDto(newEvent);
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(newEvent.getId())
+                .toUri();
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .location(uri)
+                .body(displayEventResponseDto);
     }
 
     @GetMapping("/events")

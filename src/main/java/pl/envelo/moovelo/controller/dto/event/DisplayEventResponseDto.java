@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import pl.envelo.moovelo.controller.dto.HashtagListResponseDto;
+import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.participation.EventParticipationStatsDto;
 import pl.envelo.moovelo.controller.dto.group.groupownership.GroupResponseDto;
@@ -22,6 +23,7 @@ public class DisplayEventResponseDto {
     private boolean isPrivate;
     private GroupResponseDto group;
     private List<HashtagListResponseDto> hashtags;
+    private List<BasicUserDto> usersWithAccess;
     private EventParticipationStatsDto eventParticipationStats;
     private int frequencyInDays;
     private int numberOfRepeats;
