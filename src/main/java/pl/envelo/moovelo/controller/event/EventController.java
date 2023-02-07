@@ -16,11 +16,13 @@ import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;
+import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.CyclicEvent;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
+import pl.envelo.moovelo.service.actors.UserService;
 import pl.envelo.moovelo.service.event.EventService;
 
 import java.util.List;
@@ -32,13 +34,16 @@ import java.util.List;
 public class EventController {
 
     private EventService eventService;
+    private UserService userService;
 
     @Autowired
-    public EventController(EventService eventService) {
+    public EventController(EventService eventService, UserService userService) {
         this.eventService = eventService;
+        this.userService = userService;
     }
 
     @GetMapping("/events")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<EventListResponseDto>> getAllEvents() {
         log.info("EventController - getAllEvents()");
         List<? extends Event> allEvents = eventService.getAllEvents();
@@ -50,14 +55,14 @@ public class EventController {
     }
 
     @GetMapping("events/eventOwners/{userId}")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<List<EventListResponseDto>> getAllEventsByEventOwnerBasicUserId(@PathVariable("userId") Long basicUserId) {
         log.info("EventController - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
-            BasicUser user = (BasicUser) auth.getPrincipal();
-
+            String email = auth.getPrincipal().toString();
+            User user = userService.getUserByEmail(email);
             if (!user.getId().equals(basicUserId)) {
                 throw new UnauthorizedRequestException("The ID you passed does not belong to your account");
             }
@@ -82,7 +87,9 @@ public class EventController {
         return eventsDto;
     }
 
+    //TODO Sprawdzić czy user ma dostęp do tego wydarzenia
     @GetMapping("/events/{eventId}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<DisplayEventResponseDto> getEventById(@PathVariable Long eventId) {
         log.info("EventController - getEventById()");
         Event eventById = eventService.getEventById(eventId);

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.envelo.moovelo.Constants;
+import pl.envelo.moovelo.config.security.JwtTokens;
 import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.service.actors.UserService;
@@ -47,17 +48,8 @@ public class UserController {
                 DecodedJWT decodedJwt = verifier.verify(refreshToken);
                 String email = decodedJwt.getSubject();
                 User user = userService.getUserByEmail(email);
-                String accessToken = JWT.create()
-                        .withSubject(user.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + Constants.ACCESS_TOKEN_DURATION_TIME))
-                        .withIssuer(request.getRequestURL().toString())
-                        .withClaim("roles", user.getRoles().stream().map(Role::getAuthority).toList())
-                        .sign(algorithm);
-                refreshToken = JWT.create()
-                        .withSubject(user.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + Constants.RESET_TOKEN_DURATION_TIME))
-                        .withIssuer(request.getRequestURL().toString())
-                        .sign(algorithm);
+                String accessToken = JwtTokens.createAccessToken(user, request, algorithm);
+                refreshToken = JwtTokens.createRefreshToken(user, request, algorithm);
                 Map<String, String> tokens = new HashMap<>();
                 tokens.put("access_token", accessToken);
                 tokens.put("refresh_token", refreshToken);

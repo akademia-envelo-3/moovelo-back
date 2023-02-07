@@ -44,17 +44,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             throws IOException, ServletException {
         User user = (User) authResult.getPrincipal();
         Algorithm algorithm = Algorithm.HMAC256(Constants.SECRET_KEY_FOR_JWT_ALGORITHM.getBytes());
-        String accessToken = JWT.create()
-                .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + Constants.ACCESS_TOKEN_DURATION_TIME))
-                .withIssuer(request.getRequestURL().toString())
-                .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
-                .sign(algorithm);
-        String refreshToken = JWT.create()
-                .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + Constants.RESET_TOKEN_DURATION_TIME))
-                .withIssuer(request.getRequestURL().toString())
-                .sign(algorithm);
+        String accessToken = JwtTokens.createAccessToken(user, request, algorithm);
+        String refreshToken = JwtTokens.createRefreshToken(user, request, algorithm);
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access_token", accessToken);
         tokens.put("refresh_token", refreshToken);
