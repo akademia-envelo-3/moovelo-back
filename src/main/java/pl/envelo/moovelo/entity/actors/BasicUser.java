@@ -13,6 +13,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -31,10 +32,12 @@ public class BasicUser extends User {
     @ManyToMany(mappedBy = "usersWithAccess")
     private List<Event> accessibleEvents;
 
-    @OneToMany
-    private List<Event> acceptedEvents;
-//    private List<Event> acceptedEvents;
-//    private List<Event> acceptedEvents;
+    @ManyToMany(mappedBy = "acceptedStatusUsers")
+    private Set<Event> acceptedEvents;
+    @ManyToMany(mappedBy = "pendingStatusUsers")
+    private Set<Event> pendingEvents;
+    @ManyToMany(mappedBy = "rejectedStatusUsers")
+    private Set<Event> rejectedEvents;
 
     @Override
     public boolean equals(Object o) {

@@ -40,16 +40,19 @@ public class Event {
     private List<EventSurvey> eventSurveys;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "events_X_basic_users")
+    @JoinTable(name = "events_X_basic_users_access")
     private List<BasicUser> usersWithAccess;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "events_X_basic_users_accepted")
     private Set<BasicUser> acceptedStatusUsers;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "events_X_basic_users_pending")
     private Set<BasicUser> pendingStatusUsers;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "events_X_basic_users_rejected")
     private Set<BasicUser> rejectedStatusUsers;
 
     @ManyToMany(cascade = CascadeType.ALL)
