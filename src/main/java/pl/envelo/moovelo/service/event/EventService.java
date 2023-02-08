@@ -6,22 +6,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
-import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.Event;
-import pl.envelo.moovelo.repository.event.EventOwnerRepository;
 import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.exception.NoContentException;
+import pl.envelo.moovelo.repository.event.EventOwnerRepository;
 import pl.envelo.moovelo.repository.event.EventRepository;
-import pl.envelo.moovelo.service.HashTagService;
-import pl.envelo.moovelo.service.actors.BasicUserService;
-import pl.envelo.moovelo.service.actors.EventOwnerService;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.LocationService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 
 import javax.persistence.EntityExistsException;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -101,7 +96,6 @@ public class EventService {
         }
         log.info("EventService - removeEventById() - event with id = {} removed", id);
     }
-}
 
     private Event validateAggregatedEntities(Event event, Long userId) {
         Event eventWithFieldsAfterValidation = new Event();
