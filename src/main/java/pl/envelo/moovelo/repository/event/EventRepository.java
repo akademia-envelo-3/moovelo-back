@@ -9,6 +9,7 @@ import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.entity.events.EventType;
 
 import java.util.List;
+import java.util.Optional;
 
 @Primary
 @Repository

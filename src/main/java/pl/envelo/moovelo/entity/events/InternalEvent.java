@@ -5,10 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.envelo.moovelo.entity.groups.Group;
 
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -17,7 +14,7 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 public class InternalEvent extends Event {
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     private Group group;
 
     private boolean isPrivate;

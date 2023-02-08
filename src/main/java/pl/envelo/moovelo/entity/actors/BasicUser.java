@@ -29,13 +29,16 @@ public class BasicUser extends User {
 
     @ManyToMany
     private List<Group> groups;
-    @ManyToMany(mappedBy = "usersWithAccess")
+
+    @ManyToMany(mappedBy = "acceptedStatusUsers")
     private List<Event> accessibleEvents;
 
     @ManyToMany(mappedBy = "acceptedStatusUsers")
     private Set<Event> acceptedEvents;
+
     @ManyToMany(mappedBy = "pendingStatusUsers")
     private Set<Event> pendingEvents;
+
     @ManyToMany(mappedBy = "rejectedStatusUsers")
     private Set<Event> rejectedEvents;
 

@@ -4,14 +4,24 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.envelo.moovelo.entity.Hashtag;
+import pl.envelo.moovelo.entity.Location;
+import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.repository.event.EventOwnerRepository;
+import pl.envelo.moovelo.entity.events.EventOwner;
+import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
+import pl.envelo.moovelo.service.HashTagService;
+import pl.envelo.moovelo.service.LocationService;
+import pl.envelo.moovelo.service.actors.BasicUserService;
+import pl.envelo.moovelo.service.actors.EventOwnerService;
 
 import javax.persistence.EntityExistsException;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -21,12 +31,13 @@ import java.util.Optional;
 @Slf4j
 public class EventService {
     private final EventOwnerRepository eventOwnerRepository;
-    private final static String EVENT_EXIST_MESSAGE = "Entity exists in Database";
+    private static final String EVENT_EXIST_MESSAGE = "Entity exists in Database";
     private EventRepository<Event> eventRepository;
     private final EventInfoService eventInfoService;
     private final EventOwnerService eventOwnerService;
     private final HashTagService hashTagService;
     private final BasicUserService basicUserService;
+    private LocationService locationService;
 
     public List<? extends Event> getAllEvents() {
         log.info("EventService - getAllEvents()");
@@ -72,6 +83,25 @@ public class EventService {
         }
         return eventRepository.findById(event.getId()).isPresent();
     }
+
+    public void removeEventById(long id) {
+        log.info("EventService - removeEventById() - id = {}", id);
+        Optional<Event> eventOptional = eventRepository.findById(id);
+        if (eventOptional.isEmpty()) {
+            throw new NoContentException("Event with id = " + id + " doesn't exist!");
+        } else {
+            Event event = eventOptional.get();
+            Location location = event.getEventInfo().getLocation();
+            EventOwner eventOwner = event.getEventOwner();
+            List<Hashtag> hashtags = event.getHashtags();
+            eventRepository.delete(event);
+            locationService.removeLocationWithNoEvents(location);
+            eventOwnerService.removeEventOwnerWithNoEvents(eventOwner);
+            hashtags.forEach(hashTagService::decrementHashtagOccurrence);
+        }
+        log.info("EventService - removeEventById() - event with id = {} removed", id);
+    }
+}
 
     private Event validateAggregatedEntities(Event event, Long userId) {
         Event eventWithFieldsAfterValidation = new Event();

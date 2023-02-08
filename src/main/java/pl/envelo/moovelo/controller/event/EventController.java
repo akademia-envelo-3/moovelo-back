@@ -3,10 +3,13 @@ package pl.envelo.moovelo.controller.event;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.bind.annotation.*;
 import pl.envelo.moovelo.controller.AuthenticatedUser;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
@@ -17,10 +20,16 @@ import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
 import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.*;
+import pl.envelo.moovelo.entity.events.CyclicEvent;
+import pl.envelo.moovelo.entity.events.Event;
+import pl.envelo.moovelo.entity.events.ExternalEvent;
+import pl.envelo.moovelo.entity.events.InternalEvent;
+import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.event.EventService;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -93,6 +102,26 @@ public class EventController {
                     EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
         }).toList();
         return eventsDto;
+    }
+
+    @DeleteMapping("/events/{eventId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> removeEventById(@PathVariable long eventId) throws IllegalAccessException {
+        log.info("EventController - removeEventById() - eventId = {}", eventId);
+
+        User user = authenticatedUser.getAuthenticatedUser();
+        Event event = eventService.getEventById(eventId);
+
+        if (!event.getEventOwner().getUserId().equals(user.getId())) {
+            throw new UnauthorizedRequestException("Access denied!");
+        }
+        if (event.getEventInfo().getStartDate().isBefore(LocalDateTime.now())) {
+            throw new IllegalEventException("Can't delete an event that has already taken place!");
+        }
+
+        eventService.removeEventById(eventId);
+        log.info("EventController - removeEventById() - event with eventId = {} removed", eventId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     //TODO Sprawdzić czy user ma dostęp do tego wydarzenia

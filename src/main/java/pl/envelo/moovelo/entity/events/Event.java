@@ -25,37 +25,53 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private EventOwner eventOwner;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     private EventInfo eventInfo;
 
     private int limitedPlaces;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<EventSurvey> eventSurveys;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "events_X_basic_users_access")
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "events_X_basic_users_access",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private List<BasicUser> usersWithAccess;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "events_X_basic_users_accepted")
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "events_X_basic_users_accepted",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private Set<BasicUser> acceptedStatusUsers;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "events_X_basic_users_pending")
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "events_X_basic_users_pending",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private Set<BasicUser> pendingStatusUsers;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "events_X_basic_users_rejected")
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "events_X_basic_users_rejected",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private Set<BasicUser> rejectedStatusUsers;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
     @JoinTable(
             name = "events_hashtags",
             joinColumns = @JoinColumn(name = "event_id"),
@@ -65,22 +81,4 @@ public class Event {
 
     @Enumerated(value = EnumType.STRING)
     private EventType eventType;
-
-    @Override
-    public String toString() {
-        return "Event{" +
-                "id=" + id +
-                ", eventOwner=" + eventOwner +
-                ", eventInfo=" + eventInfo +
-                ", limitedPlaces=" + limitedPlaces +
-                ", comments=" + comments +
-                ", eventSurveys=" + eventSurveys +
-                ", usersWithAccess=" + usersWithAccess +
-                ", acceptedStatusUsers=" + acceptedStatusUsers +
-                ", pendingStatusUsers=" + pendingStatusUsers +
-                ", rejectedStatusUsers=" + rejectedStatusUsers +
-                ", hashtags=" + hashtags +
-                ", eventType=" + eventType +
-                '}';
-    }
 }
