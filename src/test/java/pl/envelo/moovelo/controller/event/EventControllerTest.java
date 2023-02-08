@@ -83,4 +83,33 @@ class EventControllerTest {
         assertTrue(result.hasBody());
         assertEquals(result.getStatusCode(), HttpStatus.OK);
     }
+
+    @Test
+    void getAllEventsByEventOwnerBasicUserIdPositiveTest() throws Exception {
+        mvc.perform(get("/api/v1/events/eventOwners/{userId}", 1))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].eventOwner.userId", is(1)));
+    }
+
+    @Disabled
+    void getAllEventsByEventOwnerBasicUserIdNegativeTest() throws Exception {
+        //TODO: Napisać test kiedy ogarniemy spring security
+    }
+
+    @Test
+    @Transactional
+    void getAllEventsByEventOwnerBasicUserIdUnitTest() {
+        // GIVEN
+
+        // WHEN
+        ResponseEntity<List<EventListResponseDto>> result = eventController.getAllEventsByEventOwnerBasicUserId(1L);
+
+        // THEN
+        assertTrue(result.hasBody());
+        assertEquals(result.getStatusCode(), HttpStatus.OK);
+        assertTrue(Objects.requireNonNull(result.getBody()).size() > 0);
+        assertEquals(1L, result.getBody().get(0).getEventOwner().getUserId());
+    }
 }
