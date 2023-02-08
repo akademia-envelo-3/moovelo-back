@@ -16,7 +16,7 @@ public class JwtTokens {
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + Constants.ACCESS_TOKEN_DURATION_TIME))
                 .withIssuer(request.getRequestURL().toString())
-                .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+                .withClaim("role", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
                 .sign(algorithm);
     }
 

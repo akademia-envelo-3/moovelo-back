@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pl.envelo.moovelo.controller.AuthenticatedUser;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;
+import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.CyclicEvent;
 import pl.envelo.moovelo.entity.events.Event;
@@ -34,12 +36,12 @@ import java.util.List;
 public class EventController {
 
     private EventService eventService;
-    private UserService userService;
+    private AuthenticatedUser authenticatedUser;
 
     @Autowired
-    public EventController(EventService eventService, UserService userService) {
+    public EventController(EventService eventService, AuthenticatedUser authenticatedUser) {
         this.eventService = eventService;
-        this.userService = userService;
+        this.authenticatedUser = authenticatedUser;
     }
 
     @GetMapping("/events")
@@ -59,13 +61,9 @@ public class EventController {
     public ResponseEntity<List<EventListResponseDto>> getAllEventsByEventOwnerBasicUserId(@PathVariable("userId") Long basicUserId) {
         log.info("EventController - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
-            String email = auth.getPrincipal().toString();
-            User user = userService.getUserByEmail(email);
-            if (!user.getId().equals(basicUserId)) {
-                throw new UnauthorizedRequestException("The ID you passed does not belong to your account");
-            }
+        User user = authenticatedUser.getAuthenticatedUser();
+        if (user.getRole().equals(Role.ROLE_USER) && !user.getId().equals(basicUserId)) {
+            throw new UnauthorizedRequestException("Access denied");
         }
 
         List<? extends Event> allEvents = eventService.getAllEventsByEventOwnerBasicUserId(basicUserId);
