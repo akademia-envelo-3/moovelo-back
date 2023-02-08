@@ -9,6 +9,7 @@ import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.entity.groups.Group;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;

@@ -26,18 +26,18 @@ public class Event {
     @ManyToOne
     private EventOwner eventOwner;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private EventInfo eventInfo;
 
     private int limitedPlaces;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<EventSurvey> eventSurveys;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JoinTable(
             name = "events_X_basic_users_access",
             joinColumns = @JoinColumn(name = "event_id"),
@@ -45,7 +45,7 @@ public class Event {
     )
     private List<BasicUser> usersWithAccess;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JoinTable(
             name = "events_X_basic_users_accepted",
             joinColumns = @JoinColumn(name = "event_id"),
@@ -53,7 +53,7 @@ public class Event {
     )
     private Set<BasicUser> acceptedStatusUsers;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JoinTable(
             name = "events_X_basic_users_pending",
             joinColumns = @JoinColumn(name = "event_id"),
@@ -61,7 +61,7 @@ public class Event {
     )
     private Set<BasicUser> pendingStatusUsers;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JoinTable(
             name = "events_X_basic_users_rejected",
             joinColumns = @JoinColumn(name = "event_id"),
@@ -69,7 +69,7 @@ public class Event {
     )
     private Set<BasicUser> rejectedStatusUsers;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
     @JoinTable(
             name = "events_hashtags",
             joinColumns = @JoinColumn(name = "event_id"),
