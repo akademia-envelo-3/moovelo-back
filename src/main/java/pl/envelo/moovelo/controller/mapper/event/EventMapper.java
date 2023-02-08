@@ -2,22 +2,49 @@ package pl.envelo.moovelo.controller.mapper.event;
 
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventIdDto;
+import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.dto.group.groupownership.GroupResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventOwnerListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.HashtagListResponseMapper;
+import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.group.GroupResponseMapper;
-import pl.envelo.moovelo.entity.events.CyclicEvent;
-import pl.envelo.moovelo.entity.events.Event;
-import pl.envelo.moovelo.entity.events.ExternalEvent;
-import pl.envelo.moovelo.entity.events.InternalEvent;
+import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.entity.groups.Group;
 
 import java.util.stream.Collectors;
 
-public class EventMapper {
+public class EventMapper implements EventMapperInterface {
 
     public static EventIdDto mapEventToEventIdDto(Event event) {
         return new EventIdDto(event.getId());
+    }
+
+    @Override
+    public <T extends Event> T mapEventRequestDtoToEventByEventType(EventRequestDto eventRequestDto, EventType eventType) {
+        T event = getEventByEventType(eventType);
+        event.setEventOwner(new EventOwner());
+        event.setEventInfo(EventInfoMapper.mapEventInfoDtoToEventInfo(eventRequestDto.getEventInfo()));
+        event.setLimitedPlaces(eventRequestDto.getLimitedPlaces());
+//        event.setComments(new ArrayList<>());
+//        event.setUsersWithAccess(new ArrayList<>());
+//        event.setAcceptedStatusUsers(new HashSet<>());
+//        event.setRejectedStatusUsers(new HashSet<>());
+//        event.setPendingStatusUsers(new HashSet<>());
+        event.setHashtags(eventRequestDto.getHashtags().stream()
+                .map(HashtagListResponseMapper::mapHashTagDtoToHashtag)
+                .collect(Collectors.toList())
+        );
+        return event;
+    }
+
+    private <T extends Event> T getEventByEventType(EventType eventType) {
+        Event event = switch (eventType) {
+            case EVENT -> new Event();
+            case EXTERNAL_EVENT -> new ExternalEvent();
+            case INTERNAL_EVENT -> new InternalEvent();
+            case CYCLIC_EVENT -> new CyclicEvent();
+        };
+        return (T) event;
     }
 
     public static DisplayEventResponseDto mapEventToEventResponseDto(Event event) {
@@ -26,6 +53,8 @@ public class EventMapper {
                 .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()))
                 .eventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(event.getEventInfo()))
                 .limitedPlaces(event.getLimitedPlaces())
+                .usersWithAccess(event.getUsersWithAccess().stream().map(BasicUserMapper::map).collect(Collectors.toList()))
+                //TODO Wysypuje blad
                 .eventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(event))
                 .isPrivate(false)
                 .isCyclic(false)

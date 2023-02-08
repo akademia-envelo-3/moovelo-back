@@ -1,9 +1,21 @@
 package pl.envelo.moovelo.service.actors;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import pl.envelo.moovelo.entity.actors.BasicUser;
+import pl.envelo.moovelo.repository.actors.BasicUserRepository;
 
-@RequiredArgsConstructor
+import java.util.List;
+
+@AllArgsConstructor
 @Service
 public class BasicUserService {
+
+    private BasicUserRepository basicUserRepository;
+
+    public List<BasicUser> getAllBasicUsers() {
+        return basicUserRepository.findAll();
+    }
+
+
 }

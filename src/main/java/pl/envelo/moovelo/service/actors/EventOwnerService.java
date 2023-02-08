@@ -1,22 +1,37 @@
 package pl.envelo.moovelo.service.actors;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.repository.event.EventOwnerRepository;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Service
 @Slf4j
 public class EventOwnerService {
 
-    private EventOwnerRepository eventOwnerRepository;
+    private final EventOwnerRepository eventOwnerRepository;
 
-    @Autowired
-    public EventOwnerService(EventOwnerRepository eventOwnerRepository) {
-        this.eventOwnerRepository = eventOwnerRepository;
+    public EventOwner assignEventOwnerToCurrentEvent(Long userId) {
+        EventOwner eventOwnerBasedOnBasicUser;
+
+        if (eventOwnerRepository.findEventOwnerByUserId(userId) == null) {
+            eventOwnerBasedOnBasicUser = createEventOwnerBasedOnExistingUser(userId);
+        } else {
+            eventOwnerBasedOnBasicUser = assignExistingEventOwnerBasedOnUser(userId);
+        }
+        return eventOwnerBasedOnBasicUser;
+    }
+
+    private EventOwner createEventOwnerBasedOnExistingUser(Long userId) {
+        EventOwner eventOwner = new EventOwner();
+        eventOwner.setUserId(userId);
+        return eventOwner;
+    }
+
+    private EventOwner assignExistingEventOwnerBasedOnUser(Long userId) {
+        return eventOwnerRepository.findEventOwnerByUserId(userId);
     }
 
     /**
