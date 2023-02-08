@@ -1,8 +1,10 @@
 package pl.envelo.moovelo.controller.event;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,7 @@ import pl.envelo.moovelo.service.event.ExternalEventService;
 import pl.envelo.moovelo.service.event.InternalEventService;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,18 +53,22 @@ public class ExternalEventController {
         return ResponseEntity.ok(externalEventsDto);
     }
 
-    @PostMapping("/externalEvents/{id}")
-    public ResponseEntity<?> addVisitorToEvent(@RequestBody VisitorDto visitorDto, @PathVariable("id") Long externalEventId) {
-        log.info("ExternalEventController - addVisitorToEvent() - visitorDto = {}, externalEventId = {}", visitorDto, externalEventId);
+    @PostMapping("/externalEvents/{id}/visitors")
+    public ResponseEntity<?> sendConfirmationMailToVisitor(@RequestBody VisitorDto visitorDto, @PathVariable("id") Long externalEventId) {
+        log.info("ExternalEventController - sendConfirmationMailToVisitor() - visitorDto = {}, externalEventId = {}", visitorDto, externalEventId);
 
-        LocalDateTime linkCreationDate = LocalDateTime.now();
-
-        LocalDateTime linkExpireDate = visitorService.sendMailWithConfirmationLink(visitorDto, externalEventId, linkCreationDate);
+        visitorService.sendMailWithConfirmationLink(visitorDto, externalEventId);
 
         Map<String, String> result = new HashMap<>();
-        result.put("message", "Potwierdź udział w wydarzeniu poprzez link przesłany na podany adres mail");
-        result.put("confirm_link_create_date", linkCreationDate.toString());
-        result.put("confirm_link_expire_date", linkExpireDate.toString());
+        result.put("message", "Confirm your participation in the event through the link sent to the email");
+        result.put("confirm_link_expire_date", new Date(System.currentTimeMillis() + Constants.VISITOR_CONFIRM_TOKEN_DURATION_TIME).toString());
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/externalEvent/visitor/{token}")
+    public ResponseEntity<?> addVisitorToEventAndSendCancellationLink(@PathVariable String token) {
+        log.info("ExternalEventController - sendConfirmationMailToVisitor() - token = {}", token);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
