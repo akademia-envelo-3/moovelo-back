@@ -7,10 +7,6 @@ import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.repository.HashtagRepository;
 
-import javax.transaction.Transactional;
-import java.util.Iterator;
-import java.util.List;
-
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -23,11 +19,10 @@ public class HashTagService {
         this.hashtagRepository = hashtagRepository;
     }
 
-    public void removeHashtagWithNoEvents(Hashtag hashtag) {
-        log.info("HashtagService - removeHashtagWithNoEvents() - hashtag = {}", hashtag);
-        if (hashtag.getEvents().isEmpty()) {
-            hashtagRepository.delete(hashtag);
-            log.info("HashtagService - removeHashtagWithNoEvents() - hashtag removed");
+    public void decrementHashtagOccurrence(Hashtag hashtag) {
+        if (hashtag.getOccurrences() > 0) {
+            hashtag.setOccurrences(hashtag.getOccurrences() - 1);
+            hashtagRepository.save(hashtag);
         }
     }
 }

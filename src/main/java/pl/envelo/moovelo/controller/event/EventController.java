@@ -82,12 +82,10 @@ public class EventController {
     }
 
     @DeleteMapping("/events/{eventId}")
-    @PreAuthorize("hasRole('BASIC_USER')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> removeEventById(@PathVariable long eventId) throws IllegalAccessException {
         log.info("EventController - removeEventById() - eventId = {}", eventId);
 
-        //TODO: Uswuwanie usuwa również grupy!
-        //TODO: Po zmianie struktury encji zmienić sposób usuwania
         User user = authenticatedUser.getAuthenticatedUser();
         Event event = eventService.getEventById(eventId);
 
@@ -95,7 +93,7 @@ public class EventController {
             throw new UnauthorizedRequestException("Access denied!");
         }
         if (event.getEventInfo().getStartDate().isBefore(LocalDateTime.now())) {
-            throw new IllegalEventException("Can't delete an event that has already taken place");
+            throw new IllegalEventException("Can't delete an event that has already taken place!");
         }
 
         eventService.removeEventById(eventId);

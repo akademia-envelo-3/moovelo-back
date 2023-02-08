@@ -14,7 +14,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class InternalEvent extends Event {
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.DETACH)
     private Group group;
 
     private boolean isPrivate;

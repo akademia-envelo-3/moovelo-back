@@ -82,7 +82,7 @@ public class EventService {
             eventRepository.delete(event);
             locationService.removeLocationWithNoEvents(location);
             eventOwnerService.removeEventOwnerWithNoEvents(eventOwner);
-            hashtags.forEach(hashTagService::removeHashtagWithNoEvents);
+            hashtags.forEach(hashTagService::decrementHashtagOccurrence);
         }
         log.info("EventService - removeEventById() - event with id = {} removed", id);
     }
