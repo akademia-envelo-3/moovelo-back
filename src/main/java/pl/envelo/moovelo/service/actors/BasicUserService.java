@@ -6,6 +6,8 @@ import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.repository.actors.BasicUserRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -17,5 +19,11 @@ public class BasicUserService {
         return basicUserRepository.findAll();
     }
 
-
+    public boolean checkIfBasicUserExistsById(Long userId) {
+        Optional<BasicUser> basicUserOptional = basicUserRepository.findById(userId);
+        if (basicUserOptional.isPresent()) {
+            return true;
+        } else throw new NoSuchElementException("No BasicUser with id: " + userId);
+    }
 }
+
