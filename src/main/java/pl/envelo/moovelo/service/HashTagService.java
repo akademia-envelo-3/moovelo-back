@@ -16,40 +16,6 @@ public class HashTagService {
     private static final int INCREMENT_HASHTAG_OCCURRENCE = 1;
     private final HashtagRepository hashtagRepository;
 
-// TODO: 09.02.2023  Jak przeszukujemy HAshtagi?
-//    public List<Hashtag> getAllVisibleHashtags() {
-//        return hashtagRepository.findHashtagsByVisibleIsTrue();
-//    }
-//
-//    public List<Hashtag> validateHashtags(Event event) {
-//        List<Hashtag> hashtagListToSave = new ArrayList<>();
-//        List<Hashtag> allVisibleHashtagsInDb = getAllVisibleHashtags();
-//
-//        event.getHashtags().forEach(hashtag -> {
-//            if (allVisibleHashtagsInDb.contains(hashtag)) {
-//                incrementHashTagOccurrence(hashtag);
-//            } else {
-//                hashtag.setOccurrences(INCREMENT_HASHTAG_OCCURRENCE);
-//                hashtag.setVisible(true);
-//                hashtagListToSave.add(hashtag);
-//            }
-//        });
-//        return hashtagListToSave;
-//    }
-
-    private Hashtag incrementHashTagOccurrence(Hashtag hashtag) {
-        Hashtag hashtagToIncrement = hashtagRepository.findHashtagByHashtagValue(hashtag.getHashtagValue());
-        hashtagToIncrement.setOccurrences(hashtagToIncrement.getOccurrences() + INCREMENT_HASHTAG_OCCURRENCE);
-        return hashtagRepository.save(hashtagToIncrement);
-    }
-
-    public void decrementHashtagOccurrence(Hashtag hashtag) {
-        if (hashtag.getOccurrences() > 0) {
-            hashtag.setOccurrences(hashtag.getOccurrences() - 1);
-            hashtagRepository.save(hashtag);
-        }
-    }
-
     public List<Hashtag> hashtagsToAssign(List<Hashtag> hashtags) {
         List<Hashtag> hashtagsToAssign = new ArrayList<>();
         hashtags.forEach(hashtag -> {
@@ -63,6 +29,19 @@ public class HashTagService {
             }
         });
         return hashtagsToAssign;
+    }
+
+    private Hashtag incrementHashTagOccurrence(Hashtag hashtag) {
+        Hashtag hashtagToIncrement = hashtagRepository.findHashtagByHashtagValue(hashtag.getHashtagValue());
+        hashtagToIncrement.setOccurrences(hashtagToIncrement.getOccurrences() + INCREMENT_HASHTAG_OCCURRENCE);
+        return hashtagRepository.save(hashtagToIncrement);
+    }
+
+    public void decrementHashtagOccurrence(Hashtag hashtag) {
+        if (hashtag.getOccurrences() > 0) {
+            hashtag.setOccurrences(hashtag.getOccurrences() - 1);
+            hashtagRepository.save(hashtag);
+        }
     }
 
     private Hashtag createHashTag(Hashtag hashtag) {

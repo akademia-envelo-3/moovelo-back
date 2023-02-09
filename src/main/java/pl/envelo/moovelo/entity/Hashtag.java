@@ -51,7 +51,4 @@ public class Hashtag {
         return Objects.hash(hashtagValue);
     }
 
-    public void addEvent(Event savedEvent) {
-        events.add(savedEvent);
-    }
 }

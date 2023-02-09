@@ -82,7 +82,4 @@ public class Event {
     @Enumerated(value = EnumType.STRING)
     private EventType eventType;
 
-    public void addExistingHashtags(List<Hashtag> existingHashtags) {
-        hashtags.addAll(existingHashtags);
-    }
 }
