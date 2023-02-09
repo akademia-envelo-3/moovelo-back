@@ -110,7 +110,7 @@ public class EventService {
     }
 
     public Long getEventOwnerUserIdByEventId(Long eventId) {
-        log.info("EventService - getEventOwnerUserIdByEventId()");
+        log.info("EventService - getEventOwnerUserIdByEventId() - eventId = {}", eventId);
         EventOwner eventOwnerByEventId = eventOwnerService.getEventOwnerByEventId(eventId);
         Long userId = eventOwnerByEventId.getUserId();
         log.info("EventService - getEventOwnerUserIdByEventId() return{}", userId);
