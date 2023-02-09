@@ -50,4 +50,8 @@ public class Hashtag {
     public int hashCode() {
         return Objects.hash(hashtagValue);
     }
+
+    public void addEvent(Event savedEvent) {
+        events.add(savedEvent);
+    }
 }

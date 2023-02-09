@@ -3,13 +3,10 @@ package pl.envelo.moovelo.controller.event;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.bind.annotation.*;
 import pl.envelo.moovelo.controller.AuthenticatedUser;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
@@ -20,10 +17,6 @@ import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
 import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.*;
-import pl.envelo.moovelo.entity.events.CyclicEvent;
-import pl.envelo.moovelo.entity.events.Event;
-import pl.envelo.moovelo.entity.events.ExternalEvent;
-import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.event.EventService;
@@ -57,6 +50,8 @@ public class EventController {
                 .path("/{id}")
                 .buildAndExpand(newEvent.getId())
                 .toUri();
+
+        log.info("EventController - getAllEvents() return {}", displayEventResponseDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(uri)
