@@ -3,6 +3,7 @@ package pl.envelo.moovelo.controller.event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
@@ -32,19 +33,25 @@ public class EventController {
     }
 
     @GetMapping("/events")
-    public ResponseEntity<List<EventListResponseDto>> getAllEvents(@RequestParam(required = false) String name) {
+    public ResponseEntity<Page<EventListResponseDto>> getAllEvents(
+            String privacy,
+            String group,
+            String cat,
+            @RequestParam(defaultValue = "eventInfo.date") String sort,
+            @RequestParam(defaultValue = "DESC") String sortOrder,
+            @RequestParam(defaultValue = "0") Integer page) {
         log.info("EventController - getAllEvents()");
 
-        List<? extends Event> events = name == null ? eventService.getAllEvents() : eventService.getAllEventsByEventNameContains(name);
+        Page<? extends Event> events = eventService.getAllEvents(privacy, group, cat, sort, sortOrder, page);
 
-        List<EventListResponseDto> eventsDto = events.stream().map(event -> switch (event.getEventType()) {
+        Page<EventListResponseDto> eventsDto = events.map(event -> switch (event.getEventType()) {
             case EVENT -> EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
             case INTERNAL_EVENT ->
                     EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
             case CYCLIC_EVENT -> EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) event);
             case EXTERNAL_EVENT ->
                     EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
-        }).toList();
+        });
 
         log.info("EventController - getAllEvents() return {}", eventsDto);
         return ResponseEntity.ok(eventsDto);
