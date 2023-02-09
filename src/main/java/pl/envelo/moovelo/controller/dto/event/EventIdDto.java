@@ -3,7 +3,7 @@ package pl.envelo.moovelo.controller.dto.event;
 import java.util.Objects;
 
 public class EventIdDto {
-    private long id;
+    private final long id;
 
     public EventIdDto(long id) {
         this.id = id;

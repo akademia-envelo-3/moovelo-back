@@ -5,8 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventType;
+import pl.envelo.moovelo.exception.NoContentException;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,20 +32,40 @@ class EventServiceTest {
     }
 
     @Test
-    void getAllEventsByEventNameContainsTest() {
+    @Transactional
+    void removeEventByIdTest() {
+        // GIVEN
+        long eventId = 1;
 
-        //GIVEN
-        String name = "ex";
+        // WHEN
+        eventService.removeEventById(eventId);
 
-        //WHEN
-        List<? extends Event> eventsByNameContains = eventService.getAllEventsByEventNameContains(name);
+        // THEN
+        assertThrows(NoSuchElementException.class, () -> eventService.getEventById(eventId));
+    }
 
-        System.out.println("tests print");
-        System.out.println(eventService.getAllEvents());
-        System.out.println(eventService.getAllEventsByEventNameContains(name));
+    @Test
+    @Transactional
+    void removeEventByIdWhenEventDoesNotExistTest() {
+        // GIVEN
+        long eventId = 1;
 
-        //THEN
-        assertFalse(eventsByNameContains.isEmpty());
-        assertEquals(eventsByNameContains.size(), 1);
+        // WHEN
+        eventService.removeEventById(eventId);
+
+        // THEN
+        assertThrows(NoContentException.class, () -> eventService.removeEventById(eventId));
+    }
+
+    void getAllEventsByEventOwnerBasicUserIdTest() {
+        // GIVEN
+        Long userId = 1L;
+
+        // WHEN
+        List<? extends Event> allEventOwnerEvents = eventService.getAllEventsByEventOwnerBasicUserId(userId);
+
+        // THEN
+        assertFalse(allEventOwnerEvents.isEmpty());
+        assertEquals(allEventOwnerEvents.get(0).getEventOwner().getUserId(), userId);
     }
 }

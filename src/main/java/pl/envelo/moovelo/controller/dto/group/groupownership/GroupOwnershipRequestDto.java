@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public class GroupOwnershipRequestDto {
-    private long groupId;
-    private long userId;
-    private long newOwnerId;
+    private final long groupId;
+    private final long userId;
+    private final long newOwnerId;
 
     public GroupOwnershipRequestDto(long groupId, long userId, long newOwnerId) {
         this.groupId = groupId;

@@ -7,10 +7,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
+import pl.envelo.moovelo.entity.events.CyclicEvent;
 import pl.envelo.moovelo.entity.events.Event;
+import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.entity.events.EventType;
 
 import java.util.List;
+import java.util.Optional;
 
 @Primary
 @Repository
@@ -19,5 +22,9 @@ public interface EventRepository<I extends Event> extends JpaRepository<I, Long>
     Page<I> findAll(Specification<I> eventSpecification, Pageable pageable);
 
     List<I> findAllByEventType(EventType eventType);
+
+    List<I> findByEventOwner_UserId(Long userId);
+
+    List<I> findAllByEventOwnerId(Long eventOwnerId);
 
 }

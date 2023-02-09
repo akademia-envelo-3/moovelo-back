@@ -6,7 +6,7 @@ import lombok.Getter;
 @Builder
 @Getter
 public class LocationDto {
-    private long id;
+    private Long id;
 
     private double altitude;
 
