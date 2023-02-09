@@ -8,7 +8,7 @@ import pl.envelo.moovelo.config.security.JwtTokens;
 import pl.envelo.moovelo.controller.dto.actor.VisitorDto;
 import pl.envelo.moovelo.service.EmailService;
 
-import java.time.LocalDateTime;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
@@ -21,5 +21,9 @@ public class VisitorService {
         String token = JwtTokens.createConfirmationToken(visitorDto.getFirstname(), visitorDto.getLastname(), visitorDto.getEmail(), externalEventId);
         String message = Constants.URL + "/api/v1/externalEvent/visitor/" + token;
         emailService.sendSimpleMessage(visitorDto.getEmail(), "Event confirmation", message);
+    }
+
+    public Map<String, String> getVisitorDetailsFromToken(String token) {
+        return null;
     }
 }
