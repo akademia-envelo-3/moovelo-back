@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.envelo.moovelo.controller.dto.CommentDto;
+import pl.envelo.moovelo.controller.dto.CommentRequestDto;
 import pl.envelo.moovelo.controller.dto.EventDto;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
@@ -21,6 +22,7 @@ import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.service.CommentService;
+import pl.envelo.moovelo.service.actors.UserService;
 import pl.envelo.moovelo.service.event.EventService;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 
@@ -107,7 +109,7 @@ public class EventController {
     }
 
     @GetMapping("/events/{eventId}/comments")
-    public ResponseEntity<List<Comment>> getAllComments(@PathVariable Long eventId){
+    public ResponseEntity<List<Comment>> getAllComments(@PathVariable Long eventId){ //zapytać o paginacje w wybieraniu komentarzy do wydarzenia
         log.info("EventController - getAllComments()");
         Event eventById = eventService.getEventById(eventId);
 
@@ -115,15 +117,15 @@ public class EventController {
         return ResponseEntity.ok(comments);
     }
 
-    @PostMapping("/events/{eventId}/comments")
-    public ResponseEntity<?> addCommentWithoutAttachmentToEvent(@PathVariable Long eventId, CommentDto commentDto){
+    @PostMapping("/events/{eventId}/comments") //
+    public ResponseEntity<?> addCommentWithoutAttachmentToEvent(@PathVariable Long eventId, @RequestBody CommentRequestDto commentRequestDto){
         log.info("EventController - addCommentToEvent()");
         Event eventById = eventService.getEventById(eventId);
         BasicUser basicUser = (BasicUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Comment comment = new Comment();
         comment.setEvent(eventById);
         comment.setBasicUser(basicUser);
-        comment.setText(commentDto.getText());
+        comment.setText(commentRequestDto.getText());
         comment.setDate(LocalDateTime.now());
 
         Comment savedComment = commentService.addComment(comment);
