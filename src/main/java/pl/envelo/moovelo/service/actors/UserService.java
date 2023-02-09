@@ -33,7 +33,7 @@ public class UserService implements UserDetailsService {
         Optional<User> userOptional = userRepository.findByEmail(email);
 
         if (userOptional.isEmpty()) {
-            throw new UsernameNotFoundException("Not found!");
+            throw new UsernameNotFoundException("Not user not found!");
         }
 
         return userOptional.get();

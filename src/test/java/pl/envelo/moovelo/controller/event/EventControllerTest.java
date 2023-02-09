@@ -84,6 +84,23 @@ class EventControllerTest {
         assertEquals(result.getStatusCode(), HttpStatus.OK);
     }
 
+    //TODO: stworzyć test dla removeEvent kiedy ogarniemy Spring security
+
+    @Test
+    @Disabled
+    void removeEventByIdPositiveTest() {
+    }
+
+    @Test
+    @Disabled
+    void removeEventByIdNegativeTest() {
+    }
+
+    @Test
+    @Disabled
+    void removeEventByIdUnitTest() {
+    }
+
     @Test
     void getAllEventsByEventOwnerBasicUserIdPositiveTest() throws Exception {
         mvc.perform(get("/api/v1/events/eventOwners/{userId}", 1))

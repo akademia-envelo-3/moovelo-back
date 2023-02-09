@@ -38,8 +38,10 @@ public class InternalEventController {
         List<? extends Event> allInternalEvents = internalEventService.getAllInternalEvents();
 
         List<EventListResponseDto> internalEventsDto = allInternalEvents.stream().map(internalEvent -> switch (internalEvent.getEventType()) {
-            case INTERNAL_EVENT -> EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) internalEvent);
-            case CYCLIC_EVENT -> EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) internalEvent);
+            case INTERNAL_EVENT ->
+                    EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) internalEvent);
+            case CYCLIC_EVENT ->
+                    EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) internalEvent);
             default -> throw new IllegalEventException("Unexpected value: " + internalEvent.getEventType());
         }).toList();
 

@@ -19,7 +19,7 @@ public class EventSurvey {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<BasicUser> surveyees;
 
     @ManyToOne

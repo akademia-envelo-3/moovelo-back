@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ExternalEvent extends Event {
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST})
     @JoinTable(
             name = "external_events_visitors",
             joinColumns = @JoinColumn(name = "external_event_id"),

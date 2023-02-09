@@ -9,8 +9,7 @@ import pl.envelo.moovelo.entity.Location;
 @AllArgsConstructor
 public class LocationMapper {
 
-    public static Location mapFromLocationDtoToLocationEntity(long id, LocationDto locationDto) {
-
+    public static Location mapFromLocationDtoToLocationEntity(Long id, LocationDto locationDto) {
         Location location = new Location();
         location.setId(id);
         location.setAltitude(locationDto.getAltitude());
@@ -20,13 +19,12 @@ public class LocationMapper {
         location.setStreet(locationDto.getStreet());
         location.setStreetNumber(locationDto.getStreetNumber());
         location.setApartmentNumber(locationDto.getApartmentNumber());
-
         return location;
     }
 
     public static LocationDto mapFromLocationEntityToLocationDto(Location location) {
 
-        LocationDto locationDto = LocationDto.builder()
+        return LocationDto.builder()
                 .id(location.getId())
                 .altitude(location.getAltitude())
                 .latitude(location.getLatitude())
@@ -36,8 +34,6 @@ public class LocationMapper {
                 .streetNumber(location.getStreetNumber())
                 .apartmentNumber(location.getApartmentNumber())
                 .build();
-
-        return locationDto;
     }
 
 }

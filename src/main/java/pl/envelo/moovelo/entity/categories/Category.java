@@ -29,7 +29,9 @@ public class Category {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Category category = (Category) o;
-        return Objects.equals(id, category.id) && Objects.equals(name, category.name) && Objects.equals(visible, category.visible);
+        return Objects.equals(id, category.id)
+                && Objects.equals(name, category.name)
+                && Objects.equals(visible, category.visible);
     }
 
     @Override

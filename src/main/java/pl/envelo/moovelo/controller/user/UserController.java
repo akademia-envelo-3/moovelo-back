@@ -38,7 +38,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("api/refreshToken")
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
@@ -55,7 +55,7 @@ public class UserController {
                 tokens.put("refresh_token", refreshToken);
                 response.setContentType(Constants.RESPONSE_CONTENT_TYPE);
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-            } catch (Exception exception) {
+            } catch (IOException exception) {
                 log.error("Error logging in: {}", exception.getMessage());
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 Map<String, String> error = new HashMap<>();
