@@ -143,4 +143,25 @@ public class EventController {
         log.info("EventController - getEventById() return {}", displayEventResponseDto);
         return displayEventResponseDto == null ? ResponseEntity.badRequest().build() : ResponseEntity.ok(displayEventResponseDto);
     }
+
+    @PutMapping("/events/{eventId}")
+    @PreAuthorize("hasRole('BASIC_USER')")
+    public ResponseEntity<?> updateEventById(@PathVariable Long eventId, @RequestBody EventRequestDto eventRequestDto) {
+        log.info("EventController - updateEventById()");
+        Event eventById = eventService.getEventById(eventId);
+        Long currentEventOwnerUserId = eventService.getEventOwnerUserIdByEventId(eventId);
+        User loggedInUser = authenticatedUser.getAuthenticatedUser();
+        if (isBasicUserEventOwner(loggedInUser, currentEventOwnerUserId)) {
+
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    private boolean isBasicUserEventOwner(User user, Long eventOwnerUserId) {
+        return user.getRole().name().equals("ROLE_USER") &&
+                user.getId().equals(eventOwnerUserId);
+    }
+
+
 }
