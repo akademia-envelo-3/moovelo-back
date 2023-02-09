@@ -2,7 +2,6 @@ package pl.envelo.moovelo.controller.mapper;
 
 import pl.envelo.moovelo.controller.dto.AttachmentDto;
 import pl.envelo.moovelo.entity.Attachment;
-import pl.envelo.moovelo.entity.events.EventInfo;
 
 import java.util.List;
 

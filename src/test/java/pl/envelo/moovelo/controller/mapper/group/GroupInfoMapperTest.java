@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import pl.envelo.moovelo.controller.dto.group.GroupInfoDto;
 import pl.envelo.moovelo.entity.groups.GroupInfo;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GroupInfoMapperTest {
 

@@ -3,19 +3,14 @@ package pl.envelo.moovelo.controller.event;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.bind.annotation.*;
-import pl.envelo.moovelo.controller.AuthenticatedUser;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import pl.envelo.moovelo.controller.AuthenticatedUser;
 import pl.envelo.moovelo.controller.dto.CommentDto;
 import pl.envelo.moovelo.controller.dto.CommentRequestDto;
-import pl.envelo.moovelo.controller.dto.EventDto;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
@@ -23,27 +18,18 @@ import pl.envelo.moovelo.controller.mapper.CommentMapper;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
+import pl.envelo.moovelo.entity.Comment;
+import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.*;
-import pl.envelo.moovelo.entity.Comment;
-import pl.envelo.moovelo.entity.actors.BasicUser;
-import pl.envelo.moovelo.entity.events.CyclicEvent;
-import pl.envelo.moovelo.entity.events.Event;
-import pl.envelo.moovelo.entity.events.ExternalEvent;
-import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.CommentService;
-import pl.envelo.moovelo.service.actors.UserService;
-import pl.envelo.moovelo.service.CommentService;
 import pl.envelo.moovelo.service.event.EventService;
-import springfox.documentation.spi.service.contexts.SecurityContext;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -169,7 +155,7 @@ public class EventController {
     }
 
     @PostMapping("/events/{eventId}/comments") //
-    public ResponseEntity<?> addCommentWithoutAttachmentToEvent(@PathVariable Long eventId, @RequestBody CommentRequestDto commentRequestDto){
+    public ResponseEntity<?> addCommentWithoutAttachmentToEvent(@PathVariable Long eventId, @RequestBody CommentRequestDto commentRequestDto) {
         log.info("EventController - addCommentToEvent()");
         Event eventById = eventService.getEventById(eventId);
         BasicUser basicUser = (BasicUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
