@@ -10,6 +10,7 @@ import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.repository.event.ExternalEventRepository;
 
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
@@ -29,5 +30,9 @@ public class ExternalEventService {
 
         log.info("ExternalEventService - getAllExternalEvents() return {}", allExternalEvents.toString());
         return allExternalEvents;
+    }
+
+    public void addVisitorToExternalEvent(Map<String, String> visitorDetails) {
+
     }
 }
