@@ -99,7 +99,7 @@ public class EventService {
 
     private Event validateAggregatedEntities(Event event, Long userId) {
         Event eventWithFieldsAfterValidation = new Event();
-        eventWithFieldsAfterValidation.setEventOwner(eventOwnerService.assignEventOwnerToCurrentEvent(userId));
+        eventWithFieldsAfterValidation.setEventOwner(eventOwnerService.getEventOwnerByUserId(userId));
         eventWithFieldsAfterValidation
                 .setEventInfo(eventInfoService.getEventInfoWithLocationCoordinates(event.getEventInfo()));
         eventWithFieldsAfterValidation.setEventInfo(eventInfoService.checkIfCategoryExists(event.getEventInfo()));
@@ -107,6 +107,28 @@ public class EventService {
         eventWithFieldsAfterValidation.setUsersWithAccess(basicUserService.getAllBasicUsers());
         eventWithFieldsAfterValidation.setHashtags(hashTagService.validateHashtags(event.getHashtags()));
         return eventWithFieldsAfterValidation;
+    }
+
+    public Long getEventOwnerUserIdByEventId(Long eventId) {
+        log.info("EventService - getEventOwnerUserIdByEventId() - eventId = {}", eventId);
+        EventOwner eventOwnerByEventId = eventOwnerService.getEventOwnerByEventId(eventId);
+        Long userId = eventOwnerByEventId.getUserId();
+        log.info("EventService - getEventOwnerUserIdByEventId() return{}", userId);
+        return userId;
+    }
+
+    public EventOwner getEventOwnerByUserId(Long userId) {
+        return eventOwnerService.getEventOwnerByUserId(userId);
+    }
+
+    @Transactional
+    public void updateEventOwnershipByEventId(Long eventId, EventOwner eventOwner, Long currentEventOwnerUserId) {
+        log.info("EventService - updateEventOwnershipById()");
+        Event event = getEventById(eventId);
+        eventOwnerService.createEventOwner(eventOwner);
+        event.setEventOwner(eventOwner);
+        eventOwnerService.removeEventFromEventOwnerEvents(event, currentEventOwnerUserId);
+        eventOwnerService.removeEventOwnerWithNoEvents(getEventOwnerByUserId(currentEventOwnerUserId));
     }
 }
 
