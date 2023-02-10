@@ -51,6 +51,8 @@ public class EventService {
             Event eventAfterFieldValidation = validateAggregatedEntities(event, userId);
             eventAfterFieldValidation.setHashtags(hashtagsToAssign);
             eventAfterFieldValidation.setEventInfo(validatedEventInfo);
+
+            log.info("EventService - createNewEvent() return {}", eventAfterFieldValidation);
             return eventRepository.save(eventAfterFieldValidation);
         }
     }
@@ -101,7 +103,8 @@ public class EventService {
     private Event validateAggregatedEntities(Event event, Long userId) {
         Event eventWithFieldsAfterValidation = new Event();
         eventWithFieldsAfterValidation.setEventOwner(eventOwnerService.assignEventOwnerToCurrentEvent(userId));
-        eventWithFieldsAfterValidation.setEventInfo(eventInfoService.checkIfCategoryExists(event.getEventInfo()));
+        // TODO: 10.02.2023 wywalic
+//        eventWithFieldsAfterValidation.setEventInfo(eventInfoService.checkIfCategoryExists(event.getEventInfo()));
         eventWithFieldsAfterValidation.setLimitedPlaces(event.getLimitedPlaces());
         eventWithFieldsAfterValidation.setUsersWithAccess(basicUserService.getAllBasicUsers());
         return eventWithFieldsAfterValidation;

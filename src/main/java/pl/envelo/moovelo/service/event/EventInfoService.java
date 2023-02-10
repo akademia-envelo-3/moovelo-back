@@ -17,17 +17,12 @@ public class EventInfoService {
     private final EventInfoRepository eventInfoRepository;
 
     public EventInfo validateEventInfo(EventInfo eventInfo) {
-        Location locationBeforeValidation = eventInfo.getLocation();
-        Location validatedLocation = locationService.validateLocation(locationBeforeValidation);
+        Location validatedLocation = locationService.validateLocation(eventInfo.getLocation());
+        Category validatedCategory = categoryService.validateCategory(eventInfo.getCategory());
 
         eventInfo.setLocation(validatedLocation);
-        eventInfoRepository.save(eventInfo);
-        return eventInfo;
-    }
+        eventInfo.setCategory(validatedCategory);
 
-    public EventInfo checkIfCategoryExists(EventInfo eventInfo) {
-        Category category = categoryService.checkIfCategoryExists(eventInfo.getCategory());
-        eventInfo.setCategory(category);
-        return eventInfo;
+        return eventInfoRepository.save(eventInfo);
     }
 }

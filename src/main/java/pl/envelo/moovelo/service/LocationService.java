@@ -21,11 +21,9 @@ public class LocationService {
     private LocationRepository locationRepository;
 
     public Location validateLocation(Location location) {
-
         Location locationAfterGeocodingApiRequest = getLocationAfterGeocodingApiRequest(location);
-
+        locationAfterGeocodingApiRequest.setApartmentNumber(location.getApartmentNumber());
         Optional<Location> locationComparedWithDb = checkIfLocationExistInDatabase(locationAfterGeocodingApiRequest);
-
         return locationComparedWithDb.orElseGet(() -> locationRepository.save(locationAfterGeocodingApiRequest));
     }
 

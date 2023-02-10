@@ -13,21 +13,29 @@ public class GeocodingApiClient {
     private static final String DATA_FORMAT = "json";
     private static final String API_KEY = "AIzaSyDV6J_lwZ8KtNQg_1DFdJLKQRPjrlxCm4E";
     public static final char ADDRESS_SEPARATOR = '%';
+    public static final String ERROR_MESSAGE = "Podales zly ADRES";
 
     public GeocodingApiDto getGeolocationInfoForAddress(Location locationBeforeRequest) {
 
         final String address = createAddressFromLocationFields(locationBeforeRequest);
 
-        return restTemplate.getForObject(GEOLOCATION_API_BASE_URL + DATA_FORMAT + "?address={address}&key={apiKey}",
+        GeocodingApiDto geocodingApiDto = restTemplate.getForObject(GEOLOCATION_API_BASE_URL + DATA_FORMAT + "?address={address}&key={apiKey}",
                 GeocodingApiDto.class, address, API_KEY);
+
+        if (!geocodingApiDto.getResults().isEmpty()) {
+            return geocodingApiDto;
+        } else {
+            throw new IllegalArgumentException(ERROR_MESSAGE);
+        }
     }
 
     private String createAddressFromLocationFields(Location location) {
-        String addressBuilder = location.getStreet() +
-                ADDRESS_SEPARATOR +
-                location.getStreetNumber() +
-                ADDRESS_SEPARATOR +
-                location.getCity();
-        return addressBuilder;
+        StringBuilder addressBuilder = new StringBuilder();
+        addressBuilder.append(location.getStreet())
+                .append(ADDRESS_SEPARATOR)
+                .append(location.getStreetNumber())
+                .append(ADDRESS_SEPARATOR)
+                .append(location.getCity());
+        return addressBuilder.toString();
     }
 }
