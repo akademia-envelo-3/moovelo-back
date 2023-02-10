@@ -71,7 +71,7 @@ public class Event {
     )
     private Set<BasicUser> rejectedStatusUsers;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.DETACH}, fetch = FetchType.EAGER)
     @JoinTable(
             name = "events_hashtags",
             joinColumns = @JoinColumn(name = "event_id"),
@@ -81,4 +81,5 @@ public class Event {
 
     @Enumerated(value = EnumType.STRING)
     private EventType eventType;
+
 }
