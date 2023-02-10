@@ -116,7 +116,8 @@ public class EventController {
         }
 
         eventService.removeEventById(eventId);
-        log.info("EventController - removeEventById() - event with eventId = {} removed", eventId);
+        log.info("EventController - removeEventById() - event with e" +
+                "ventId = {} removed", eventId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
