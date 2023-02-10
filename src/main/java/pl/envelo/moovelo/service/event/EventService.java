@@ -6,10 +6,9 @@ import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.events.Event;
+import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.exception.NoContentException;
-import pl.envelo.moovelo.repository.HashtagRepository;
-import pl.envelo.moovelo.repository.event.EventOwnerRepository;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.LocationService;
@@ -40,17 +39,18 @@ public class EventService {
         log.info("EventService - getAllEvents() return {}", allEvents.toString());
         return allEvents;
     }
-
-
+    
     public Event createNewEvent(Event event, Long userId) {
         log.info("EventService - createNewEvent()");
         if (checkIfEntityExist(event)) {
             throw new EntityExistsException(EVENT_EXIST_MESSAGE);
         } else {
-            List<Hashtag> eventHashtags = hashTagService.hashtagsToAssign(event.getHashtags());
+            List<Hashtag> hashtagsToAssign = hashTagService.getHashtagsToAssign(event.getHashtags());
+            EventInfo validatedEventInfo = eventInfoService.validateEventInfo(event.getEventInfo());
 
             Event eventAfterFieldValidation = validateAggregatedEntities(event, userId);
-            eventAfterFieldValidation.setHashtags(eventHashtags);
+            eventAfterFieldValidation.setHashtags(hashtagsToAssign);
+            eventAfterFieldValidation.setEventInfo(validatedEventInfo);
             return eventRepository.save(eventAfterFieldValidation);
         }
     }
@@ -101,8 +101,6 @@ public class EventService {
     private Event validateAggregatedEntities(Event event, Long userId) {
         Event eventWithFieldsAfterValidation = new Event();
         eventWithFieldsAfterValidation.setEventOwner(eventOwnerService.assignEventOwnerToCurrentEvent(userId));
-        eventWithFieldsAfterValidation
-                .setEventInfo(eventInfoService.getEventInfoWithLocationCoordinates(event.getEventInfo()));
         eventWithFieldsAfterValidation.setEventInfo(eventInfoService.checkIfCategoryExists(event.getEventInfo()));
         eventWithFieldsAfterValidation.setLimitedPlaces(event.getLimitedPlaces());
         eventWithFieldsAfterValidation.setUsersWithAccess(basicUserService.getAllBasicUsers());

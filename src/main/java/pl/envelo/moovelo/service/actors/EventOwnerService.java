@@ -16,10 +16,10 @@ public class EventOwnerService {
     public EventOwner assignEventOwnerToCurrentEvent(Long userId) {
         EventOwner eventOwnerBasedOnBasicUser;
 
-        if (eventOwnerRepository.findEventOwnerByUserId(userId) == null) {
-            eventOwnerBasedOnBasicUser = createEventOwnerBasedOnExistingUser(userId);
-        } else {
+        if (eventOwnerRepository.findEventOwnerByUserId(userId).isPresent()) {
             eventOwnerBasedOnBasicUser = assignExistingEventOwnerBasedOnUser(userId);
+        } else {
+            eventOwnerBasedOnBasicUser = createEventOwnerBasedOnExistingUser(userId);
         }
         return eventOwnerBasedOnBasicUser;
     }
@@ -31,7 +31,7 @@ public class EventOwnerService {
     }
 
     private EventOwner assignExistingEventOwnerBasedOnUser(Long userId) {
-        return eventOwnerRepository.findEventOwnerByUserId(userId);
+        return eventOwnerRepository.findEventOwnerByUserId(userId).get();
     }
 
     /**
