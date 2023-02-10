@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,14 +40,14 @@ public class EventService {
     private final HashTagService hashTagService;
     private final BasicUserService basicUserService;
     private LocationService locationService;
+    private EventSearchSpecification eventSearchSpecification;
 
     public Page<? extends Event> getAllEvents(String privacy, String group, String cat, String sort, String sortOrder, int page) {
         log.info("EventService - getAllEvents()");
 
-        int size = 10;
+        int sizeOfPage = 10;
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(eventSearchSpecification.createSortOrder(sort, sortOrder.toUpperCase())));
-
+        Pageable pageable = PageRequest.of(page, sizeOfPage, Sort.by(eventSearchSpecification.createSortOrder(sort, sortOrder)));
         Page<? extends Event> allEvents = eventRepository.findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat), pageable);
 
         log.info("EventService - getAllEvents() return {}", allEvents.toString());
@@ -119,8 +120,4 @@ public class EventService {
         eventWithFieldsAfterValidation.setHashtags(hashTagService.validateHashtags(event.getHashtags()));
         return eventWithFieldsAfterValidation;
     }
-}
-
-
-
 }

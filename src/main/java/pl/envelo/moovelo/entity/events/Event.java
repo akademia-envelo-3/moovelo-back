@@ -2,6 +2,7 @@ package pl.envelo.moovelo.entity.events;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.actors.BasicUser;
@@ -33,6 +34,8 @@ public class Event {
 
     private int limitedPlaces;
 
+    private boolean isPrivate;
+
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
@@ -54,6 +57,9 @@ public class Event {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<BasicUser> acceptedStatusUsers;
+
+    @Formula("select count(*) from events_X_basic_users_accepted x where x.event_id = id")
+    private int numOfAcceptedStatusUsers;
 
     @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JoinTable(
@@ -81,4 +87,5 @@ public class Event {
 
     @Enumerated(value = EnumType.STRING)
     private EventType eventType;
+
 }

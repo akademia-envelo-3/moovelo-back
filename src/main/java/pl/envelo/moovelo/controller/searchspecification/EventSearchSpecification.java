@@ -1,82 +1,102 @@
 package pl.envelo.moovelo.controller.searchspecification;
 
-import io.swagger.models.auth.In;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.events.Event;
-import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.InternalEvent;
-
-import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
-import javax.persistence.metamodel.SingularAttribute;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class EventSearchSpecification {
 
-    public Specification<? extends Event> getEventsSpecification(String privacy, String group, String cat) {
+    public Specification<Event> getEventsSpecification(String privacy, String group, String cat) {
+        log.info("EventSearchSpecification - getEventsSpecification()");
 
-        return (root, query, criteriaBuilder) -> {
+        Specification<Event> specification = (root, query, criteriaBuilder) -> {
 
             Root<InternalEvent> internalEventRoot = criteriaBuilder.treat(root, InternalEvent.class);
 
             List<Predicate> predicates = new ArrayList<>();
 
-//            query.where(
-//                    criteriaBuilder.and(
-//                            criteriaBuilder.equal(root.type(), sublcass)
-//                    )
-//            );
-
-            if(Objects.nonNull(privacy)) {
+            if (Objects.nonNull(privacy)) {
 
                 if (privacy.equals("true")) {
-
                     predicates.add(
-                            criteriaBuilder.isTrue(internalEventRoot.get("isPrivate"))
+                            criteriaBuilder.isTrue(root.get("isPrivate"))
                     );
                 }
 
                 if (privacy.equals("false")) {
-
-
                     predicates.add(
-                            criteriaBuilder.or(
-                                    criteriaBuilder.like(root.get("eventInfo").get("name"), "%Ext%"),
-                                    criteriaBuilder.isFalse(internalEventRoot.get("isPrivate"))
-
-                                    )
+                            criteriaBuilder.isFalse(root.get("isPrivate"))
                     );
-
                 }
             }
 
             if (Objects.nonNull(group) && group.equals("true")) {
-
-
                 predicates.add(
-
-                                criteriaBuilder.isNotNull(criteriaBuilder.treat(root, InternalEvent.class).get("group"))
+                        criteriaBuilder.isNotNull(internalEventRoot.get("group"))
                 );
-
             }
 
-
+            if (Objects.nonNull(cat)) {
+                predicates.add(
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("eventInfo").get("category").get("name")), cat.toLowerCase())
+                );
+            }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
+
+        log.info("EventSearchSpecification - getEventsSpecification() return {}", specification);
+        return specification;
     }
 
-    public Sort.Order createSortOrder(String sort, String sortOrder){
+    public Sort.Order createSortOrder(String sort, String sortOrder) {
+        log.info("EventSearchSpecification - createSortOrder()");
+        List<String> sortingParameters = List.of("participants", "name", "location");
 
-        List<String> sortingParametres = List.of("name");
-        if(!sortingParametres.contains(sort)) sort = "eventInfo_name";
-        if(!sortOrder.equals("DESC")) sortOrder = "ASC";
+        if (sort == null || !sortingParameters.contains(sort)) {
+            sort = "eventInfo_startDate";
+            if (sortOrder == null) {
+                sortOrder = "DESC";
+            }
+        }
 
-        return new Sort.Order(Sort.Direction.valueOf(sortOrder), sort);
+        if (sort.equals("participants")) {
+            sort = "numOfAcceptedStatusUsers";
+            if (sortOrder == null) {
+                sortOrder = "DESC";
+            }
+        }
+
+        if (sort.equals("name")) {
+            sort = "eventInfo_name";
+            if (sortOrder == null) {
+                sortOrder = "ASC";
+            }
+        }
+
+        if (sort.equals("location")) {
+            sort = "eventInfo_location_city";
+            if (sortOrder == null) {
+                sortOrder = "ASC";
+            }
+        }
+
+        if (!sortOrder.equals("ASC") && !sortOrder.equals("DESC")) {
+            sortOrder = "ASC";
+        }
+
+        Sort.Order order = new Sort.Order(Sort.Direction.valueOf(sortOrder), sort);
+
+        log.info("EventSearchSpecification - createSortOrder() return {}", order);
+        return order;
     }
 }

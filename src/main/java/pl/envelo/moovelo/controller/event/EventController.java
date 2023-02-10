@@ -70,8 +70,8 @@ public class EventController {
             String privacy,
             String group,
             String cat,
-            @RequestParam(defaultValue = "eventInfo.date") String sort,
-            @RequestParam(defaultValue = "DESC") String sortOrder,
+            String sort,
+            String sortOrder,
             @RequestParam(defaultValue = "0") Integer page) {
         log.info("EventController - getAllEvents()");
 
@@ -109,6 +109,18 @@ public class EventController {
             case EXTERNAL_EVENT ->
                     EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
         }).toList();
+        return eventsDto;
+    }
+
+    private Page<EventListResponseDto> mapEventToEventListResponseDto(Page<? extends Event> allEvents) {
+        Page<EventListResponseDto> eventsDto = allEvents.map(event -> switch (event.getEventType()) {
+            case EVENT -> EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
+            case INTERNAL_EVENT ->
+                    EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
+            case CYCLIC_EVENT -> EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) event);
+            case EXTERNAL_EVENT ->
+                    EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
+        });
         return eventsDto;
     }
 
