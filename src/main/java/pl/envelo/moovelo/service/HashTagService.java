@@ -1,11 +1,7 @@
 package pl.envelo.moovelo.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.repository.HashtagRepository;
@@ -20,31 +16,25 @@ public class HashTagService {
     private static final int INCREMENT_HASHTAG_OCCURRENCE = 1;
     private final HashtagRepository hashtagRepository;
 
-
-    public List<Hashtag> getAllVisibleHashtags() {
-        return hashtagRepository.findHashtagsByVisibleIsTrue();
-    }
-
-    public List<Hashtag> validateHashtags(List<Hashtag> hashtags) {
-        List<Hashtag> hashtagListToSave = new ArrayList<>();
-        List<Hashtag> allVisibleHashtagsInDb = getAllVisibleHashtags();
-
+    public List<Hashtag> hashtagsToAssign(List<Hashtag> hashtags) {
+        List<Hashtag> hashtagsToAssign = new ArrayList<>();
         hashtags.forEach(hashtag -> {
-            if (allVisibleHashtagsInDb.contains(hashtag)) {
-                incrementHashTagOccurrence(hashtag);
-            } else {
-                hashtag.setOccurrences(INCREMENT_HASHTAG_OCCURRENCE);
-                hashtag.setVisible(true);
-                hashtagListToSave.add(hashtag);
+            if (checkIfHashtagExistByHashTagValue(hashtag)) {
+                Hashtag incrementedHashtag = incrementHashTagOccurrence(hashtag);
+                hashtagsToAssign.add(incrementedHashtag);
+            }
+            if (!checkIfHashtagExistByHashTagValue(hashtag)) {
+                Hashtag createdHashtag = createHashTag(hashtag);
+                hashtagsToAssign.add(createdHashtag);
             }
         });
-        return hashtagListToSave;
+        return hashtagsToAssign;
     }
 
-    private void incrementHashTagOccurrence(Hashtag hashtag) {
-        Hashtag hashtagByHashtagValue = hashtagRepository.findHashtagByHashtagValue(hashtag.getHashtagValue());
-        hashtagByHashtagValue.setOccurrences(hashtagByHashtagValue.getOccurrences() + INCREMENT_HASHTAG_OCCURRENCE);
-        hashtagRepository.save(hashtagByHashtagValue);
+    private Hashtag incrementHashTagOccurrence(Hashtag hashtag) {
+        Hashtag hashtagToIncrement = hashtagRepository.findHashtagByHashtagValue(hashtag.getHashtagValue());
+        hashtagToIncrement.setOccurrences(hashtagToIncrement.getOccurrences() + INCREMENT_HASHTAG_OCCURRENCE);
+        return hashtagRepository.save(hashtagToIncrement);
     }
 
     public void decrementHashtagOccurrence(Hashtag hashtag) {
@@ -52,5 +42,15 @@ public class HashTagService {
             hashtag.setOccurrences(hashtag.getOccurrences() - 1);
             hashtagRepository.save(hashtag);
         }
+    }
+
+    private Hashtag createHashTag(Hashtag hashtag) {
+        hashtag.setVisible(true);
+        hashtag.setOccurrences(INCREMENT_HASHTAG_OCCURRENCE);
+        return hashtagRepository.save(hashtag);
+    }
+
+    private boolean checkIfHashtagExistByHashTagValue(Hashtag hashtag) {
+        return hashtagRepository.findHashtagByHashtagValue(hashtag.getHashtagValue()) != null;
     }
 }

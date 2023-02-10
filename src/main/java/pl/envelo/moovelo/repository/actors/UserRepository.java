@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import pl.envelo.moovelo.entity.actors.User;
 
 import java.util.List;
-
 import java.util.Optional;
 
 @Primary
