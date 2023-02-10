@@ -28,7 +28,7 @@ public class Event {
     @ManyToOne
     private EventOwner eventOwner;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private EventInfo eventInfo;
 
     private int limitedPlaces;

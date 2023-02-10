@@ -54,7 +54,7 @@ public class EventController {
                 .buildAndExpand(newEvent.getId())
                 .toUri();
 
-        log.info("EventController - getAllEvents() return {}", displayEventResponseDto);
+        log.info("EventController - () return createNewEvent() - dto {}", displayEventResponseDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(uri)
@@ -90,7 +90,7 @@ public class EventController {
         return ResponseEntity.ok(eventsDto);
     }
 
-    private List<EventListResponseDto> mapEventToEventListResponseDto(List<? extends Event> allEvents) {
+    private List<EventListResponseDto>  mapEventToEventListResponseDto(List<? extends Event> allEvents) {
         List<EventListResponseDto> eventsDto = allEvents.stream().map(event -> switch (event.getEventType()) {
             case EVENT -> EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
             case INTERNAL_EVENT ->
@@ -180,10 +180,10 @@ public class EventController {
                 eventService.updateEventById(eventId, eventFromDto, loggedInUser.getId());
 
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Logged in user is not authorized to update the event" + eventId);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Logged in user is not authorized to update the  with id: " + eventId);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event with " + eventId + " does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event with id " + eventId + " does not exist");
         }
         log.info("EventController - updateEventById() - event with eventId = {} updated", eventId);
         return ResponseEntity.status(HttpStatus.OK).build();

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @AllArgsConstructor
-public
-class UserIdDto {
+public class UserIdDto {
     private Long userId;
 }
