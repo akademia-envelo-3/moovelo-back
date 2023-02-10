@@ -54,6 +54,8 @@ public class EventController {
                 .buildAndExpand(newEvent.getId())
                 .toUri();
 
+        log.info("EventController - getAllEvents() return {}", displayEventResponseDto);
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(uri)
                 .body(displayEventResponseDto);

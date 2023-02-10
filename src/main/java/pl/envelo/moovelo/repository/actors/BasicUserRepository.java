@@ -2,7 +2,6 @@ package pl.envelo.moovelo.repository.actors;
 
 import org.springframework.stereotype.Repository;
 import pl.envelo.moovelo.entity.actors.BasicUser;
-import pl.envelo.moovelo.entity.actors.User;
 
 import java.util.List;
 
