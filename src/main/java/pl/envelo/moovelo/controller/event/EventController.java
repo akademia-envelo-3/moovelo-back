@@ -5,18 +5,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.envelo.moovelo.controller.AuthenticatedUser;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
+import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
-import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
 import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.*;
@@ -149,8 +147,7 @@ public class EventController {
         log.info("EventController - updateEventOwnershipById()");
         Long currentEventOwnerUserId = eventService.getEventOwnerUserIdByEventId(eventId);
         User loggedInUser = authenticatedUser.getAuthenticatedUser();
-        if (loggedInUser.getRole().name().equals("ROLE_USER") &&
-                loggedInUser.getId().equals(currentEventOwnerUserId)
+        if (basicUserService.isBasicUserEventOwner(loggedInUser, currentEventOwnerUserId)
                 || loggedInUser.getRole().name().equals("ROLE_ADMIN")) {
             Long newOwnerUserId = eventOwnershipRequestDto.getNewOwnerUserId();
             if (basicUserService.checkIfBasicUserExistsById(newOwnerUserId)) {
@@ -168,21 +165,24 @@ public class EventController {
     }
 
     @PutMapping("/events/{eventId}")
-    @PreAuthorize("hasRole('BASIC_USER')")
-    public ResponseEntity<?> updateEventById(@PathVariable Long eventId, @RequestBody EventRequestDto eventRequestDto) {
-        log.info("EventController - updateEventById()");
-        Event eventById = eventService.getEventById(eventId);
-        Long currentEventOwnerUserId = eventService.getEventOwnerUserIdByEventId(eventId);
-        User loggedInUser = authenticatedUser.getAuthenticatedUser();
-        if (isBasicUserEventOwner(loggedInUser, currentEventOwnerUserId)) {
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<String> updateEventById(@PathVariable Long eventId, @RequestBody EventRequestDto eventRequestDto) {
+        log.info("EventController - updateEventById() - eventId = {}", eventId);
+        if (eventService.checkIfEventExistsById(eventId)) {
+            Long currentEventOwnerUserId = eventService.getEventOwnerUserIdByEventId(eventId);
+            User loggedInUser = authenticatedUser.getAuthenticatedUser();
+            if (basicUserService.isBasicUserEventOwner(loggedInUser, currentEventOwnerUserId)) {
+                EventMapperInterface eventMapper = new EventMapper();
+                Event eventFromDto = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.EVENT);
+                eventService.updateEventById(eventId, eventFromDto, loggedInUser.getId());
 
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Logged in user is not authorized to update the event" + eventId);
+            }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event with " + eventId + " does not exist");
         }
-    }
-
-    private boolean isBasicUserEventOwner(User user, Long eventOwnerUserId) {
-        return user.getRole().name().equals("ROLE_USER") &&
-                user.getId().equals(eventOwnerUserId);
+        log.info("EventController - updateEventById() - event with eventId = {} updated", eventId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

@@ -40,8 +40,8 @@ public class EventOwnerService {
     }
 
     /**
-     * Method check if location is assigned to any EventInfo. If list of EventInfos is empty,
-     * then location entity is remove from database.
+     * Method check if EventOwner is assigned to any Event. If not,
+     * remove the EventOwner entity remove from database.
      */
     public void removeEventOwnerWithNoEvents(EventOwner eventOwner) {
         log.info("EventOwnerService - removeEventOwnerWithNoEvents() - eventOwner = {}", eventOwner);

@@ -123,12 +123,30 @@ public class EventService {
 
     @Transactional
     public void updateEventOwnershipByEventId(Long eventId, EventOwner eventOwner, Long currentEventOwnerUserId) {
-        log.info("EventService - updateEventOwnershipById()");
+        log.info("EventService - updateEventOwnershipById() - eventId = {}", eventId);
         Event event = getEventById(eventId);
         eventOwnerService.createEventOwner(eventOwner);
         event.setEventOwner(eventOwner);
         eventOwnerService.removeEventFromEventOwnerEvents(event, currentEventOwnerUserId);
         eventOwnerService.removeEventOwnerWithNoEvents(getEventOwnerByUserId(currentEventOwnerUserId));
+        log.info("EventService - updateEventOwnershipById() - eventId = {} updated", eventId);
+    }
+
+    public boolean checkIfEventExistsById(Long eventId) {
+        ;
+        return eventRepository.findById(eventId).isPresent();
+    }
+
+    @Transactional
+    public void updateEventById(Long eventId, Event event, Long userId) {
+        log.info("EventService - updateEventById() - eventId = {}", eventId);
+        Event eventInDb = getEventById(eventId);
+        eventInDb.setEventOwner(getEventOwnerByUserId(userId));
+        eventInDb.setEventInfo(eventInfoService.getEventInfoWithLocationCoordinates(event.getEventInfo()));
+        eventInDb.setEventInfo(eventInfoService.checkIfCategoryExists(event.getEventInfo()));
+        eventInDb.setLimitedPlaces(event.getLimitedPlaces());
+        eventInDb.setHashtags(hashTagService.validateHashtags(event.getHashtags()));
+        log.info("EventService - updateEventById() - eventId = {} updated", eventId);
     }
 }
 
