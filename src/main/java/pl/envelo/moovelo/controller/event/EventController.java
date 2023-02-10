@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.envelo.moovelo.controller.AuthenticatedUser;
@@ -26,11 +25,15 @@ import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.CommentService;
+import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.event.EventService;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
@@ -39,10 +42,13 @@ import java.util.List;
 public class EventController {
 
     //    TODO : Tymaczasowa imitacja ID usera wyciaganego z security
+
     private static final Long USER_ID = 2L;
     private EventService eventService;
     private AuthenticatedUser authenticatedUser;
     private CommentService commentService;
+
+    private BasicUserService basicUserService;
 
     @PostMapping("/events")
     public ResponseEntity<DisplayEventResponseDto> createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
@@ -146,19 +152,28 @@ public class EventController {
     }
 
     @GetMapping("/events/{eventId}/comments")
-    public ResponseEntity<List<Comment>> getAllComments(@PathVariable Long eventId){ //zapytać o paginacje w wybieraniu komentarzy do wydarzenia
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<List<CommentDto>> getAllComments(@PathVariable Long eventId){
         log.info("EventController - getAllComments()");
         Event eventById = eventService.getEventById(eventId);
 
         List<Comment> comments = eventService.getAllComments(eventById);
-        return ResponseEntity.ok(comments);
+        List<CommentDto> commentDtoList = comments.stream()
+                .map(CommentMapper::mapFromCommentToCommentDto)
+                .toList();
+
+        return ResponseEntity.ok(commentDtoList);
     }
 
-    @PostMapping("/events/{eventId}/comments") //
-    public ResponseEntity<?> addCommentWithoutAttachmentToEvent(@PathVariable Long eventId, @RequestBody CommentRequestDto commentRequestDto) {
+
+    @PostMapping("/events/{eventId}/comments")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> addCommentToEvent(@PathVariable Long eventId, @RequestBody @Valid CommentRequestDto commentRequestDto){
         log.info("EventController - addCommentToEvent()");
         Event eventById = eventService.getEventById(eventId);
-        BasicUser basicUser = (BasicUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = authenticatedUser.getAuthenticatedUser();
+        BasicUser basicUser = basicUserService.getBasicUserById(user.getId());
+
         Comment comment = new Comment();
         comment.setEvent(eventById);
         comment.setBasicUser(basicUser);

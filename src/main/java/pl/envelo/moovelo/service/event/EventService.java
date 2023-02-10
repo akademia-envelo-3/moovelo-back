@@ -2,6 +2,13 @@ package pl.envelo.moovelo.service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.entity.Comment;
@@ -82,12 +89,16 @@ public class EventService {
         return eventRepository.findById(event.getId()).isPresent();
     }
 
-    public List<Comment> getAllComments(Event event) {
+
+
+    public List<Comment> getAllComments(Event event){
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("date"));
+
         log.info("EventService - getAllComments()");
-        List<Comment> comments = commentRepository.findAllByEvent(event);
+        List<Comment> comments = commentRepository.findAllByEvent(event, pageable);
 
         if (comments.isEmpty()) {
-            throw new NoSuchElementException("No comments for Event with id: " + event.getId());
+            throw new NoSuchElementException("No Event comments with id: " + event.getId());
         }
 
         log.info("EventService - getAllComments() return {}", comments);
