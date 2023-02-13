@@ -176,9 +176,13 @@ public class EventController {
 
     @GetMapping("/events/{eventId}/users")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<Page<BasicUserDto>> getUsersWithAccess(@PathVariable Long eventId, @RequestParam(defaultValue = "0") Integer page) {
+    public ResponseEntity<Page<BasicUserDto>> getUsersWithAccess(
+            @PathVariable Long eventId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
         log.info("EventController - getUsersWithAccess");
-        Page<BasicUser> usersWithAccess = eventService.getUsersWithAccess(eventId, page);
+        Page<BasicUser> usersWithAccess = eventService.getUsersWithAccess(eventId, page, size);
 
         Page<BasicUserDto> usersWithAccessDto = usersWithAccess.map(BasicUserMapper::map);
 

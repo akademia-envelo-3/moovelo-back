@@ -137,13 +137,12 @@ public class EventService {
         eventOwnerService.removeEventOwnerWithNoEvents(getEventOwnerByUserId(currentEventOwnerUserId));
     }
 
-    public Page<BasicUser> getUsersWithAccess(Long eventId, int page) {
+    public Page<BasicUser> getUsersWithAccess(Long eventId, int page, int size) {
         log.info("EventService - getUsersWithAccess()");
         Event event = getEventById(eventId);
         List<BasicUser> usersWithAccessList = event.getUsersWithAccess();
 
-        int sizeOfPage = 10;
-        Pageable pageable = PageRequest.of(page, sizeOfPage);
+        Pageable pageable = PageRequest.of(page, size);
         Page<BasicUser> usersWithAccess = listToPage(pageable, usersWithAccessList);
         log.info("EventService - getUsersWithAccess() return {}", usersWithAccess);
         return usersWithAccess;
