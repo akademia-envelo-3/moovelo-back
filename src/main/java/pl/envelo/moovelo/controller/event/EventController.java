@@ -2,6 +2,7 @@ package pl.envelo.moovelo.controller.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -174,11 +175,12 @@ public class EventController {
     }
 
     @GetMapping("/events/{eventId}/users")
-    public ResponseEntity<List<BasicUserDto>> getUsersWithAccess(@PathVariable Long eventId) {
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    public ResponseEntity<Page<BasicUserDto>> getUsersWithAccess(@PathVariable Long eventId, @RequestParam(defaultValue = "0") Integer page) {
         log.info("EventController - getUsersWithAccess");
-        List<BasicUser> usersWithAccess = eventService.getUsersWithAccess(eventId);
+        Page<BasicUser> usersWithAccess = eventService.getUsersWithAccess(eventId, page);
 
-        List<BasicUserDto> usersWithAccessDto = usersWithAccess.stream().map(BasicUserMapper::map).toList();
+        Page<BasicUserDto> usersWithAccessDto = usersWithAccess.map(BasicUserMapper::map);
 
         log.info("EventController - getUsersWithAccess() return {}", usersWithAccessDto);
         return ResponseEntity.ok(usersWithAccessDto);
