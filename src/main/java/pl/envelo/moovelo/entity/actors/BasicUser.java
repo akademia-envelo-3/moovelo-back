@@ -1,13 +1,11 @@
 package pl.envelo.moovelo.entity.actors;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.categories.CategoryProposal;
 import pl.envelo.moovelo.entity.events.Event;
-import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.entity.groups.Group;
 
 import javax.persistence.Entity;
@@ -15,6 +13,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -31,8 +30,17 @@ public class BasicUser extends User {
     @ManyToMany
     private List<Group> groups;
 
-    @OneToMany
-    private List<Event> acceptedEvents;
+    @ManyToMany(mappedBy = "acceptedStatusUsers")
+    private List<Event> accessibleEvents;
+
+    @ManyToMany(mappedBy = "acceptedStatusUsers")
+    private Set<Event> acceptedEvents;
+
+    @ManyToMany(mappedBy = "pendingStatusUsers")
+    private Set<Event> pendingEvents;
+
+    @ManyToMany(mappedBy = "rejectedStatusUsers")
+    private Set<Event> rejectedEvents;
 
     @Override
     public boolean equals(Object o) {
@@ -43,7 +51,7 @@ public class BasicUser extends User {
             return false;
         }
         BasicUser basicUser = (BasicUser) o;
-        return  Objects.equals(categoryProposals, basicUser.categoryProposals)
+        return Objects.equals(categoryProposals, basicUser.categoryProposals)
                 && Objects.equals(comments, basicUser.comments) && Objects.equals(groups, basicUser.groups)
                 && Objects.equals(acceptedEvents, basicUser.acceptedEvents);
     }

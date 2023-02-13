@@ -5,14 +5,13 @@ import lombok.Getter;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.actor.VisitorDto;
 
-import java.util.List;
+import java.util.Set;
 
-@Builder
 @Getter
-
+@Builder
 public class EventParticipationStatsDto {
-    private List<BasicUserDto> accepted;
-    private List<BasicUserDto> pending;
-    private List<BasicUserDto> rejected;
-    private List<VisitorDto> visitors;
+    private Set<BasicUserDto> accepted;
+    private Set<BasicUserDto> pending;
+    private Set<BasicUserDto> rejected;
+    private Set<VisitorDto> visitors;
 }

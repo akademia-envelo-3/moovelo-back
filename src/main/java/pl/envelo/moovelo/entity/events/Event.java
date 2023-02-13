@@ -1,7 +1,6 @@
 package pl.envelo.moovelo.entity.events;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.Hashtag;
@@ -16,8 +15,11 @@ import java.util.Set;
 @Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter
-@NoArgsConstructor
 public class Event {
+
+    public Event() {
+        this.eventType = EventType.EVENT;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,35 +28,50 @@ public class Event {
     @ManyToOne
     private EventOwner eventOwner;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private EventInfo eventInfo;
 
     private int limitedPlaces;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<EventSurvey> eventSurveys;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JoinTable(
-            name = "events_usersWithAccess",
+            name = "events_X_basic_users_access",
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<BasicUser> usersWithAccess;
 
-    @OneToMany
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "events_X_basic_users_accepted",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private Set<BasicUser> acceptedStatusUsers;
 
-    @OneToMany
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "events_X_basic_users_pending",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private Set<BasicUser> pendingStatusUsers;
 
-    @OneToMany
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "events_X_basic_users_rejected",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private Set<BasicUser> rejectedStatusUsers;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.DETACH}, fetch = FetchType.EAGER)
     @JoinTable(
             name = "events_hashtags",
             joinColumns = @JoinColumn(name = "event_id"),
@@ -64,4 +81,5 @@ public class Event {
 
     @Enumerated(value = EnumType.STRING)
     private EventType eventType;
+
 }

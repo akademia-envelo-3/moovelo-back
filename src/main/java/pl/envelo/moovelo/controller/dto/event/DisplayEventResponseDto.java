@@ -23,6 +23,7 @@ public class DisplayEventResponseDto {
     private boolean isPrivate;
     private GroupResponseDto group;
     private List<HashtagListResponseDto> hashtags;
+    private List<BasicUserDto> usersWithAccess;
     private EventParticipationStatsDto eventParticipationStats;
     private int frequencyInDays;
     private int numberOfRepeats;

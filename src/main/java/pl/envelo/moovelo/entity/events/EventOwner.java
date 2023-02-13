@@ -19,6 +19,7 @@ public class EventOwner {
 
     private Long userId;
 
-    @OneToMany(mappedBy = "eventOwner")
+    @OneToMany(mappedBy = "eventOwner", cascade = CascadeType.ALL)
     private List<Event> events;
+
 }
