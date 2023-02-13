@@ -40,4 +40,11 @@ public class JwtTokens {
                 .withExpiresAt(new Date(System.currentTimeMillis() + Constants.VISITOR_CONFIRM_TOKEN_DURATION_TIME))
                 .sign(algorithm);
     }
+
+    public static String createCancellationToken(Long visitorId, Long externalEventId) {
+        return JWT.create()
+                .withClaim("visitorId", visitorId)
+                .withClaim("externalEventId", externalEventId)
+                .sign(algorithm);
+    }
 }

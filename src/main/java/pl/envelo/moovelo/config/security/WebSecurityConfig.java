@@ -26,12 +26,12 @@ public class WebSecurityConfig {
     private static final String[] AUTH_WHITELIST = {
         "/api/login/**",
         "/api/refreshToken/**",
-        "/api/v1/externalEvents/**",
         "/v2/api-docs",
         "/v3/api-docs",
         "/swagger-resources/**",
         "/swagger-ui/**",
-        "/h2/**"
+        "/h2/**",
+        "/api/v1/externalEvents/**"
     };
 
     @Bean
