@@ -12,7 +12,6 @@ import java.util.Optional;
 @AllArgsConstructor
 @Service
 public class BasicUserService {
-
     private BasicUserRepository basicUserRepository;
 
     public List<BasicUser> getAllBasicUsers() {
@@ -24,6 +23,4 @@ public class BasicUserService {
                 .orElseThrow(() -> new UsernameNotFoundException("BasicUser with id " + id + " not found."));
         return basicUser;
     }
-
-
 }

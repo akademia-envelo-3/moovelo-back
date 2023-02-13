@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -11,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.envelo.moovelo.CommentPage;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
@@ -20,6 +22,7 @@ import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.repository.CommentRepository;
 import pl.envelo.moovelo.repository.event.EventOwnerRepository;
 import pl.envelo.moovelo.repository.event.EventRepository;
+import pl.envelo.moovelo.service.CommentService;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.LocationService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
@@ -42,7 +45,8 @@ public class EventService {
     private final HashTagService hashTagService;
     private final BasicUserService basicUserService;
     private LocationService locationService;
-    private CommentRepository commentRepository;
+
+    private CommentService commentService;
 
     public List<? extends Event> getAllEvents() {
         log.info("EventService - getAllEvents()");
@@ -89,13 +93,9 @@ public class EventService {
         return eventRepository.findById(event.getId()).isPresent();
     }
 
-
-
-    public List<Comment> getAllComments(Event event){
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("date"));
-
-        log.info("EventService - getAllComments()");
-        List<Comment> comments = commentRepository.findAllByEvent(event, pageable);
+    public Page<Comment> getComments (Event event, CommentPage commentPage){
+        log.info("EventService - getComments()");
+        Page<Comment> comments = commentService.getComments(commentPage);
 
         if (comments.isEmpty()) {
             throw new NoSuchElementException("No Event comments with id: " + event.getId());
@@ -103,7 +103,6 @@ public class EventService {
 
         log.info("EventService - getAllComments() return {}", comments);
         return comments;
-
     }
 
     public void removeEventById(long id) {

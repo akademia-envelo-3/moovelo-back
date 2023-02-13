@@ -10,8 +10,5 @@ import java.util.Optional;
 @Primary
 public interface UserRepository<I extends User> extends JpaRepository<I, Long> {
     List<I> findAll();
-
     Optional<User> findByEmail(String email);
-
-
 }
