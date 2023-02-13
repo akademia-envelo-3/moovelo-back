@@ -3,6 +3,7 @@ package pl.envelo.moovelo.service.event;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.events.Event;
@@ -40,7 +41,6 @@ public class EventService {
         log.info("EventService - getAllEvents() return {}", allEvents.toString());
         return allEvents;
     }
-
 
     public Event createNewEvent(Event event, Long userId) {
         log.info("EventService - createNewEvent()");
@@ -129,6 +129,12 @@ public class EventService {
         event.setEventOwner(eventOwner);
         eventOwnerService.removeEventFromEventOwnerEvents(event, currentEventOwnerUserId);
         eventOwnerService.removeEventOwnerWithNoEvents(getEventOwnerByUserId(currentEventOwnerUserId));
+    }
+
+    public void setStatus(Long eventId, Long userId, String status) {
+        log.info("EventService - setStatus()");
+
+        List<String> statuses = List.of("accepted", "pending", "rejected");
     }
 }
 
