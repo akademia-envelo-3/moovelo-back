@@ -39,7 +39,7 @@ public class EventService {
         log.info("EventService - getAllEvents() return {}", allEvents.toString());
         return allEvents;
     }
-    
+
     public Event createNewEvent(Event event, Long userId) {
         log.info("EventService - createNewEvent()");
         if (checkIfEntityExist(event)) {
@@ -103,8 +103,7 @@ public class EventService {
     private Event validateAggregatedEntities(Event event, Long userId) {
         Event eventWithFieldsAfterValidation = new Event();
         eventWithFieldsAfterValidation.setEventOwner(eventOwnerService.assignEventOwnerToCurrentEvent(userId));
-        // TODO: 10.02.2023 wywalic
-//        eventWithFieldsAfterValidation.setEventInfo(eventInfoService.checkIfCategoryExists(event.getEventInfo()));
+        eventWithFieldsAfterValidation.setEventType(event.getEventType());
         eventWithFieldsAfterValidation.setLimitedPlaces(event.getLimitedPlaces());
         eventWithFieldsAfterValidation.setUsersWithAccess(basicUserService.getAllBasicUsers());
         return eventWithFieldsAfterValidation;

@@ -6,8 +6,11 @@ import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.RestController;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.actors.BasicUser;
+import pl.envelo.moovelo.entity.events.EventType;
+import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.repository.HashtagRepository;
 import pl.envelo.moovelo.repository.actors.BasicUserRepository;
+import pl.envelo.moovelo.repository.event.InternalEventRepository;
 
 @RestController
 @AllArgsConstructor
@@ -15,6 +18,7 @@ public class MooveloApi {
 
     BasicUserRepository basicUserRepository;
     HashtagRepository hashtagRepository;
+    InternalEventRepository<InternalEvent>  internalEventRepository;
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
@@ -31,6 +35,7 @@ public class MooveloApi {
         basicUserRepository.save(basicUser1);
         basicUserRepository.save(basicUser2);
         basicUserRepository.save(basicUser3);
+
     }
 
     @EventListener(ApplicationReadyEvent.class)
