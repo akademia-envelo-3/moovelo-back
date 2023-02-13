@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.categories.Category;
 import pl.envelo.moovelo.entity.events.EventInfo;
+import pl.envelo.moovelo.repository.event.EventInfoRepository;
 import pl.envelo.moovelo.service.LocationService;
 import pl.envelo.moovelo.service.category.CategoryService;
 
@@ -13,18 +14,15 @@ import pl.envelo.moovelo.service.category.CategoryService;
 public class EventInfoService {
     private final LocationService locationService;
     private final CategoryService categoryService;
+    private final EventInfoRepository eventInfoRepository;
 
-    public EventInfo getEventInfoWithLocationCoordinates(EventInfo eventInfo) {
-        Location locationBeforeGeocodingApiRequest = eventInfo.getLocation();
-        Location locationAfterGeocodingApiRequest =
-                locationService.getLocationFromGeocodingApi(locationBeforeGeocodingApiRequest);
-        eventInfo.setLocation(locationAfterGeocodingApiRequest);
-        return eventInfo;
-    }
+    public EventInfo validateEventInfo(EventInfo eventInfo) {
+        Location validatedLocation = locationService.validateLocation(eventInfo.getLocation());
+        Category validatedCategory = categoryService.validateCategory(eventInfo.getCategory());
 
-    public EventInfo checkIfCategoryExists(EventInfo eventInfo) {
-        Category category = categoryService.checkIfCategoryExists(eventInfo.getCategory());
-        eventInfo.setCategory(category);
-        return eventInfo;
+        eventInfo.setLocation(validatedLocation);
+        eventInfo.setCategory(validatedCategory);
+
+        return eventInfoRepository.save(eventInfo);
     }
 }

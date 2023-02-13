@@ -16,7 +16,7 @@ public class HashTagService {
     private static final int INCREMENT_HASHTAG_OCCURRENCE = 1;
     private final HashtagRepository hashtagRepository;
 
-    public List<Hashtag> hashtagsToAssign(List<Hashtag> hashtags) {
+    public List<Hashtag> getHashtagsToAssign(List<Hashtag> hashtags) {
         List<Hashtag> hashtagsToAssign = new ArrayList<>();
         hashtags.forEach(hashtag -> {
             if (checkIfHashtagExistByHashTagValue(hashtag)) {

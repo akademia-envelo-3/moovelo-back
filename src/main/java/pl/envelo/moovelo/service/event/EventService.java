@@ -46,10 +46,14 @@ public class EventService {
         if (checkIfEntityExist(event)) {
             throw new EntityExistsException(EVENT_EXIST_MESSAGE);
         } else {
-            List<Hashtag> eventHashtags = hashTagService.hashtagsToAssign(event.getHashtags());
+            List<Hashtag> hashtagsToAssign = hashTagService.getHashtagsToAssign(event.getHashtags());
+            EventInfo validatedEventInfo = eventInfoService.validateEventInfo(event.getEventInfo());
 
             Event eventAfterFieldValidation = validateAggregatedEntitiesForCreateEvent(event, userId);
-            eventAfterFieldValidation.setHashtags(eventHashtags);
+            eventAfterFieldValidation.setHashtags(hashtagsToAssign);
+            eventAfterFieldValidation.setEventInfo(validatedEventInfo);
+
+            log.info("EventService - createNewEvent() return {}", eventAfterFieldValidation);
             return eventRepository.save(eventAfterFieldValidation);
         }
     }
@@ -105,9 +109,7 @@ public class EventService {
 
     private void setValidatedBasicEventFields(Event event, Long userId, Event eventWithFieldsAfterValidation) {
         eventWithFieldsAfterValidation.setEventOwner(eventOwnerService.getEventOwnerByUserId(userId));
-        eventWithFieldsAfterValidation
-                .setEventInfo(eventInfoService.getEventInfoWithLocationCoordinates(event.getEventInfo()));
-        eventWithFieldsAfterValidation.setEventInfo(eventInfoService.checkIfCategoryExists(event.getEventInfo()));
+        eventWithFieldsAfterValidation.setEventType(event.getEventType());
         eventWithFieldsAfterValidation.setLimitedPlaces(event.getLimitedPlaces());
         eventWithFieldsAfterValidation.setUsersWithAccess(basicUserService.getAllBasicUsers());
     }
@@ -115,17 +117,24 @@ public class EventService {
     @Transactional
     public void updateEventById(Long eventId, Event event, Long userId) {
         log.info("EventService - updateEventById() - eventId = {}", eventId);
-        validateAggregatedEntitiesForUpdateEvent(eventId, event, userId);
+        List<Hashtag> hashtagsToAssign = hashTagService.getHashtagsToAssign(event.getHashtags());
+        EventInfo validatedEventInfo = eventInfoService.validateEventInfo(event.getEventInfo());
+
+        Event eventInDb = validateAggregatedEntitiesForUpdateEvent(eventId, event, userId);
+        eventInDb.setHashtags(hashtagsToAssign);
+        // TODO: 13.02.2023 - zmiana metody na updateEventInfo
+        eventInDb.setEventInfo(validatedEventInfo);
         log.info("EventService - updateEventById() - eventId = {} updated", eventId);
     }
 
-    private void validateAggregatedEntitiesForUpdateEvent(Long eventId, Event event, Long userId) {
+    private Event validateAggregatedEntitiesForUpdateEvent(Long eventId, Event event, Long userId) {
         Event eventInDb = getEventById(eventId);
         EventInfo formerEventInfo = eventInDb.getEventInfo();
         Location formerLocation = formerEventInfo.getLocation();
         formerLocation.getEventsInfos().remove(formerEventInfo);
         setValidatedBasicEventFields(event, userId, eventInDb);
         locationService.removeLocationWithNoEvents(formerLocation);
+        return eventInDb;
     }
 
     public Long getEventOwnerUserIdByEventId(Long eventId) {

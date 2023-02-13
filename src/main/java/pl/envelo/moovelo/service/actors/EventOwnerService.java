@@ -21,10 +21,10 @@ public class EventOwnerService {
     public EventOwner getEventOwnerByUserId(Long userId) {
         EventOwner eventOwnerBasedOnBasicUser;
 
-        if (eventOwnerRepository.findEventOwnerByUserId(userId) == null) {
-            eventOwnerBasedOnBasicUser = createEventOwnerBasedOnExistingUser(userId);
-        } else {
+        if (eventOwnerRepository.findEventOwnerByUserId(userId).isPresent()) {
             eventOwnerBasedOnBasicUser = assignExistingEventOwnerBasedOnUser(userId);
+        } else {
+            eventOwnerBasedOnBasicUser = createEventOwnerBasedOnExistingUser(userId);
         }
         return eventOwnerBasedOnBasicUser;
     }
@@ -36,7 +36,7 @@ public class EventOwnerService {
     }
 
     private EventOwner assignExistingEventOwnerBasedOnUser(Long userId) {
-        return eventOwnerRepository.findEventOwnerByUserId(userId);
+        return eventOwnerRepository.findEventOwnerByUserId(userId).get();
     }
 
     /**
@@ -68,8 +68,13 @@ public class EventOwnerService {
     }
 
     public void removeEventFromEventOwnerEvents(Event event, Long eventOwnerUserId) {
-        EventOwner eventOwnerByUserId = eventOwnerRepository.findEventOwnerByUserId(eventOwnerUserId);
-        List<Event> events = eventOwnerByUserId.getEvents();
-        events.remove(event);
+        Optional<EventOwner> eventOwnerOptional = eventOwnerRepository.findEventOwnerByUserId(eventOwnerUserId);
+        if (eventOwnerOptional.isPresent()) {
+            EventOwner eventOwner = eventOwnerOptional.get();
+            List<Event> events = eventOwner.getEvents();
+            events.remove(event);
+        } else {
+            throw new NoSuchElementException("No event owner with user id: " + eventOwnerUserId);
+        }
     }
 }
