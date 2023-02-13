@@ -10,9 +10,7 @@ import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.VisitorAlreadyAssignedException;
 import pl.envelo.moovelo.repository.event.ExternalEventRepository;
 
-import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor

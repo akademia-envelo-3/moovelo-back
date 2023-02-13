@@ -23,7 +23,9 @@ public class BasicUserService {
         Optional<BasicUser> basicUserOptional = basicUserRepository.findById(userId);
         if (basicUserOptional.isPresent()) {
             return true;
-        } else throw new NoSuchElementException("No BasicUser with id: " + userId);
+        } else {
+            throw new NoSuchElementException("No BasicUser with id: " + userId);
+        }
     }
 }
 

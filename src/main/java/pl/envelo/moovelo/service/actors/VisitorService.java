@@ -13,7 +13,6 @@ import pl.envelo.moovelo.config.security.JwtTokens;
 import pl.envelo.moovelo.controller.dto.actor.VisitorDto;
 import pl.envelo.moovelo.entity.actors.Visitor;
 import pl.envelo.moovelo.exception.NoContentException;
-import pl.envelo.moovelo.exception.VisitorAlreadyAssignedException;
 import pl.envelo.moovelo.exception.VisitorAlreadyExistsException;
 import pl.envelo.moovelo.repository.actors.VisitorRepository;
 import pl.envelo.moovelo.service.EmailService;

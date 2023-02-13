@@ -22,8 +22,12 @@ public class VisitorDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         VisitorDto that = (VisitorDto) o;
         return Objects.equals(firstname, that.firstname)
                 && Objects.equals(lastname, that.lastname)

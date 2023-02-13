@@ -19,8 +19,12 @@ public class EventOwnerDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         EventOwnerDto that = (EventOwnerDto) o;
         return id == that.id && userId == that.userId && Objects.equals(firstname, that.firstname)
                 && Objects.equals(lastname, that.lastname) && Objects.equals(events, that.events);

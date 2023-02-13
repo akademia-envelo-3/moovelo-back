@@ -6,10 +6,7 @@ import pl.envelo.moovelo.controller.dto.group.groupownership.GroupOwnershipReque
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.groups.GroupOwner;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GroupOwnerMapperTest {
 

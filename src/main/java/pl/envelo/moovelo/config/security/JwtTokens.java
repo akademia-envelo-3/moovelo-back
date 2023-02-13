@@ -7,7 +7,6 @@ import pl.envelo.moovelo.Constants;
 import pl.envelo.moovelo.entity.actors.User;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 public class JwtTokens {

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import pl.envelo.moovelo.controller.dto.actor.UserDto;
 import pl.envelo.moovelo.entity.actors.BasicUser;
-import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
