@@ -24,32 +24,10 @@ public class EventSearchSpecification {
 
             List<Predicate> predicates = new ArrayList<>();
 
-            if (Objects.nonNull(privacy)) {
-
-                if (privacy.equals("true")) {
-                    predicates.add(
-                            criteriaBuilder.isTrue(root.get("isPrivate"))
-                    );
-                }
-
-                if (privacy.equals("false")) {
-                    predicates.add(
-                            criteriaBuilder.isFalse(root.get("isPrivate"))
-                    );
-                }
-            }
-
-            if (Objects.nonNull(group) && group.equals("true")) {
-                predicates.add(
-                        criteriaBuilder.isNotNull(internalEventRoot.get("group"))
-                );
-            }
-
-            if (Objects.nonNull(cat)) {
-                predicates.add(
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("eventInfo").get("category").get("name")), cat.toLowerCase())
-                );
-            }
+            predicatePrivacyIsTrue(privacy, root, criteriaBuilder, predicates);
+            predicatePrivacyIsFalse(privacy, root, criteriaBuilder, predicates);
+            predicateGroupNotNull(group, internalEventRoot, criteriaBuilder,  predicates);
+            predicateCategoryLike(cat, root, criteriaBuilder, predicates);
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
@@ -60,43 +38,77 @@ public class EventSearchSpecification {
 
     public Sort.Order createSortOrder(String sort, String sortOrder) {
         log.info("EventSearchSpecification - createSortOrder()");
-        List<String> sortingParameters = List.of("participants", "name", "location");
 
-        if (sort == null || !sortingParameters.contains(sort)) {
-            sort = "eventInfo_startDate";
-            if (sortOrder == null) {
-                sortOrder = "DESC";
-            }
-        }
+        String sortParameter = getSortParameter(sort);
+        String sortOrderParameter = getSortOrder(sortParameter, sortOrder);
 
-        if (sort.equals("participants")) {
-            sort = "numOfAcceptedStatusUsers";
-            if (sortOrder == null) {
-                sortOrder = "DESC";
-            }
-        }
-
-        if (sort.equals("name")) {
-            sort = "eventInfo_name";
-            if (sortOrder == null) {
-                sortOrder = "ASC";
-            }
-        }
-
-        if (sort.equals("location")) {
-            sort = "eventInfo_location_city";
-            if (sortOrder == null) {
-                sortOrder = "ASC";
-            }
-        }
-
-        if (!sortOrder.equals("ASC") && !sortOrder.equals("DESC")) {
-            sortOrder = "ASC";
-        }
-
-        Sort.Order order = new Sort.Order(Sort.Direction.valueOf(sortOrder), sort);
+        Sort.Order order = new Sort.Order(Sort.Direction.valueOf(sortOrderParameter), sortParameter);
 
         log.info("EventSearchSpecification - createSortOrder() return {}", order);
         return order;
     }
+
+    private static void predicatePrivacyIsFalse(String privacy, Root<Event> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (Objects.nonNull(privacy) && privacy.equals("false")) {
+            predicates.add(
+                    criteriaBuilder.isFalse(root.get("isPrivate"))
+            );
+        }
+    }
+
+    private static void predicatePrivacyIsTrue(String privacy, Root<Event> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (Objects.nonNull(privacy) && privacy.equals("true")) {
+            predicates.add(
+                    criteriaBuilder.isTrue(root.get("isPrivate"))
+            );
+        }
+    }
+
+    private static void predicateGroupNotNull(String group, Root<InternalEvent> internalEventRoot,
+                                              CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (Objects.nonNull(group) && group.equals("true")) {
+            predicates.add(
+                    criteriaBuilder.isNotNull(internalEventRoot.get("group"))
+            );
+        }
+    }
+
+    private static void predicateCategoryLike(String cat, Root<Event> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (Objects.nonNull(cat)) {
+            predicates.add(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("eventInfo").get("category").get("name")), cat.toLowerCase())
+            );
+        }
+    }
+
+    private static String getSortParameter(String sort) {
+        List<String> sortingParameters = List.of("participants", "name", "location");
+
+        if (sort == null || !sortingParameters.contains(sort)) {
+            return "eventInfo_startDate";
+        } else if (sort.equals("participants")) {
+            return "numOfAcceptedStatusUsers";
+        } else if (sort.equals("name")) {
+            return "eventInfo_name";
+        } else {
+            return "eventInfo_location_city";
+        }
+    }
+
+    private static String getSortOrder(String sortParameter, String sortOrder) {
+
+        if (sortOrder == null) {
+            if (sortParameter.equals("eventInfo_startDate")
+                    || sortParameter.equals("numOfAcceptedStatusUsers")) {
+                return "DESC";
+            } else {
+                return "ASC";
+            }
+        } else if (!sortOrder.equals("ASC") && !sortOrder.equals("DESC")) {
+            return "ASC";
+        } else {
+            return sortOrder;
+        }
+    }
+
 }
