@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
+import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.exception.NoContentException;
@@ -21,6 +22,7 @@ import javax.persistence.EntityExistsException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 @AllArgsConstructor
 @Service
@@ -135,6 +137,18 @@ public class EventService {
         log.info("EventService - setStatus()");
 
         List<String> statuses = List.of("accepted", "pending", "rejected");
+        if(!statuses.contains(status)) return;
+
+        Event event = getEventById(eventId);
+
+        BasicUser user = basicUserService.getBasicUserById(userId);
+
+        Set<BasicUser> setOfAccepted = event.getAcceptedStatusUsers();
+        Set<BasicUser> setOfPending = event.ge
+
+
+        switch(status)
+            case "accepted" -> event.setAcceptedStatusUsers(event.getAcceptedStatusUsers().add(user));
     }
 }
 
