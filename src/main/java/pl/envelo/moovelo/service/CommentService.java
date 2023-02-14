@@ -1,16 +1,14 @@
 package pl.envelo.moovelo.service;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.CommentPage;
 import pl.envelo.moovelo.controller.AuthenticatedUser;
 import pl.envelo.moovelo.controller.dto.CommentRequestDto;
-import pl.envelo.moovelo.controller.mapper.CommentMapper;
+import pl.envelo.moovelo.controller.dto.CommentResponseDto;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.User;
@@ -20,9 +18,11 @@ import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.event.EventService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Service
+@Slf4j
 public class CommentService {
     private CommentRepository commentRepository;
     private EventService eventService;
@@ -30,6 +30,9 @@ public class CommentService {
     private BasicUserService basicUserService;
 
     public Comment addComment(Long eventID, CommentRequestDto commentRequestDto) {
+        log.info("CommentService - addComment(eventID = {} , commentRequestDto = {})"
+                , eventID, commentRequestDto);
+
         Event eventById = eventService.getEventById(eventID);
         User user = authenticatedUser.getAuthenticatedUser();
         BasicUser basicUser = basicUserService.getBasicUserById(user.getId());
@@ -40,12 +43,16 @@ public class CommentService {
         comment.setText(commentRequestDto.getText());
         comment.setDate(LocalDateTime.now());
 
-        return comment;
+        log.info("return comment = {}", comment);
+
+        return commentRepository.save(comment);
     }
 
-    public Page<Comment> getComments(CommentPage commentPage) {
+    public Page<Comment> getCommentsByEvent(Event event, CommentPage commentPage) {
         Sort sort = Sort.by(commentPage.getSortDirection(), commentPage.getSortBy());
         Pageable pageable = PageRequest.of(commentPage.getPageNumber(), commentPage.getPageSize(), sort);
-        return commentRepository.findAll(pageable);
+        List<Comment> comments = commentRepository.findAllByEvent(event, pageable);
+        Page<Comment> commentResponsePage = new PageImpl<>(comments);
+        return commentResponsePage;
     }
 }

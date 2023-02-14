@@ -21,6 +21,6 @@ public class CommentRequestDto {
     @NotBlank
     private String text;
 
-    private List<Attachment> attachments;
+    private List<AttachmentDto> attachments;
 
 }

@@ -50,4 +50,5 @@ public class Hashtag {
     public int hashCode() {
         return Objects.hash(hashtagValue);
     }
+
 }

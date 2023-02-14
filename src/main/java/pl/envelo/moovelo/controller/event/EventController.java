@@ -16,12 +16,12 @@ import pl.envelo.moovelo.controller.dto.CommentResponseDto;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
+import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
 import pl.envelo.moovelo.controller.mapper.CommentMapper;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
 import pl.envelo.moovelo.entity.Comment;
-import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.*;
@@ -35,7 +35,6 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
@@ -44,15 +43,11 @@ import java.util.stream.Collectors;
 public class EventController {
 
     //    TODO : Tymaczasowa imitacja ID usera wyciaganego z security
-
     private static final Long USER_ID = 2L;
     private EventService eventService;
-
-    private CommentService commentService;
     private AuthenticatedUser authenticatedUser;
-
-
     private BasicUserService basicUserService;
+    private CommentService commentService;
 
     @PostMapping("/events")
     public ResponseEntity<DisplayEventResponseDto> createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
@@ -68,6 +63,8 @@ public class EventController {
                 .path("/{id}")
                 .buildAndExpand(newEvent.getId())
                 .toUri();
+
+        log.info("EventController - getAllEvents() return {}", displayEventResponseDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(uri)
@@ -155,18 +152,42 @@ public class EventController {
         return displayEventResponseDto == null ? ResponseEntity.badRequest().build() : ResponseEntity.ok(displayEventResponseDto);
     }
 
+    @PatchMapping("/events/{eventId}/ownership")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    public ResponseEntity<String> updateEventOwnershipById(@RequestBody EventOwnershipRequestDto eventOwnershipRequestDto,
+                                                           @PathVariable Long eventId) {
+        log.info("EventController - updateEventOwnershipById()");
+        Long currentEventOwnerUserId = eventService.getEventOwnerUserIdByEventId(eventId);
+        User loggedInUser = authenticatedUser.getAuthenticatedUser();
+        if (loggedInUser.getRole().name().equals("ROLE_USER") &&
+                loggedInUser.getId().equals(currentEventOwnerUserId)
+                || loggedInUser.getRole().name().equals("ROLE_ADMIN")) {
+            Long newOwnerUserId = eventOwnershipRequestDto.getNewOwnerUserId();
+            if (basicUserService.checkIfBasicUserExistsById(newOwnerUserId)) {
+                EventOwner eventOwner = eventService.getEventOwnerByUserId(newOwnerUserId);
+                eventService.updateEventOwnershipByEventId(eventId, eventOwner, currentEventOwnerUserId);
+            } else {
+                log.error("EventController - updateEventOwnershipById()", new UnauthorizedRequestException("Unauthorized request"));
+                throw new UnauthorizedRequestException("The id of the new event owner does not belong to any user account");
+            }
+        } else {
+            log.error("EventController - updateEventOwnershipById()", new UnauthorizedRequestException("Unauthorized request"));
+            throw new UnauthorizedRequestException("Logged in user is not authorized to change the event owner of the event with id: " + eventId);
+        }
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/events/{eventId}/comments")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Page<CommentResponseDto>> getComments(@PathVariable Long eventId, CommentPage commentPage) {
-        log.info("EventController - getAllComments()");
-        Event eventById = eventService.getEventById(eventId);
-
-        Page<Comment> comments = eventService.getComments(eventById, commentPage);
+        log.info("EventController - getComments()");
+        Page<Comment> comments = eventService.getComments(eventId, commentPage);
 
         List<CommentResponseDto> commentsResponseDtoList = comments.stream()
                 .map(CommentMapper::mapFromCommentToCommentResponseDto).toList();
 
         Page<CommentResponseDto> commentResponseDtoPage = new PageImpl<>(commentsResponseDtoList);
+        log.info("EventController - return {} ", commentResponseDtoPage);
         return ResponseEntity.ok(commentResponseDtoPage);
     }
 
@@ -176,6 +197,7 @@ public class EventController {
         log.info("EventController - addCommentToEvent()");
 
         Comment savedComment = commentService.addComment(eventId, commentRequestDto);
+        log.info("EventController - return {} ", savedComment);
         return ResponseEntity.ok(savedComment);
     }
 }

@@ -2,14 +2,7 @@ package pl.envelo.moovelo.service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.CommentPage;
@@ -19,8 +12,6 @@ import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.exception.NoContentException;
-import pl.envelo.moovelo.repository.CommentRepository;
-import pl.envelo.moovelo.repository.event.EventOwnerRepository;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.CommentService;
 import pl.envelo.moovelo.service.HashTagService;
@@ -37,7 +28,6 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class EventService {
-    private final EventOwnerRepository eventOwnerRepository;
     private static final String EVENT_EXIST_MESSAGE = "Entity exists in Database";
     private EventRepository<Event> eventRepository;
     private final EventInfoService eventInfoService;
@@ -45,7 +35,6 @@ public class EventService {
     private final HashTagService hashTagService;
     private final BasicUserService basicUserService;
     private LocationService locationService;
-
     private CommentService commentService;
 
     public List<? extends Event> getAllEvents() {
@@ -56,14 +45,16 @@ public class EventService {
         return allEvents;
     }
 
-    @Transactional
+
     public Event createNewEvent(Event event, Long userId) {
         log.info("EventService - createNewEvent()");
         if (checkIfEntityExist(event)) {
             throw new EntityExistsException(EVENT_EXIST_MESSAGE);
         } else {
-            //TODO Stworzonych hasztagow nie chcemy zwracac?
+            List<Hashtag> eventHashtags = hashTagService.hashtagsToAssign(event.getHashtags());
+
             Event eventAfterFieldValidation = validateAggregatedEntities(event, userId);
+            eventAfterFieldValidation.setHashtags(eventHashtags);
             return eventRepository.save(eventAfterFieldValidation);
         }
     }
@@ -125,14 +116,35 @@ public class EventService {
 
     private Event validateAggregatedEntities(Event event, Long userId) {
         Event eventWithFieldsAfterValidation = new Event();
-        eventWithFieldsAfterValidation.setEventOwner(eventOwnerService.assignEventOwnerToCurrentEvent(userId));
+        eventWithFieldsAfterValidation.setEventOwner(eventOwnerService.getEventOwnerByUserId(userId));
         eventWithFieldsAfterValidation
                 .setEventInfo(eventInfoService.getEventInfoWithLocationCoordinates(event.getEventInfo()));
         eventWithFieldsAfterValidation.setEventInfo(eventInfoService.checkIfCategoryExists(event.getEventInfo()));
         eventWithFieldsAfterValidation.setLimitedPlaces(event.getLimitedPlaces());
         eventWithFieldsAfterValidation.setUsersWithAccess(basicUserService.getAllBasicUsers());
-        eventWithFieldsAfterValidation.setHashtags(hashTagService.validateHashtags(event.getHashtags()));
         return eventWithFieldsAfterValidation;
+    }
+
+    public Long getEventOwnerUserIdByEventId(Long eventId) {
+        log.info("EventService - getEventOwnerUserIdByEventId() - eventId = {}", eventId);
+        EventOwner eventOwnerByEventId = eventOwnerService.getEventOwnerByEventId(eventId);
+        Long userId = eventOwnerByEventId.getUserId();
+        log.info("EventService - getEventOwnerUserIdByEventId() return{}", userId);
+        return userId;
+    }
+
+    public EventOwner getEventOwnerByUserId(Long userId) {
+        return eventOwnerService.getEventOwnerByUserId(userId);
+    }
+
+    @Transactional
+    public void updateEventOwnershipByEventId(Long eventId, EventOwner eventOwner, Long currentEventOwnerUserId) {
+        log.info("EventService - updateEventOwnershipById()");
+        Event event = getEventById(eventId);
+        eventOwnerService.createEventOwner(eventOwner);
+        event.setEventOwner(eventOwner);
+        eventOwnerService.removeEventFromEventOwnerEvents(event, currentEventOwnerUserId);
+        eventOwnerService.removeEventOwnerWithNoEvents(getEventOwnerByUserId(currentEventOwnerUserId));
     }
 }
 
