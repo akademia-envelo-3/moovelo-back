@@ -7,7 +7,7 @@ import pl.envelo.moovelo.entity.actors.Role;
 @Getter
 @Builder
 public class UserDto {
-    private long id;
+    private Long id;
     private String email;
     private String password;
     private Role role;

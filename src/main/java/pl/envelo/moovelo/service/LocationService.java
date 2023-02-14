@@ -11,6 +11,8 @@ import pl.envelo.moovelo.controller.mapper.LocationMapper;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.repository.LocationRepository;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 @AllArgsConstructor
@@ -18,10 +20,23 @@ public class LocationService {
     private final GeocodingApiClient geocodingApiClient;
     private LocationRepository locationRepository;
 
-    public Location getLocationFromGeocodingApi(Location locationBeforeApiRequest) {
-        GeocodingApiDto geocodingApiResponse = sendGeolocationApiRequest(locationBeforeApiRequest);
+    public Location validateLocation(Location location) {
+        Location locationAfterGeocodingApiRequest = getLocationAfterGeocodingApiRequest(location);
+        locationAfterGeocodingApiRequest.setApartmentNumber(location.getApartmentNumber());
+        Optional<Location> locationComparedWithDb = checkIfLocationExistInDatabase(locationAfterGeocodingApiRequest);
+        return locationComparedWithDb.orElseGet(() -> locationRepository.save(locationAfterGeocodingApiRequest));
+    }
+
+    private Location getLocationAfterGeocodingApiRequest(Location location) {
+        GeocodingApiDto geocodingApiResponse = sendGeolocationApiRequest(location);
         LocationDto locationDtoAfterGeolocationApiRequest = GeocodingApiDtoToGeolocationDtoMapper.map(geocodingApiResponse);
         return LocationMapper.mapFromLocationDtoToLocationEntity(null, locationDtoAfterGeolocationApiRequest);
+    }
+
+    private Optional<Location> checkIfLocationExistInDatabase(Location locationBeforeApiRequest) {
+        return locationRepository.findLocationByLatitudeAndAltitude(
+                locationBeforeApiRequest.getLatitude(),
+                locationBeforeApiRequest.getAltitude());
     }
 
     private GeocodingApiDto sendGeolocationApiRequest(Location locationBeforeApiRequest) {

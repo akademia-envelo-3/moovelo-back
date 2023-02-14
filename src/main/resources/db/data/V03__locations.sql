@@ -1,2 +1,2 @@
 INSERT INTO LOCATION(ALTITUDE, APARTMENT_NUMBER, CITY,LATITUDE, POSTCODE, STREET, STREET_NUMBER)
-VALUES (0.0, '5A', 'Warsaw', 0.0, '92-100', 'Al. Jerozolimskie', '142');
+VALUES (0.1, '5A', 'Warsaw', 0.1, '92-100', 'Al. Jerozolimskie', '142');

@@ -11,5 +11,5 @@ public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
 
     List<Hashtag> findHashtagsByVisibleIsTrue();
 
-    Hashtag findHashtagByHashtagValue(String hashtagValue);
+    Hashtag findByHashtagValueIgnoreCase(String hashtagValue);
 }
