@@ -40,12 +40,13 @@ public class EventController {
     private BasicUserService basicUserService;
 
     @PostMapping("/events")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<DisplayEventResponseDto> createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
         log.info("EventController - createNewEvent()");
         //TODO do powalczenia z wyborem Rodzaju eventu? albo usunac
         EventMapperInterface eventMapper = new EventMapper();
         Event event = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.EVENT);
-        Event newEvent = eventService.createNewEvent(event, USER_ID);
+        Event newEvent = eventService.createNewEvent(event, U.SER_ID);
         DisplayEventResponseDto displayEventResponseDto = EventMapper.mapEventToEventResponseDto(newEvent);
 
         URI uri = ServletUriComponentsBuilder

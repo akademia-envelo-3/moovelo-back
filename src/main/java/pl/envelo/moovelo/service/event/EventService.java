@@ -31,7 +31,6 @@ public class EventService {
     private final EventOwnerService eventOwnerService;
     private final HashTagService hashTagService;
     private final BasicUserService basicUserService;
-    private LocationService locationService;
 
     public List<? extends Event> getAllEvents() {
         log.info("EventService - getAllEvents()");
@@ -94,7 +93,7 @@ public class EventService {
             EventOwner eventOwner = event.getEventOwner();
             List<Hashtag> hashtags = event.getHashtags();
             eventRepository.delete(event);
-            locationService.removeLocationWithNoEvents(location);
+            eventInfoService.removeLocationWithNoEvents(location);
             eventOwnerService.removeEventOwnerWithNoEvents(eventOwner);
             hashtags.forEach(hashTagService::decrementHashtagOccurrence);
         }
@@ -114,7 +113,6 @@ public class EventService {
         eventWithFieldsAfterValidation.setUsersWithAccess(basicUserService.getAllBasicUsers());
     }
 
-    @Transactional
     public void updateEventById(Long eventId, Event eventFromDto, Long userId) {
         log.info("EventService - updateEventById() - eventId = {}", eventId);
         Event eventInDb = getEventById(eventId);
@@ -125,7 +123,8 @@ public class EventService {
         setValidatedEntitiesForUpdateEvent(eventInDb, eventFromDto, userId);
         eventInDb.setHashtags(hashtagsToAssign);
         eventInDb.setEventInfo(validatedEventInfo);
-        locationService.removeLocationWithNoEvents(formerLocation);
+        eventRepository.save(eventInDb);
+        eventInfoService.removeLocationWithNoEvents(formerLocation);
         log.info("EventService - updateEventById() - eventId = {} updated", eventId);
     }
 

@@ -58,4 +58,8 @@ public class EventInfoService {
             throw new NoSuchElementException("No eventInfo with id: " + id);
         }
     }
+
+    public void removeLocationWithNoEvents(Location location) {
+        locationService.removeLocationWithNoEvents(location);
+    }
 }
