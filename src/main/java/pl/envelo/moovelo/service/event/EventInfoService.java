@@ -9,7 +9,6 @@ import pl.envelo.moovelo.repository.event.EventInfoRepository;
 import pl.envelo.moovelo.service.LocationService;
 import pl.envelo.moovelo.service.category.CategoryService;
 
-import javax.transaction.Transactional;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
