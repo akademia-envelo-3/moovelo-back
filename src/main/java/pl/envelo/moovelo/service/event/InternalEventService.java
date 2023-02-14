@@ -5,13 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.events.Event;
-import pl.envelo.moovelo.entity.events.EventType;
-import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.repository.event.InternalEventRepository;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service

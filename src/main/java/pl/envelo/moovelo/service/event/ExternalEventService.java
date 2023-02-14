@@ -12,8 +12,6 @@ import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.exception.VisitorAlreadyAssignedException;
 import pl.envelo.moovelo.repository.event.ExternalEventRepository;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

@@ -1,9 +1,7 @@
 package pl.envelo.moovelo.controller.event;
 
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,18 +17,19 @@ import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.exception.AvailablePlacesExceededException;
 import pl.envelo.moovelo.exception.EventDateException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
+import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.VisitorService;
 import pl.envelo.moovelo.service.event.ExternalEventService;
 
 import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @RestController
@@ -41,6 +40,7 @@ public class ExternalEventController {
     private ExternalEventService externalEventService;
     private VisitorService visitorService;
     private AuthenticatedUser authenticatedUser;
+    private BasicUserService basicUserService;
 
     @GetMapping("/externalEvents")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -129,7 +129,8 @@ public class ExternalEventController {
         log.info("ExternalEventController - createInvitationLink(eventId = '{}')", eventId);
         ExternalEvent event = externalEventService.getExternalEventById(eventId);
         User user = authenticatedUser.getAuthenticatedUser();
-        if (!event.getEventOwner().getUserId().equals(user.getId())) {
+
+        if (basicUserService.isBasicUserEventOwner(user, event.getEventOwner().getUserId())) {
             throw new UnauthorizedRequestException("You are not the owner of this event!");
         }
 
