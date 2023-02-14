@@ -2,10 +2,7 @@ package pl.envelo.moovelo.service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.entity.Hashtag;
@@ -15,6 +12,9 @@ import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.exception.NoContentException;
+import pl.envelo.moovelo.model.EventsForUserCriteria;
+import pl.envelo.moovelo.model.SortingAndPagingCriteria;
+import pl.envelo.moovelo.repository.event.EventCriteriaRepository;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
@@ -35,6 +35,7 @@ public class EventService {
     private final EventOwnerService eventOwnerService;
     private final HashTagService hashTagService;
     private final BasicUserService basicUserService;
+    private EventCriteriaRepository eventCriteriaRepository;
 
     public List<? extends Event> getAllEvents() {
         log.info("EventService - getAllEvents()");
@@ -179,6 +180,14 @@ public class EventService {
         int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());;
         int last = Math.min(first + pageable.getPageSize(), list.size());
         return new PageImpl<>(list.subList(first, last), pageable, list.size());
+    }
+
+    public Page<? extends Event> getEventsForUser(
+            Long userId,
+            EventsForUserCriteria filterCriteria,
+            SortingAndPagingCriteria sortingAndPagingCriteria
+    ) {
+        return eventCriteriaRepository.findAllEventsAvailableForUserWithFilters(userId, filterCriteria, sortingAndPagingCriteria);
     }
 }
 

@@ -3,6 +3,7 @@ package pl.envelo.moovelo.controller.event;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +25,8 @@ import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
+import pl.envelo.moovelo.model.EventsForUserCriteria;
+import pl.envelo.moovelo.model.SortingAndPagingCriteria;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.event.EventService;
 
@@ -209,5 +212,17 @@ public class EventController {
 
         log.info("EventController - getUsersWithAccess() return {}", usersWithAccessDto);
         return ResponseEntity.ok(usersWithAccessDto);
+    }
+
+    @GetMapping("/events/users/{userId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<Page<?>> getAllEventsAvailableForUser(
+            @PathVariable Long userId,
+            EventsForUserCriteria filterCriteria,
+            SortingAndPagingCriteria sortingAndPagingCriteria
+    ) {
+        log.info("EventController - getAllEventsAvailableForUser");
+        Page<? extends Event> eventsAvailableForUser = eventService.getEventsForUser(userId, filterCriteria, sortingAndPagingCriteria);
+        return ResponseEntity.ok(eventsAvailableForUser);
     }
 }
