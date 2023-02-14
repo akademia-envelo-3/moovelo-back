@@ -47,7 +47,7 @@ public class EventService {
             throw new EntityExistsException(EVENT_EXIST_MESSAGE);
         } else {
             List<Hashtag> hashtagsToAssign = hashTagService.getHashtagsToAssign(event.getHashtags());
-            EventInfo validatedEventInfo = eventInfoService.validateEventInfo(event.getEventInfo());
+            EventInfo validatedEventInfo = eventInfoService.validateEventInfoForCreateEvent(event.getEventInfo());
 
             Event eventAfterFieldValidation = validateAggregatedEntitiesForCreateEvent(event, userId);
             eventAfterFieldValidation.setHashtags(hashtagsToAssign);
@@ -115,25 +115,22 @@ public class EventService {
     }
 
     @Transactional
-    public void updateEventById(Long eventId, Event event, Long userId) {
+    public void updateEventById(Long eventId, Event eventFromDto, Long userId) {
         log.info("EventService - updateEventById() - eventId = {}", eventId);
-        List<Hashtag> hashtagsToAssign = hashTagService.getHashtagsToAssign(event.getHashtags());
-        EventInfo validatedEventInfo = eventInfoService.validateEventInfo(event.getEventInfo());
-
-        Event eventInDb = validateAggregatedEntitiesForUpdateEvent(eventId, event, userId);
+        Event eventInDb = getEventById(eventId);
+        Location formerLocation = eventInDb.getEventInfo().getLocation();
+        Long eventInfoInDbId = eventInDb.getEventInfo().getId();
+        List<Hashtag> hashtagsToAssign = hashTagService.validateHashtagsForUpdateEvent(eventFromDto.getHashtags(), eventInDb.getHashtags());
+        EventInfo validatedEventInfo = eventInfoService.validateEventInfoForUpdateEvent(eventFromDto.getEventInfo(), eventInfoInDbId);
+        setValidatedEntitiesForUpdateEvent(eventInDb, eventFromDto, userId);
         eventInDb.setHashtags(hashtagsToAssign);
-        // TODO: 13.02.2023 - zmiana metody na updateEventInfo
         eventInDb.setEventInfo(validatedEventInfo);
+        locationService.removeLocationWithNoEvents(formerLocation);
         log.info("EventService - updateEventById() - eventId = {} updated", eventId);
     }
 
-    private Event validateAggregatedEntitiesForUpdateEvent(Long eventId, Event event, Long userId) {
-        Event eventInDb = getEventById(eventId);
-        EventInfo formerEventInfo = eventInDb.getEventInfo();
-        Location formerLocation = formerEventInfo.getLocation();
-        formerLocation.getEventsInfos().remove(formerEventInfo);
+    private Event setValidatedEntitiesForUpdateEvent(Event eventInDb, Event event, Long userId) {
         setValidatedBasicEventFields(event, userId, eventInDb);
-        locationService.removeLocationWithNoEvents(formerLocation);
         return eventInDb;
     }
 

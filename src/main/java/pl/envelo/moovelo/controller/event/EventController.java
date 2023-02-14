@@ -90,7 +90,7 @@ public class EventController {
         return ResponseEntity.ok(eventsDto);
     }
 
-    private List<EventListResponseDto>  mapEventToEventListResponseDto(List<? extends Event> allEvents) {
+    private List<EventListResponseDto> mapEventToEventListResponseDto(List<? extends Event> allEvents) {
         List<EventListResponseDto> eventsDto = allEvents.stream().map(event -> switch (event.getEventType()) {
             case EVENT -> EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
             case INTERNAL_EVENT ->
@@ -178,7 +178,6 @@ public class EventController {
                 EventMapperInterface eventMapper = new EventMapper();
                 Event eventFromDto = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.EVENT);
                 eventService.updateEventById(eventId, eventFromDto, loggedInUser.getId());
-
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Logged in user is not authorized to update the  with id: " + eventId);
             }

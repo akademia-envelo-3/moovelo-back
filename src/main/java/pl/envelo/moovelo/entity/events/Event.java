@@ -26,7 +26,6 @@ public class Event {
     @ManyToOne
     protected EventOwner eventOwner;
 
-    // TODO: 13.02.2023  - spraqwdzić działanie Ophan removal bez Cascad
     @OneToOne(orphanRemoval = true)
     protected EventInfo eventInfo;
 
