@@ -89,7 +89,7 @@ public class ExternalEventController {
 
         Visitor visitor = visitorService.createOrGetExistingVisitor(visitorDetails);
         externalEventService.addVisitorToExternalEvent(externalEvent, visitor);
-        visitorService.sendCancellationLink(visitorDetails.get("email"), visitor.getId(), externalEventId);
+        visitorService.sendCancellationLink(visitorDetails.get("email"), visitor.getId(), externalEvent);
 
         Map<String, String> result = new HashMap<>();
         result.put("message", "Successfully added a visitor to the event");
