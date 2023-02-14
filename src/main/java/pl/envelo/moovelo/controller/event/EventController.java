@@ -232,7 +232,7 @@ public class EventController {
         log.info("EventController - getUsersWithAccess() return {}", usersWithAccessDto);
         return ResponseEntity.ok(usersWithAccessDto);
     }
-}
+
 
     @PatchMapping("events/{eventId}/users/{userId}")
     @PreAuthorize("hasRole('ROLE_USER')")

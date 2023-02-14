@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.actors.BasicUser;
+import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventOwner;
@@ -193,6 +194,7 @@ public class EventService {
         return new PageImpl<>(list.subList(first, last), pageable, list.size());
     }
 
+    @Transactional
     public void setStatus(Long eventId, Long userId, String status) {
         log.info("EventService - setStatus()");
 
@@ -204,24 +206,73 @@ public class EventService {
         Event event = getEventById(eventId);
         BasicUser user = basicUserService.getBasicUserById(userId);
 
-        switch (status) {
+        Set<BasicUser> setOfAccepted = event.getAcceptedStatusUsers();
+        Set<BasicUser> setOfPending = event.getPendingStatusUsers();
+        Set<BasicUser> setOfRejected = event.getRejectedStatusUsers();
+
+        switch (status.toLowerCase()) {
             case "accepted" -> {
-                Set<BasicUser> setOfAccepted = event.getAcceptedStatusUsers();
-                setOfAccepted.add(user);
-                event.setAcceptedStatusUsers(setOfAccepted);
+                setAcceptedStatus(user, setOfAccepted, setOfPending, setOfRejected);
             }
             case "pending" -> {
-                Set<BasicUser> setOfPending = event.getPendingStatusUsers();
-                setOfPending.add(user);
-                event.setPendingStatusUsers(setOfPending);
+                setPendingStatus(user, setOfAccepted, setOfPending, setOfRejected);
             }
             case "rejected" -> {
-                Set<BasicUser> setOfRejected = event.getRejectedStatusUsers();
-                setOfRejected.add(user);
-                event.setRejectedStatusUsers(setOfRejected);
+                setRejectedStatus(user, setOfAccepted, setOfPending, setOfRejected);
             }
         }
 
+        event.setAcceptedStatusUsers(setOfAccepted);
+        event.setPendingStatusUsers(setOfPending);
+        event.setRejectedStatusUsers(setOfRejected);
+    }
+
+    private void setAcceptedStatus(BasicUser user,
+                                   Set<BasicUser> setOfAccepted,
+                                   Set<BasicUser> setOfPending,
+                                   Set<BasicUser> setOfRejected) {
+
+        if (!setOfAccepted.contains(user)) {
+            setOfAccepted.add(user);
+            if (setOfPending.contains(user)) {
+                setOfPending.remove(user);
+            }
+            if (setOfRejected.contains(user)) {
+                setOfRejected.remove(user);
+            }
+        }
+    }
+
+    private void setPendingStatus(BasicUser user,
+                                   Set<BasicUser> setOfAccepted,
+                                   Set<BasicUser> setOfPending,
+                                   Set<BasicUser> setOfRejected) {
+
+        if (!setOfPending.contains(user)) {
+            setOfPending.add(user);
+            if (setOfAccepted.contains(user)) {
+                setOfAccepted.remove(user);
+            }
+            if (setOfRejected.contains(user)) {
+                setOfRejected.remove(user);
+            }
+        }
+    }
+
+    private void setRejectedStatus(BasicUser user,
+                                   Set<BasicUser> setOfAccepted,
+                                   Set<BasicUser> setOfPending,
+                                   Set<BasicUser> setOfRejected) {
+
+        if (!setOfRejected.contains(user)) {
+            setOfRejected.add(user);
+            if (setOfPending.contains(user)) {
+                setOfPending.remove(user);
+            }
+            if (setOfAccepted.contains(user)) {
+                setOfAccepted.remove(user);
+            }
+        }
     }
 }
 
