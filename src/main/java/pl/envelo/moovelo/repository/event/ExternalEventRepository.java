@@ -11,4 +11,6 @@ public interface ExternalEventRepository extends EventRepository<ExternalEvent> 
     List<ExternalEvent> findAll();
 
     Optional<ExternalEvent> findExternalEventById(Long id);
+
+    Optional<ExternalEvent> getExternalEventByInvitationUuid(String uuid);
 }
