@@ -4,14 +4,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.envelo.moovelo.Constants;
 import pl.envelo.moovelo.entity.actors.Visitor;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.exception.IllegalEventException;
+import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.exception.VisitorAlreadyAssignedException;
 import pl.envelo.moovelo.repository.event.ExternalEventRepository;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -65,5 +70,37 @@ public class ExternalEventService {
         } else {
             return externalEvent.getLimitedPlaces() > (externalEvent.getVisitors().size() + externalEvent.getAcceptedStatusUsers().size());
         }
+    }
+
+    public String createInvitationLink(ExternalEvent event) {
+        log.info("ExternalEventsService - createInvitationLink(event = '{}')", event);
+        String uuid = UUID.randomUUID().toString();
+        event.setInvitationUuid(uuid);
+        externalEventRepository.save(event);
+        String link = Constants.URL + "/api/v1/externalEvents/" + uuid;
+        log.info("ExternalEventsService - createInvitationLink(event = '{}') - return '{}'", event, link);
+        return link;
+    }
+
+    public String getInvitationLink(Long eventId) {
+        log.info("ExternalEventsService - getInvitationLink(eventId = '{}')", eventId);
+        ExternalEvent event = getExternalEventById(eventId);
+
+        if (event.getInvitationUuid() == null) {
+            throw new NoContentException("Event doesn't have invitation link!");
+        }
+
+        String link = Constants.URL + "/api/v1/externalEvents/" + event.getInvitationUuid();
+        log.info("ExternalEventsService - getInvitationLink(eventId = '{}') - return '{}'", eventId, link);
+        return link;
+    }
+
+    public Long getExternalEventIdByUuid(String uuid) {
+        log.info("ExternalEventService - getExternalEventIdByUuid(uuid = '{}')", uuid);
+        ExternalEvent event = externalEventRepository.getExternalEventByInvitationUuid(uuid)
+                .orElseThrow(() -> new NoContentException("No event with invitation uuid = " + uuid));
+        Long eventId = event.getId();
+        log.info("ExternalEventService - getExternalEventIdByUuid(uuid = '{}') - return eventId = '{}'", uuid, eventId);
+        return eventId;
     }
 }

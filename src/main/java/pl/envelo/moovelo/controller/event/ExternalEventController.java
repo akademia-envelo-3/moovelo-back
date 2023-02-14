@@ -1,31 +1,38 @@
 package pl.envelo.moovelo.controller.event;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.envelo.moovelo.Constants;
+import pl.envelo.moovelo.controller.AuthenticatedUser;
 import pl.envelo.moovelo.controller.dto.actor.VisitorDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
+import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.actors.Visitor;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.exception.AvailablePlacesExceededException;
 import pl.envelo.moovelo.exception.EventDateException;
+import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.actors.VisitorService;
 import pl.envelo.moovelo.service.event.ExternalEventService;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @RestController
 @RequestMapping("api/v1")
 @Slf4j
@@ -33,12 +40,7 @@ public class ExternalEventController {
 
     private ExternalEventService externalEventService;
     private VisitorService visitorService;
-
-    @Autowired
-    public ExternalEventController(ExternalEventService externalEventService, VisitorService visitorService) {
-        this.externalEventService = externalEventService;
-        this.visitorService = visitorService;
-    }
+    private AuthenticatedUser authenticatedUser;
 
     @GetMapping("/externalEvents")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -119,5 +121,37 @@ public class ExternalEventController {
         result.put("message", "You were successfully discharged from the event");
 
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/externalEvents/{eventId}/invite")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> createInvitationLink(@PathVariable Long eventId) {
+        log.info("ExternalEventController - createInvitationLink(eventId = '{}')", eventId);
+        ExternalEvent event = externalEventService.getExternalEventById(eventId);
+        User user = authenticatedUser.getAuthenticatedUser();
+        if (!event.getEventOwner().getUserId().equals(user.getId())) {
+            throw new UnauthorizedRequestException("You are not the owner of this event!");
+        }
+
+        String link = externalEventService.createInvitationLink(event);
+        log.info("ExternalEventController - createInvitationLink(eventId = '{}') - return link = '{}'", eventId, link);
+        return ResponseEntity.status(HttpStatus.CREATED).body(link);
+    }
+
+    @GetMapping("/externalEvents/{eventId}/invite")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    public ResponseEntity<?> getInvitationLink(@PathVariable Long eventId) {
+        log.info("ExternalEventController - getInvitationLink(eventId = '{}')", eventId);
+        String link = externalEventService.getInvitationLink(eventId);
+        log.info("ExternalEventController - getInvitationLink(eventId = '{}') - return link = '{}'", eventId, link);
+        return ResponseEntity.ok(link);
+    }
+
+    @GetMapping("/externalEvents/{uuid}")
+    public void redirectToExternalEventPage(@PathVariable String uuid, HttpServletResponse response) throws IOException {
+        log.info("ExternalEventController - redirectToExternalEventPage(uuid = '{}')", uuid);
+        Long eventId = externalEventService.getExternalEventIdByUuid(uuid);
+        log.info("ExternalEventController - redirectToExternalEventPage(uuid = '{}') - return eventId = {}", uuid, eventId);
+        response.sendRedirect("https://develop--moovelo-envelo.netlify.app/events/" + eventId);
     }
 }
