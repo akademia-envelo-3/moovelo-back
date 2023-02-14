@@ -16,5 +16,4 @@ public class InternalEvent extends Event {
     @ManyToOne(cascade = CascadeType.DETACH)
     private Group group;
 
-    private boolean isPrivate;
 }
