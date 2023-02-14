@@ -21,10 +21,10 @@ public class EventOwnerService {
     public EventOwner getEventOwnerByUserId(Long userId) {
         EventOwner eventOwnerBasedOnBasicUser;
 
-        if (eventOwnerRepository.findEventOwnerByUserId(userId) == null) {
-            eventOwnerBasedOnBasicUser = createEventOwnerBasedOnExistingUser(userId);
-        } else {
+        if (eventOwnerRepository.findEventOwnerByUserId(userId).isPresent()) {
             eventOwnerBasedOnBasicUser = assignExistingEventOwnerBasedOnUser(userId);
+        } else {
+            eventOwnerBasedOnBasicUser = createEventOwnerBasedOnExistingUser(userId);
         }
         return eventOwnerBasedOnBasicUser;
     }
@@ -36,12 +36,12 @@ public class EventOwnerService {
     }
 
     private EventOwner assignExistingEventOwnerBasedOnUser(Long userId) {
-        return eventOwnerRepository.findEventOwnerByUserId(userId);
+        return eventOwnerRepository.findEventOwnerByUserId(userId).get();
     }
 
     /**
-     * Method check if location is assigned to any EventInfo. If list of EventInfos is empty,
-     * then location entity is remove from database.
+     * Method check if EventOwner is assigned to any Event. If not,
+     * remove the EventOwner entity remove from database.
      */
     public void removeEventOwnerWithNoEvents(EventOwner eventOwner) {
         log.info("EventOwnerService - removeEventOwnerWithNoEvents() - eventOwner = {}", eventOwner);
@@ -68,8 +68,13 @@ public class EventOwnerService {
     }
 
     public void removeEventFromEventOwnerEvents(Event event, Long eventOwnerUserId) {
-        EventOwner eventOwnerByUserId = eventOwnerRepository.findEventOwnerByUserId(eventOwnerUserId);
-        List<Event> events = eventOwnerByUserId.getEvents();
-        events.remove(event);
+        Optional<EventOwner> eventOwnerOptional = eventOwnerRepository.findEventOwnerByUserId(eventOwnerUserId);
+        if (eventOwnerOptional.isPresent()) {
+            EventOwner eventOwner = eventOwnerOptional.get();
+            List<Event> events = eventOwner.getEvents();
+            events.remove(event);
+        } else {
+            throw new NoSuchElementException("No event owner with user id: " + eventOwnerUserId);
+        }
     }
 }

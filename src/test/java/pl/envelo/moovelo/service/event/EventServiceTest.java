@@ -31,6 +31,20 @@ class EventServiceTest {
         assertEquals(allEvents.get(0).getEventType(), EventType.EVENT);
     }
 
+    /*@Test
+    @Transactional
+    void getUsersWithAccess() {
+        // GIVEN
+        Long eventId = 1L;
+
+        // WHEN
+        List<BasicUser> users = eventService.getUsersWithAccess(eventId);
+
+        // THEN
+        assertFalse(users.isEmpty());
+        assertEquals(users.size(), 4);
+    }*/
+
     @Test
     @Transactional
     void removeEventByIdTest() {

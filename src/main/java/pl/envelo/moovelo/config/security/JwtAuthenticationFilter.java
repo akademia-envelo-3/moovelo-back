@@ -1,6 +1,5 @@
 package pl.envelo.moovelo.config.security;
 
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,9 +39,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult)
             throws IOException, ServletException {
         User user = (User) authResult.getPrincipal();
-        Algorithm algorithm = Algorithm.HMAC256(Constants.SECRET_KEY_FOR_JWT_ALGORITHM.getBytes());
-        String accessToken = JwtTokens.createAccessToken(user, request, algorithm);
-        String refreshToken = JwtTokens.createRefreshToken(user, request, algorithm);
+        String accessToken = JwtTokens.createAccessToken(user, request);
+        String refreshToken = JwtTokens.createRefreshToken(user, request);
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access_token", accessToken);
         tokens.put("refresh_token", refreshToken);

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.Event;
+import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.repository.actors.BasicUserRepository;
 
 import java.util.List;
@@ -26,7 +27,14 @@ public class BasicUserService {
         Optional<BasicUser> basicUserOptional = basicUserRepository.findById(userId);
         if (basicUserOptional.isPresent()) {
             return true;
-        } else throw new NoSuchElementException("No BasicUser with id: " + userId);
+        } else {
+            throw new NoSuchElementException("No BasicUser with id: " + userId);
+        }
+    }
+
+    public boolean isBasicUserEventOwner(User user, Long eventOwnerUserId) {
+        return user.getRole().name().equals("ROLE_USER") &&
+                user.getId().equals(eventOwnerUserId);
     }
 
     public BasicUser getBasicUserById(Long id) {

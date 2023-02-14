@@ -2,16 +2,21 @@ package pl.envelo.moovelo.service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
+import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
 import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.Event;
+import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.exception.NoContentException;
-import pl.envelo.moovelo.repository.HashtagRepository;
-import pl.envelo.moovelo.repository.event.EventOwnerRepository;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.LocationService;
@@ -19,8 +24,10 @@ import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 
 import javax.persistence.EntityExistsException;
+
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -35,10 +42,15 @@ public class EventService {
     private final HashTagService hashTagService;
     private final BasicUserService basicUserService;
     private LocationService locationService;
+    private EventSearchSpecification eventSearchSpecification;
 
-    public List<? extends Event> getAllEvents() {
+    public Page<? extends Event> getAllEvents(String privacy, String group, String cat, String sort, String sortOrder, int page) {
         log.info("EventService - getAllEvents()");
-        List<? extends Event> allEvents = eventRepository.findAll();
+
+        int sizeOfPage = 10;
+
+        Pageable pageable = PageRequest.of(page, sizeOfPage, Sort.by(eventSearchSpecification.createSortOrder(sort, sortOrder)));
+        Page<? extends Event> allEvents = eventRepository.findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat), pageable);
 
         log.info("EventService - getAllEvents() return {}", allEvents.toString());
         return allEvents;
@@ -49,10 +61,14 @@ public class EventService {
         if (checkIfEntityExist(event)) {
             throw new EntityExistsException(EVENT_EXIST_MESSAGE);
         } else {
-            List<Hashtag> eventHashtags = hashTagService.hashtagsToAssign(event.getHashtags());
+            List<Hashtag> hashtagsToAssign = hashTagService.getHashtagsToAssign(event.getHashtags());
+            EventInfo validatedEventInfo = eventInfoService.validateEventInfoForCreateEvent(event.getEventInfo());
 
-            Event eventAfterFieldValidation = validateAggregatedEntities(event, userId);
-            eventAfterFieldValidation.setHashtags(eventHashtags);
+            Event eventAfterFieldValidation = validateAggregatedEntitiesForCreateEvent(event, userId);
+            eventAfterFieldValidation.setHashtags(hashtagsToAssign);
+            eventAfterFieldValidation.setEventInfo(validatedEventInfo);
+
+            log.info("EventService - createNewEvent() return {}", eventAfterFieldValidation);
             return eventRepository.save(eventAfterFieldValidation);
         }
     }
@@ -93,22 +109,44 @@ public class EventService {
             EventOwner eventOwner = event.getEventOwner();
             List<Hashtag> hashtags = event.getHashtags();
             eventRepository.delete(event);
-            locationService.removeLocationWithNoEvents(location);
+            eventInfoService.removeLocationWithNoEvents(location);
             eventOwnerService.removeEventOwnerWithNoEvents(eventOwner);
             hashtags.forEach(hashTagService::decrementHashtagOccurrence);
         }
         log.info("EventService - removeEventById() - event with id = {} removed", id);
     }
 
-    private Event validateAggregatedEntities(Event event, Long userId) {
+    private Event validateAggregatedEntitiesForCreateEvent(Event event, Long userId) {
         Event eventWithFieldsAfterValidation = new Event();
+        setValidatedBasicEventFields(event, userId, eventWithFieldsAfterValidation);
+        return eventWithFieldsAfterValidation;
+    }
+
+    private void setValidatedBasicEventFields(Event event, Long userId, Event eventWithFieldsAfterValidation) {
         eventWithFieldsAfterValidation.setEventOwner(eventOwnerService.getEventOwnerByUserId(userId));
-        eventWithFieldsAfterValidation
-                .setEventInfo(eventInfoService.getEventInfoWithLocationCoordinates(event.getEventInfo()));
-        eventWithFieldsAfterValidation.setEventInfo(eventInfoService.checkIfCategoryExists(event.getEventInfo()));
+        eventWithFieldsAfterValidation.setEventType(event.getEventType());
         eventWithFieldsAfterValidation.setLimitedPlaces(event.getLimitedPlaces());
         eventWithFieldsAfterValidation.setUsersWithAccess(basicUserService.getAllBasicUsers());
-        return eventWithFieldsAfterValidation;
+    }
+
+    public void updateEventById(Long eventId, Event eventFromDto, Long userId) {
+        log.info("EventService - updateEventById() - eventId = {}", eventId);
+        Event eventInDb = getEventById(eventId);
+        Location formerLocation = eventInDb.getEventInfo().getLocation();
+        Long eventInfoInDbId = eventInDb.getEventInfo().getId();
+        List<Hashtag> hashtagsToAssign = hashTagService.validateHashtagsForUpdateEvent(eventFromDto.getHashtags(), eventInDb.getHashtags());
+        EventInfo validatedEventInfo = eventInfoService.validateEventInfoForUpdateEvent(eventFromDto.getEventInfo(), eventInfoInDbId);
+        setValidatedEntitiesForUpdateEvent(eventInDb, eventFromDto, userId);
+        eventInDb.setHashtags(hashtagsToAssign);
+        eventInDb.setEventInfo(validatedEventInfo);
+        eventRepository.save(eventInDb);
+        eventInfoService.removeLocationWithNoEvents(formerLocation);
+        log.info("EventService - updateEventById() - eventId = {} updated", eventId);
+    }
+
+    private Event setValidatedEntitiesForUpdateEvent(Event eventInDb, Event event, Long userId) {
+        setValidatedBasicEventFields(event, userId, eventInDb);
+        return eventInDb;
     }
 
     public Long getEventOwnerUserIdByEventId(Long eventId) {
@@ -125,12 +163,34 @@ public class EventService {
 
     @Transactional
     public void updateEventOwnershipByEventId(Long eventId, EventOwner eventOwner, Long currentEventOwnerUserId) {
-        log.info("EventService - updateEventOwnershipById()");
+        log.info("EventService - updateEventOwnershipById() - eventId = {}", eventId);
         Event event = getEventById(eventId);
         eventOwnerService.createEventOwner(eventOwner);
         event.setEventOwner(eventOwner);
         eventOwnerService.removeEventFromEventOwnerEvents(event, currentEventOwnerUserId);
         eventOwnerService.removeEventOwnerWithNoEvents(getEventOwnerByUserId(currentEventOwnerUserId));
+        log.info("EventService - updateEventOwnershipById() - eventId = {} updated", eventId);
+    }
+
+    public boolean checkIfEventExistsById(Long eventId) {
+        return eventRepository.findById(eventId).isPresent();
+    }
+
+    public Page<BasicUser> getUsersWithAccess(Long eventId, int page, int size) {
+        log.info("EventService - getUsersWithAccess()");
+        Event event = getEventById(eventId);
+        List<BasicUser> usersWithAccessList = event.getUsersWithAccess();
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<BasicUser> usersWithAccess = listToPage(pageable, usersWithAccessList);
+        log.info("EventService - getUsersWithAccess() return {}", usersWithAccess);
+        return usersWithAccess;
+    }
+
+    public static <T> Page<T> listToPage(final Pageable pageable, List<T> list) {
+        int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());;
+        int last = Math.min(first + pageable.getPageSize(), list.size());
+        return new PageImpl<>(list.subList(first, last), pageable, list.size());
     }
 
     public void setStatus(Long eventId, Long userId, String status) {

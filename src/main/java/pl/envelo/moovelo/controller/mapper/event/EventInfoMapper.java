@@ -15,7 +15,6 @@ public class EventInfoMapper {
     public static EventInfoDto mapEventInfoToEventInfoDto(EventInfo eventInfo) {
         return EventInfoDto.builder()
                 .id(eventInfo.getId())
-                .eventId(eventInfo.getId())
                 .name(eventInfo.getName())
                 .description(eventInfo.getDescription())
                 .category(CategoryListResponseMapper.mapCategoryToCategoryListResponseDto(eventInfo.getCategory()))

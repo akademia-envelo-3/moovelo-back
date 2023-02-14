@@ -8,7 +8,6 @@ public class VisitorMapper {
     public static VisitorDto map(Visitor visitor) {
         return VisitorDto
                 .builder()
-                .id(visitor.getId())
                 .firstname(visitor.getFirstname())
                 .lastname(visitor.getLastname())
                 .email(visitor.getEmail())

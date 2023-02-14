@@ -9,8 +9,8 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "results",
-        "status"
+    "results",
+    "status"
 })
 @Generated("jsonschema2pojo")
 public class GeocodingApiDto {
