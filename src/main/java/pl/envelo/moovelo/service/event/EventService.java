@@ -137,18 +137,31 @@ public class EventService {
         log.info("EventService - setStatus()");
 
         List<String> statuses = List.of("accepted", "pending", "rejected");
-        if(!statuses.contains(status)) return;
+        if (!statuses.contains(status.toLowerCase())) {
+            return;
+        }
 
         Event event = getEventById(eventId);
-
         BasicUser user = basicUserService.getBasicUserById(userId);
 
-        Set<BasicUser> setOfAccepted = event.getAcceptedStatusUsers();
-        Set<BasicUser> setOfPending = event.ge
+        switch (status) {
+            case "accepted" -> {
+                Set<BasicUser> setOfAccepted = event.getAcceptedStatusUsers();
+                setOfAccepted.add(user);
+                event.setAcceptedStatusUsers(setOfAccepted);
+            }
+            case "pending" -> {
+                Set<BasicUser> setOfPending = event.getPendingStatusUsers();
+                setOfPending.add(user);
+                event.setPendingStatusUsers(setOfPending);
+            }
+            case "rejected" -> {
+                Set<BasicUser> setOfRejected = event.getRejectedStatusUsers();
+                setOfRejected.add(user);
+                event.setRejectedStatusUsers(setOfRejected);
+            }
+        }
 
-
-        switch(status)
-            case "accepted" -> event.setAcceptedStatusUsers(event.getAcceptedStatusUsers().add(user));
     }
 }
 

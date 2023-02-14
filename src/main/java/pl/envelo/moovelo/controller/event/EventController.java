@@ -181,12 +181,10 @@ public class EventController {
 
         if (loggedInUser.getId().equals(userId)) {
             eventService.setStatus(eventId, userId, status);
-
         } else {
             log.error("EventController - setStatus()", new UnauthorizedRequestException("Unauthorized request"));
             throw new UnauthorizedRequestException("Logged in user is not authorized to change status of other users");
         }
-
         return ResponseEntity.ok().build();
     }
 }
