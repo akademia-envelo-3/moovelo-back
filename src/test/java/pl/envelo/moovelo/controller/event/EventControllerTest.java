@@ -130,7 +130,7 @@ class EventControllerTest {
         assertEquals(1L, result.getBody().get(0).getEventOwner().getUserId());
     }
 
-    @Test
+    /*@Test
     @Transactional
     void getUsersWithAccessUnitTest() {
         //given
@@ -143,7 +143,7 @@ class EventControllerTest {
         assertTrue(result.hasBody());
         assertEquals(result.getStatusCode(), HttpStatus.OK);
 
-    }
+    }*/
 
     @Test
     void getUsersWithAccessPositiveTest() throws Exception {

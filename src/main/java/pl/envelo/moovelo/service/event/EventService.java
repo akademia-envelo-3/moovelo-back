@@ -19,10 +19,8 @@ import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.LocationService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
-import pl.envelo.moovelo.service.actors.BasicUserService;
 
 import javax.persistence.EntityExistsException;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;

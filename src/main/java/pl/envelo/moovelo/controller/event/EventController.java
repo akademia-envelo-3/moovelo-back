@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.w3c.dom.events.EventException;
 import pl.envelo.moovelo.controller.AuthenticatedUser;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
@@ -19,7 +18,6 @@ import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
-import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
@@ -32,7 +30,6 @@ import pl.envelo.moovelo.service.event.EventService;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
