@@ -19,6 +19,7 @@ import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.HashTagService;
+import pl.envelo.moovelo.service.LocationService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 
