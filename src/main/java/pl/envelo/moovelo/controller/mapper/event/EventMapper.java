@@ -25,6 +25,7 @@ public class EventMapper implements EventMapperInterface {
         event.setEventOwner(new EventOwner());
         event.setEventInfo(EventInfoMapper.mapEventInfoDtoToEventInfo(eventRequestDto.getEventInfo()));
         event.setLimitedPlaces(eventRequestDto.getLimitedPlaces());
+        event.setEventType(eventType);
 //        event.setComments(new ArrayList<>());
 //        event.setUsersWithAccess(new ArrayList<>());
 //        event.setAcceptedStatusUsers(new HashSet<>());

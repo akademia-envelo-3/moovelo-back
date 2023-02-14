@@ -21,4 +21,7 @@ public class ExternalEvent extends Event {
             inverseJoinColumns = @JoinColumn(name = "visitor_id")
     )
     private List<Visitor> visitors;
+
+    @Column(unique = true)
+    private String invitationUuid;
 }

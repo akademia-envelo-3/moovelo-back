@@ -24,8 +24,12 @@ public class Visitor extends Person {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Visitor visitor = (Visitor) o;
         return Objects.equals(id, visitor.id) && Objects.equals(events, visitor.events);
     }

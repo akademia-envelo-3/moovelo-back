@@ -30,7 +30,7 @@ public class EventInfo {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startDate;
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.PERSIST})
+    @ManyToOne
     private Location location;
 
     private Boolean isConfirmationRequired;
@@ -43,10 +43,17 @@ public class EventInfo {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         EventInfo eventInfo = (EventInfo) o;
-        return Objects.equals(id, eventInfo.id) && Objects.equals(name, eventInfo.name) && Objects.equals(description, eventInfo.description) && Objects.equals(startDate, eventInfo.startDate) && Objects.equals(location, eventInfo.location) && Objects.equals(isConfirmationRequired, eventInfo.isConfirmationRequired) && Objects.equals(category, eventInfo.category) && Objects.equals(files, eventInfo.files);
+        return Objects.equals(id, eventInfo.id) && Objects.equals(name, eventInfo.name)
+                && Objects.equals(description, eventInfo.description) && Objects.equals(startDate, eventInfo.startDate)
+                && Objects.equals(location, eventInfo.location) && Objects.equals(isConfirmationRequired, eventInfo.isConfirmationRequired)
+                && Objects.equals(category, eventInfo.category) && Objects.equals(files, eventInfo.files);
     }
 
     @Override
