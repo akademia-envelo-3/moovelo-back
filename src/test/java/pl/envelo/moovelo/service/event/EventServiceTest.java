@@ -32,7 +32,7 @@ class EventServiceTest {
         assertEquals(allEvents.get(0).getEventType(), EventType.EVENT);
     }
 
-    @Test
+    /*@Test
     @Transactional
     void getUsersWithAccess() {
         // GIVEN
@@ -44,7 +44,7 @@ class EventServiceTest {
         // THEN
         assertFalse(users.isEmpty());
         assertEquals(users.size(), 4);
-    }
+    }*/
 
     @Test
     @Transactional

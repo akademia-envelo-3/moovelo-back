@@ -5,7 +5,6 @@ import pl.envelo.moovelo.controller.dto.group.GroupDto;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.group.groupownership.GroupOwnerMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;
-import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.entity.groups.Group;
 import pl.envelo.moovelo.entity.groups.GroupInfo;
@@ -14,7 +13,7 @@ import pl.envelo.moovelo.entity.groups.GroupOwner;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GroupMapperTest {
 

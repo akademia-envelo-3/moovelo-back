@@ -6,8 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.envelo.moovelo.controller.AuthenticatedUser;
@@ -15,11 +13,11 @@ import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
+import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
-import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
@@ -32,7 +30,6 @@ import pl.envelo.moovelo.service.event.EventService;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
@@ -137,13 +134,16 @@ public class EventController {
         Event eventById = eventService.getEventById(eventId);
         DisplayEventResponseDto displayEventResponseDto = null;
         switch (eventById.getEventType()) {
-            case EVENT -> displayEventResponseDto = EventMapper.mapEventToEventResponseDto(eventById);
+            case EVENT ->
+                    displayEventResponseDto = EventMapper.mapEventToEventResponseDto(eventById);
             case EXTERNAL_EVENT ->
                     displayEventResponseDto = EventMapper.mapExternalEventToEventResponseDto((ExternalEvent) eventById);
             case INTERNAL_EVENT ->
                     displayEventResponseDto = EventMapper.mapInternalEventToEventResponseDto((InternalEvent) eventById);
             case CYCLIC_EVENT ->
                     displayEventResponseDto = EventMapper.mapCyclicEventToEventResponseDto((CyclicEvent) eventById);
+            default ->
+                    throw new IllegalEventException("Not supported event with type = '" + eventById.getEventType() + "'");
         }
         log.info("EventController - getEventById() return {}", displayEventResponseDto);
         return displayEventResponseDto == null ? ResponseEntity.badRequest().build() : ResponseEntity.ok(displayEventResponseDto);
