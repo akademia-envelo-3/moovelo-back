@@ -2,6 +2,7 @@ package pl.envelo.moovelo.controller.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -9,13 +10,17 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.w3c.dom.events.EventException;
 import pl.envelo.moovelo.controller.AuthenticatedUser;
+import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
+import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
+import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
+import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.*;
@@ -27,6 +32,7 @@ import pl.envelo.moovelo.service.event.EventService;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
@@ -170,4 +176,21 @@ public class EventController {
         }
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/events/{eventId}/users")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    public ResponseEntity<Page<BasicUserDto>> getUsersWithAccess(
+            @PathVariable Long eventId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
+        log.info("EventController - getUsersWithAccess");
+        Page<BasicUser> usersWithAccess = eventService.getUsersWithAccess(eventId, page, size);
+
+        Page<BasicUserDto> usersWithAccessDto = usersWithAccess.map(BasicUserMapper::map);
+
+        log.info("EventController - getUsersWithAccess() return {}", usersWithAccessDto);
+        return ResponseEntity.ok(usersWithAccessDto);
+    }
+
 }
