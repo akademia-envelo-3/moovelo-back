@@ -44,6 +44,7 @@ public class EventController {
     private BasicUserService basicUserService;
 
     @PostMapping("/events")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<DisplayEventResponseDto> createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
         log.info("EventController - createNewEvent()");
         //TODO do powalczenia z wyborem Rodzaju eventu? albo usunac
@@ -58,7 +59,7 @@ public class EventController {
                 .buildAndExpand(newEvent.getId())
                 .toUri();
 
-        log.info("EventController - getAllEvents() return {}", displayEventResponseDto);
+        log.info("EventController - () return createNewEvent() - dto {}", displayEventResponseDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(uri)
@@ -156,8 +157,7 @@ public class EventController {
         log.info("EventController - updateEventOwnershipById()");
         Long currentEventOwnerUserId = eventService.getEventOwnerUserIdByEventId(eventId);
         User loggedInUser = authenticatedUser.getAuthenticatedUser();
-        if (loggedInUser.getRole().name().equals("ROLE_USER") &&
-                loggedInUser.getId().equals(currentEventOwnerUserId)
+        if (basicUserService.isBasicUserEventOwner(loggedInUser, currentEventOwnerUserId)
                 || loggedInUser.getRole().name().equals("ROLE_ADMIN")) {
             Long newOwnerUserId = eventOwnershipRequestDto.getNewOwnerUserId();
             if (basicUserService.checkIfBasicUserExistsById(newOwnerUserId)) {
@@ -172,6 +172,27 @@ public class EventController {
             throw new UnauthorizedRequestException("Logged in user is not authorized to change the event owner of the event with id: " + eventId);
         }
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/events/{eventId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<String> updateEventById(@PathVariable Long eventId, @RequestBody EventRequestDto eventRequestDto) {
+        log.info("EventController - updateEventById() - eventId = {}", eventId);
+        if (eventService.checkIfEventExistsById(eventId)) {
+            Long currentEventOwnerUserId = eventService.getEventOwnerUserIdByEventId(eventId);
+            User loggedInUser = authenticatedUser.getAuthenticatedUser();
+            if (basicUserService.isBasicUserEventOwner(loggedInUser, currentEventOwnerUserId)) {
+                EventMapperInterface eventMapper = new EventMapper();
+                Event eventFromDto = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.EVENT);
+                eventService.updateEventById(eventId, eventFromDto, loggedInUser.getId());
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Logged in user is not authorized to update the  with id: " + eventId);
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event with id " + eventId + " does not exist");
+        }
+        log.info("EventController - updateEventById() - event with eventId = {} updated", eventId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/events/{eventId}/users")
@@ -189,5 +210,4 @@ public class EventController {
         log.info("EventController - getUsersWithAccess() return {}", usersWithAccessDto);
         return ResponseEntity.ok(usersWithAccessDto);
     }
-
 }

@@ -13,7 +13,6 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 public class InternalEvent extends Event {
-
     @ManyToOne(cascade = CascadeType.DETACH)
     private Group group;
 

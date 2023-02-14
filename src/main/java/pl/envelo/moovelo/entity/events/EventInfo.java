@@ -30,7 +30,7 @@ public class EventInfo {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startDate;
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.PERSIST})
+    @ManyToOne
     private Location location;
 
     private Boolean isConfirmationRequired;

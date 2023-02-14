@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import pl.envelo.moovelo.controller.dto.AttachmentDto;
 import pl.envelo.moovelo.controller.dto.HashtagDto;
+import pl.envelo.moovelo.controller.dto.actor.UserIdDto;
 import pl.envelo.moovelo.controller.dto.group.GroupDto;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class EventRequestDto {
     private int limitedPlaces;
     private List<HashtagDto> hashtags;
     private List<AttachmentDto> attachments;
-    private List<Long> invited;
+    private List<UserIdDto> invited;
     private GroupDto group;
     private boolean isPrivate;
     private int frequencyInDays;
