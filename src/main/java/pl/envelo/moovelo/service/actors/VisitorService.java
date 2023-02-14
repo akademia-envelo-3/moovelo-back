@@ -12,10 +12,12 @@ import pl.envelo.moovelo.Constants;
 import pl.envelo.moovelo.config.security.JwtTokens;
 import pl.envelo.moovelo.controller.dto.actor.VisitorDto;
 import pl.envelo.moovelo.entity.actors.Visitor;
+import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.exception.VisitorAlreadyExistsException;
 import pl.envelo.moovelo.repository.actors.VisitorRepository;
 import pl.envelo.moovelo.service.EmailService;
+import pl.envelo.moovelo.service.event.ExternalEventService;
 
 import javax.mail.MessagingException;
 import java.util.HashMap;
@@ -28,6 +30,7 @@ import java.util.Optional;
 public class VisitorService {
 
     private EmailService emailService;
+    private ExternalEventService externalEventService;
     private VisitorRepository visitorRepository;
     private final TemplateEngine templateEngine;
 
@@ -73,17 +76,20 @@ public class VisitorService {
     public void sendConfirmationLink(VisitorDto visitorDto, Long externalEventId) throws MessagingException {
         String token = JwtTokens.createConfirmationToken(visitorDto.getFirstname(), visitorDto.getLastname(), visitorDto.getEmail(), externalEventId);
         String url = Constants.URL + "/api/v1/externalEvents/visitor/" + token;
+        ExternalEvent externalEvent = externalEventService.getExternalEventById(externalEventId);
         Context context = new Context();
         context.setVariable("url", url);
+        context.setVariable("event", externalEvent.getEventInfo().getName());
         String body = templateEngine.process("email-confirmation-link", context);
         emailService.sendSimpleMessage(visitorDto.getEmail(), "Event confirmation", body);
     }
 
-    public void sendCancellationLink(String visitorEmail, Long visitorId, Long externalEventId) throws MessagingException {
-        String token = JwtTokens.createCancellationToken(visitorId, externalEventId);
+    public void sendCancellationLink(String visitorEmail, Long visitorId, ExternalEvent externalEvent) throws MessagingException {
+        String token = JwtTokens.createCancellationToken(visitorId, externalEvent.getId());
         String url = Constants.URL + "/api/v1/externalEvents/visitor/" + token + "/remove";
         Context context = new Context();
         context.setVariable("url", url);
+        context.setVariable("event", externalEvent.getEventInfo().getName());
         String body = templateEngine.process("email-cancellation-link", context);
         emailService.sendSimpleMessage(visitorEmail, "Successfully add to The event", body);
     }
