@@ -30,7 +30,7 @@ import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 
 import javax.persistence.EntityExistsException;
-import javax.transaction.Transactional;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
