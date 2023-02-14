@@ -1,9 +1,7 @@
 package pl.envelo.moovelo.controller.event;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.hamcrest.HamcrestArgumentMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,17 +9,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
+import pl.envelo.moovelo.entity.Hashtag;
+import pl.envelo.moovelo.entity.Location;
+import pl.envelo.moovelo.entity.events.Event;
+import pl.envelo.moovelo.entity.events.EventInfo;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.hamcrest.Matchers.is;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -137,5 +143,29 @@ class EventControllerTest {
         assertEquals(result.getStatusCode(), HttpStatus.OK);
         assertTrue(Objects.requireNonNull(result.getBody()).size() > 0);
         assertEquals(1L, result.getBody().get(0).getEventOwner().getUserId());
+    }
+
+    /*@Test
+    @Transactional
+    void getUsersWithAccessUnitTest() {
+        //given
+        Long eventId = 1L;
+
+        //when
+        ResponseEntity<List<BasicUserDto>> result = eventController.getUsersWithAccess(eventId);
+
+        //then
+        assertTrue(result.hasBody());
+        assertEquals(result.getStatusCode(), HttpStatus.OK);
+
+    }*/
+
+    @Test
+    void getUsersWithAccessPositiveTest() throws Exception {
+        mvc.perform(get("/api/v1/events/{eventId}/users", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].lastname", is("Bananek")));
     }
 }

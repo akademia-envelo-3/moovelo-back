@@ -31,10 +31,15 @@ public class CategoryProposal {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         CategoryProposal that = (CategoryProposal) o;
-        return Objects.equals(id, that.id) && Objects.equals(basicUser, that.basicUser) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(date, that.date);
+        return Objects.equals(id, that.id) && Objects.equals(basicUser, that.basicUser) && Objects.equals(name, that.name)
+                && Objects.equals(description, that.description) && Objects.equals(date, that.date);
     }
 
     @Override

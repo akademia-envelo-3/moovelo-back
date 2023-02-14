@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
@@ -15,6 +16,8 @@ import javax.persistence.MappedSuperclass;
 public abstract class Person {
     private String firstname;
     private String lastname;
+
+    @Column(unique = true, nullable = false)
     private String email;
 }
 

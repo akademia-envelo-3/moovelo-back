@@ -39,8 +39,12 @@ public class Hashtag {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Hashtag hashtag)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Hashtag hashtag)) {
+            return false;
+        }
         return Objects.equals(
                 hashtagValue.compareToIgnoreCase(hashtag.hashtagValue),
                 hashtag.hashtagValue.compareToIgnoreCase(hashtagValue));

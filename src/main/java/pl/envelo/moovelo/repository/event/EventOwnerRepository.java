@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface EventOwnerRepository extends JpaRepository<EventOwner, Long> {
 
-    EventOwner findEventOwnerByUserId(Long userId);
+    Optional<EventOwner> findEventOwnerByUserId(Long userId);
 
     Optional<EventOwner> findByEventsId(Long eventId);
 }

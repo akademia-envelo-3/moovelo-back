@@ -1,0 +1,4 @@
+INSERT INTO EVENTS_X_BASIC_USERS_ACCESS(EVENT_ID, USER_ID)
+VALUES (1, 1),
+       (1, 2),
+       (1, 3);
