@@ -24,8 +24,7 @@ public class EventSearchSpecification {
 
             List<Predicate> predicates = new ArrayList<>();
 
-            predicatePrivacyIsTrue(privacy, root, criteriaBuilder, predicates);
-            predicatePrivacyIsFalse(privacy, root, criteriaBuilder, predicates);
+            predicateByPrivacy(privacy, root, criteriaBuilder, predicates);
             predicateGroupNotNull(group, internalEventRoot, criteriaBuilder,  predicates);
             predicateCategoryLike(cat, root, criteriaBuilder, predicates);
 
@@ -48,19 +47,17 @@ public class EventSearchSpecification {
         return order;
     }
 
-    private static void predicatePrivacyIsFalse(String privacy, Root<Event> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
-        if (Objects.nonNull(privacy) && privacy.equals("false")) {
-            predicates.add(
-                    criteriaBuilder.isFalse(root.get("isPrivate"))
-            );
-        }
-    }
-
-    private static void predicatePrivacyIsTrue(String privacy, Root<Event> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
-        if (Objects.nonNull(privacy) && privacy.equals("true")) {
-            predicates.add(
+    private static void predicateByPrivacy(String privacy, Root<Event> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (Objects.nonNull(privacy)) {
+            if (privacy.equals("true")) {
+                predicates.add(
                     criteriaBuilder.isTrue(root.get("isPrivate"))
-            );
+                );
+            } else if (privacy.equals("false")) {
+                predicates.add(
+                    criteriaBuilder.isFalse(root.get("isPrivate"))
+                );
+            }
         }
     }
 

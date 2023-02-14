@@ -27,6 +27,7 @@ import pl.envelo.moovelo.service.actors.EventOwnerService;
 import javax.persistence.EntityExistsException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 
 @AllArgsConstructor
