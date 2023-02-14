@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -71,11 +74,18 @@ public class EventController {
 
     @GetMapping("/events")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<List<EventListResponseDto>> getAllEvents() {
+    public ResponseEntity<Page<EventListResponseDto>> getAllEvents(
+            String privacy,
+            String group,
+            String cat,
+            String sort,
+            String sortOrder,
+            @RequestParam(defaultValue = "0") Integer page) {
         log.info("EventController - getAllEvents()");
-        List<? extends Event> allEvents = eventService.getAllEvents();
 
-        List<EventListResponseDto> eventsDto = mapEventToEventListResponseDto(allEvents);
+        Page<? extends Event> events = eventService.getAllEvents(privacy, group, cat, sort, sortOrder, page);
+
+        Page<EventListResponseDto> eventsDto = mapEventToEventListResponseDto(events);
 
         log.info("EventController - getAllEvents() return {}", eventsDto);
         return ResponseEntity.ok(eventsDto);
@@ -107,6 +117,18 @@ public class EventController {
             case EXTERNAL_EVENT ->
                     EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
         }).toList();
+        return eventsDto;
+    }
+
+    private Page<EventListResponseDto> mapEventToEventListResponseDto(Page<? extends Event> allEvents) {
+        Page<EventListResponseDto> eventsDto = allEvents.map(event -> switch (event.getEventType()) {
+            case EVENT -> EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
+            case INTERNAL_EVENT ->
+                    EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
+            case CYCLIC_EVENT -> EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) event);
+            case EXTERNAL_EVENT ->
+                    EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
+        });
         return eventsDto;
     }
 

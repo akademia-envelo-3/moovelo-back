@@ -50,14 +50,23 @@ class EventControllerTest {
     @Transactional
     void getAllEventsUnitTest() {
         // GIVEN
+        String name1 = null;
+        String name2 = "ex";
 
         // WHEN
-        ResponseEntity<List<EventListResponseDto>> result = eventController.getAllEvents();
+        ResponseEntity<List<EventListResponseDto>> result1 = eventController.getAllEvents(name1);
+        ResponseEntity<List<EventListResponseDto>> result2 = eventController.getAllEvents(name2);
 
         // THEN
-        assertTrue(result.hasBody());
-        assertEquals(result.getStatusCode(), HttpStatus.OK);
-        assertTrue(Objects.requireNonNull(result.getBody()).size() > 0);
+        assertTrue(result1.hasBody());
+        assertEquals(result1.getStatusCode(), HttpStatus.OK);
+        assertTrue(Objects.requireNonNull(result1.getBody()).size() > 0);
+
+        assertTrue(result2.hasBody());
+        assertEquals(result2.getStatusCode(), HttpStatus.OK);
+        assertTrue(Objects.requireNonNull(result1.getBody()).size() > 0);
+        assertEquals(result2.getBody().size(), 1);
+
     }
 
     @Test
