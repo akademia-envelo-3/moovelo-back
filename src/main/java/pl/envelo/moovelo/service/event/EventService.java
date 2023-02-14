@@ -2,9 +2,15 @@ package pl.envelo.moovelo.service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
+import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventOwner;
@@ -158,6 +164,23 @@ public class EventService {
 
     public boolean checkIfEventExistsById(Long eventId) {
         return eventRepository.findById(eventId).isPresent();
+    }
+
+    public Page<BasicUser> getUsersWithAccess(Long eventId, int page, int size) {
+        log.info("EventService - getUsersWithAccess()");
+        Event event = getEventById(eventId);
+        List<BasicUser> usersWithAccessList = event.getUsersWithAccess();
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<BasicUser> usersWithAccess = listToPage(pageable, usersWithAccessList);
+        log.info("EventService - getUsersWithAccess() return {}", usersWithAccess);
+        return usersWithAccess;
+    }
+
+    public static <T> Page<T> listToPage(final Pageable pageable, List<T> list) {
+        int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());;
+        int last = Math.min(first + pageable.getPageSize(), list.size());
+        return new PageImpl<>(list.subList(first, last), pageable, list.size());
     }
 }
 

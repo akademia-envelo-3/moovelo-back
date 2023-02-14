@@ -3,17 +3,11 @@ package pl.envelo.moovelo.service.event;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import pl.envelo.moovelo.entity.Hashtag;
-import pl.envelo.moovelo.entity.Location;
-import pl.envelo.moovelo.entity.categories.Category;
 import pl.envelo.moovelo.entity.events.Event;
-import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.exception.NoContentException;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -36,6 +30,20 @@ class EventServiceTest {
         assertFalse(allEvents.isEmpty());
         assertEquals(allEvents.get(0).getEventType(), EventType.EVENT);
     }
+
+    /*@Test
+    @Transactional
+    void getUsersWithAccess() {
+        // GIVEN
+        Long eventId = 1L;
+
+        // WHEN
+        List<BasicUser> users = eventService.getUsersWithAccess(eventId);
+
+        // THEN
+        assertFalse(users.isEmpty());
+        assertEquals(users.size(), 4);
+    }*/
 
     @Test
     @Transactional

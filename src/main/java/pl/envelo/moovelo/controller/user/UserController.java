@@ -35,13 +35,13 @@ public class UserController {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
                 String refreshToken = authorizationHeader.substring("Bearer ".length());
-                Algorithm algorithm = Algorithm.HMAC256(Constants.SECRET_KEY_FOR_JWT_ALGORITHM.getBytes());
+                Algorithm algorithm = JwtTokens.algorithm;
                 JWTVerifier verifier = JWT.require(algorithm).build();
                 DecodedJWT decodedJwt = verifier.verify(refreshToken);
                 String email = decodedJwt.getSubject();
                 User user = userService.getUserByEmail(email);
-                String accessToken = JwtTokens.createAccessToken(user, request, algorithm);
-                refreshToken = JwtTokens.createRefreshToken(user, request, algorithm);
+                String accessToken = JwtTokens.createAccessToken(user, request);
+                refreshToken = JwtTokens.createRefreshToken(user, request);
                 Map<String, String> tokens = new HashMap<>();
                 tokens.put("access_token", accessToken);
                 tokens.put("refresh_token", refreshToken);
