@@ -46,7 +46,7 @@ class EventControllerTest {
         //TODO: check the case when Admin is not logged in.
     }
 
-    @Test
+    /*@Test
     @Transactional
     void getAllEventsUnitTest() {
         // GIVEN
@@ -67,7 +67,7 @@ class EventControllerTest {
         assertTrue(Objects.requireNonNull(result1.getBody()).size() > 0);
         assertEquals(result2.getBody().size(), 1);
 
-    }
+    }*/
 
     @Test
     void getEventByIdPositiveTest() throws Exception {

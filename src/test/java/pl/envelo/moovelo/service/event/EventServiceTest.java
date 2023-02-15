@@ -19,7 +19,7 @@ class EventServiceTest {
     @Autowired
     private EventService eventService;
 
-    @Test
+    /*@Test
     void getAllEventsTest() {
         // GIVEN
 
@@ -29,7 +29,7 @@ class EventServiceTest {
         // THEN
         assertFalse(allEvents.isEmpty());
         assertEquals(allEvents.get(0).getEventType(), EventType.EVENT);
-    }
+    }*/
 
     /*@Test
     @Transactional

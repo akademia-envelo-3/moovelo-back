@@ -2,15 +2,10 @@ package pl.envelo.moovelo.service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
 import org.springframework.transaction.annotation.Transactional;
+import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.actors.BasicUser;
@@ -20,18 +15,14 @@ import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.model.EventsForUserCriteria;
 import pl.envelo.moovelo.model.SortingAndPagingCriteria;
-import pl.envelo.moovelo.repository.event.EventCriteriaRepository;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.HashTagService;
-import pl.envelo.moovelo.service.LocationService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 
 import javax.persistence.EntityExistsException;
-
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -44,9 +35,7 @@ public class EventService {
     private final EventOwnerService eventOwnerService;
     private final HashTagService hashTagService;
     private final BasicUserService basicUserService;
-    private LocationService locationService;
     private EventSearchSpecification eventSearchSpecification;
-    private EventCriteriaRepository eventCriteriaRepository;
 
     public Page<? extends Event> getAllEvents(String privacy, String group, String cat, String sort, String sortOrder, int page) {
         log.info("EventService - getAllEvents()");
@@ -192,7 +181,8 @@ public class EventService {
     }
 
     public static <T> Page<T> listToPage(final Pageable pageable, List<T> list) {
-        int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());;
+        int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());
+        ;
         int last = Math.min(first + pageable.getPageSize(), list.size());
         return new PageImpl<>(list.subList(first, last), pageable, list.size());
     }
@@ -202,7 +192,26 @@ public class EventService {
             EventsForUserCriteria filterCriteria,
             SortingAndPagingCriteria sortingAndPagingCriteria
     ) {
-        return eventCriteriaRepository.findAllEventsAvailableForUserWithFilters(userId, filterCriteria, sortingAndPagingCriteria);
+        Pageable pageable = PageRequest.of(
+                sortingAndPagingCriteria.getPageNumber(),
+                sortingAndPagingCriteria.getPageSize(),
+                Sort.by(
+                        eventSearchSpecification.createSortOrder(
+                                sortingAndPagingCriteria.getSortBy(),
+                                sortingAndPagingCriteria.getSortDirection().toString()
+                        )
+                )
+        );
+
+        Page<? extends Event> allEvents = eventRepository.findAll(
+                eventSearchSpecification.getEventsAvailableForUserSpecification(
+                        userId,
+                        filterCriteria
+                ),
+                pageable
+        );
+
+        return allEvents;
     }
 }
 
