@@ -189,7 +189,7 @@ public class EventService {
     }
 
     public static <T> Page<T> listToPage(final Pageable pageable, List<T> list) {
-        int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());;
+        int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());
         int last = Math.min(first + pageable.getPageSize(), list.size());
         return new PageImpl<>(list.subList(first, last), pageable, list.size());
     }
@@ -197,11 +197,6 @@ public class EventService {
     @Transactional
     public void setStatus(Long eventId, Long userId, String status) {
         log.info("EventService - setStatus()");
-
-        List<String> statuses = List.of("accepted", "pending", "rejected");
-        if (!statuses.contains(status.toLowerCase())) {
-            return;
-        }
 
         Event event = getEventById(eventId);
         BasicUser user = basicUserService.getBasicUserById(userId);
@@ -211,15 +206,9 @@ public class EventService {
         Set<BasicUser> setOfRejected = event.getRejectedStatusUsers();
 
         switch (status.toLowerCase()) {
-            case "accepted" -> {
-                setAcceptedStatus(user, setOfAccepted, setOfPending, setOfRejected);
-            }
-            case "pending" -> {
-                setPendingStatus(user, setOfAccepted, setOfPending, setOfRejected);
-            }
-            case "rejected" -> {
-                setRejectedStatus(user, setOfAccepted, setOfPending, setOfRejected);
-            }
+            case "accepted" -> setAcceptedStatus(user, setOfAccepted, setOfPending, setOfRejected);
+            case "pending" -> setPendingStatus(user, setOfAccepted, setOfPending, setOfRejected);
+            case "rejected" -> setRejectedStatus(user, setOfAccepted, setOfPending, setOfRejected);
         }
 
         event.setAcceptedStatusUsers(setOfAccepted);
@@ -234,28 +223,20 @@ public class EventService {
 
         if (!setOfAccepted.contains(user)) {
             setOfAccepted.add(user);
-            if (setOfPending.contains(user)) {
-                setOfPending.remove(user);
-            }
-            if (setOfRejected.contains(user)) {
-                setOfRejected.remove(user);
-            }
+            setOfPending.remove(user);
+            setOfRejected.remove(user);
         }
     }
 
     private void setPendingStatus(BasicUser user,
-                                   Set<BasicUser> setOfAccepted,
-                                   Set<BasicUser> setOfPending,
-                                   Set<BasicUser> setOfRejected) {
+                                  Set<BasicUser> setOfAccepted,
+                                  Set<BasicUser> setOfPending,
+                                  Set<BasicUser> setOfRejected) {
 
         if (!setOfPending.contains(user)) {
             setOfPending.add(user);
-            if (setOfAccepted.contains(user)) {
-                setOfAccepted.remove(user);
-            }
-            if (setOfRejected.contains(user)) {
-                setOfRejected.remove(user);
-            }
+            setOfAccepted.remove(user);
+            setOfRejected.remove(user);
         }
     }
 
@@ -266,14 +247,8 @@ public class EventService {
 
         if (!setOfRejected.contains(user)) {
             setOfRejected.add(user);
-            if (setOfPending.contains(user)) {
-                setOfPending.remove(user);
-            }
-            if (setOfAccepted.contains(user)) {
-                setOfAccepted.remove(user);
-            }
+            setOfPending.remove(user);
+            setOfAccepted.remove(user);
         }
     }
 }
-
-
