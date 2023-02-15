@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.actors.BasicUser;
-import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventOwner;
@@ -23,12 +22,9 @@ import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.LocationService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
-
 import javax.persistence.EntityExistsException;
-
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
