@@ -12,6 +12,7 @@ import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventOwner;
+import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.HashTagService;
@@ -181,10 +182,21 @@ public class EventService {
     }
 
     public static <T> Page<T> listToPage(final Pageable pageable, List<T> list) {
-        int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());;
+        int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());
         int last = Math.min(first + pageable.getPageSize(), list.size());
         return new PageImpl<>(list.subList(first, last), pageable, list.size());
     }
+
+    public List<EventSurvey> getEventSurveysByEventId(Long eventId) {
+        log.info("EventService - getEventSurveysByEventId()");
+        Event event = getEventById(eventId);
+
+        List<EventSurvey> surveys = event.getEventSurveys();
+
+        log.info("EventService - getEventSurveysByEventId() return {}", surveys);
+        return surveys;
+    }
+
 }
 
 

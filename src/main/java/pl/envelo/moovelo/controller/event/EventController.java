@@ -14,14 +14,17 @@ import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
+import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
+import pl.envelo.moovelo.controller.mapper.survey.EventSurveyMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.*;
+import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.actors.BasicUserService;
@@ -30,6 +33,7 @@ import pl.envelo.moovelo.service.event.EventService;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
@@ -228,5 +232,21 @@ public class EventController {
 
         log.info("EventController - getUsersWithAccess() return {}", usersWithAccessDto);
         return ResponseEntity.ok(usersWithAccessDto);
+    }
+
+    @GetMapping("/events/{eventId}/surveys")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    public ResponseEntity<List<EventSurvey>> getEventSurveysByEventId(@PathVariable Long eventId) {
+        log.info("EventController - getEventSurveysByEventId");
+        List<EventSurvey> surveys = eventService.getEventSurveysByEventId(eventId);
+
+        List<EventSurveyDto> surveysDto = surveys
+                .stream()
+                .map(EventSurveyMapper::mapEventSurveyToEventSurveyDto)
+                .collect(Collectors.toList());
+
+
+        log.info("EventController - getEventSurveysByEventId() return {}");
+        return ResponseEntity.ok().build();
     }
 }
