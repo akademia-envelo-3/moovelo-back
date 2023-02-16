@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 public class CommentRequestDto {
 
-    @NotNull
+    /*@NotNull*/
     @PositiveOrZero
     private Long basicUserId;
 

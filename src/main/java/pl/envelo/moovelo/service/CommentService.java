@@ -25,20 +25,21 @@ import java.util.List;
 @Slf4j
 public class CommentService {
     private CommentRepository commentRepository;
-    private EventService eventService;
     private AuthenticatedUser authenticatedUser;
     private BasicUserService basicUserService;
 
     public Comment addComment(Long eventID, CommentRequestDto commentRequestDto) {
-        log.info("CommentService - addComment(eventID = {} , commentRequestDto = {})"
+        log.info("CommentService - addComment(eventID = {} ,commentRequestDto = {} )"
                 , eventID, commentRequestDto);
 
-        Event eventById = eventService.getEventById(eventID);
         User user = authenticatedUser.getAuthenticatedUser();
         BasicUser basicUser = basicUserService.getBasicUserById(user.getId());
 
+        Event event = new Event();
+        event.setId(1L);
+
         Comment comment = new Comment();
-        comment.setEvent(eventById);
+        comment.setEvent(event);
         comment.setBasicUser(basicUser);
         comment.setText(commentRequestDto.getText());
         comment.setDate(LocalDateTime.now());

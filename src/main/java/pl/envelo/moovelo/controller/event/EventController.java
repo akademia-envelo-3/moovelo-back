@@ -243,7 +243,9 @@ public class EventController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Page<CommentResponseDto>> getComments(@PathVariable Long eventId, CommentPage commentPage) {
         log.info("EventController - getComments()");
-        Page<Comment> comments = eventService.getComments(eventId, commentPage);
+        Event event = eventService.getEventById(eventId);
+
+        Page<Comment> comments = eventService.getCommentsByEvent(event, commentPage);
 
         List<CommentResponseDto> commentsResponseDtoList = comments.stream()
                 .map(CommentMapper::mapFromCommentToCommentResponseDto).toList();
@@ -258,8 +260,9 @@ public class EventController {
     public ResponseEntity<?> addCommentToEvent(@PathVariable Long eventId, @RequestBody @Valid CommentRequestDto commentRequestDto) {
         log.info("EventController - addCommentToEvent()");
 
-        Comment savedComment = commentService.addComment(eventId, commentRequestDto);
-        log.info("EventController - return {} ", savedComment);
-        return ResponseEntity.ok(savedComment);
+        Comment comment = commentService.addComment(eventId, commentRequestDto);
+        CommentRequestDto savedCommentRequestDto = CommentMapper.mapFromCommentToCommentRequestDto(comment);
+        log.info("EventController - return {} ", comment);
+        return ResponseEntity.ok(savedCommentRequestDto);
     }
 }

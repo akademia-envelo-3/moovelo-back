@@ -37,6 +37,7 @@ public class EventService {
     private final EventOwnerService eventOwnerService;
     private final HashTagService hashTagService;
     private final BasicUserService basicUserService;
+
     private LocationService locationService;
     private EventSearchSpecification eventSearchSpecification;
     private CommentService commentService;
@@ -95,9 +96,9 @@ public class EventService {
         return eventRepository.findById(event.getId()).isPresent();
     }
 
-    public Page<Comment> getComments (Event event, CommentPage commentPage){
+    public Page<Comment> getCommentsByEvent(Event event, CommentPage commentPage){
         log.info("EventService - getComments()");
-        Page<Comment> comments = commentService.getComments(commentPage);
+        Page<Comment> comments = commentService.getCommentsByEvent(event, commentPage);
 
         if (comments.isEmpty()) {
             throw new NoSuchElementException("No Event comments with id: " + event.getId());
