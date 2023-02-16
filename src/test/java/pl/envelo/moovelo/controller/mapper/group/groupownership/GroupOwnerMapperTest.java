@@ -19,13 +19,9 @@ class GroupOwnerMapperTest {
         user.setFirstname("John");
         user.setLastname("Doe");
 
-        GroupOwnerDto dto = GroupOwnerMapper.mapGroupOwnerToGroupOwnerDto(entity, user);
+        GroupOwnerDto dto = GroupOwnerMapper.mapGroupOwnerToGroupOwnerDto(entity);
 
-        assertEquals(entity.getId(), dto.getId());
         assertEquals(entity.getUserId(), dto.getBasicUserId());
-        assertEquals(user.getFirstname(), dto.getFirstname());
-        assertEquals(user.getLastname(), dto.getLastname());
-
     }
 
     @Test

@@ -10,26 +10,18 @@ import java.util.Objects;
 @Builder
 @Getter
 public class GroupOwnerDto {
-    private long id;
-    private long basicUserId;
-    private String firstname;
-    private String lastname;
-    private List<GroupDto> groups;
+    private Long basicUserId;
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         GroupOwnerDto that = (GroupOwnerDto) o;
-        return id == that.id;
+        return Objects.equals(basicUserId, that.basicUserId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, basicUserId, firstname, lastname, groups);
+        return Objects.hash(basicUserId);
     }
 }

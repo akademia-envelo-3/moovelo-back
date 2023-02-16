@@ -24,6 +24,7 @@ import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
+import pl.envelo.moovelo.service.AuthorizationService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.event.EventService;
 
@@ -42,6 +43,7 @@ public class EventController {
     private EventService eventService;
     private AuthenticatedUser authenticatedUser;
     private BasicUserService basicUserService;
+    private AuthorizationService authorizationService;
 
     @PostMapping("/events")
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -146,64 +148,65 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    //TODO Sprawdzić czy user ma dostęp do tego wydarzenia
     @GetMapping("/events/{eventId}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<DisplayEventResponseDto> getEventById(@PathVariable Long eventId) {
         log.info("EventController - getEventById()");
-        Event eventById = eventService.getEventById(eventId);
-        DisplayEventResponseDto displayEventResponseDto = null;
-        switch (eventById.getEventType()) {
-            case EVENT ->
-                    displayEventResponseDto = EventMapper.mapEventToEventResponseDto(eventById);
-            case EXTERNAL_EVENT ->
-                    displayEventResponseDto = EventMapper.mapExternalEventToEventResponseDto((ExternalEvent) eventById);
-            case INTERNAL_EVENT ->
-                    displayEventResponseDto = EventMapper.mapInternalEventToEventResponseDto((InternalEvent) eventById);
-            case CYCLIC_EVENT ->
-                    displayEventResponseDto = EventMapper.mapCyclicEventToEventResponseDto((CyclicEvent) eventById);
-            default ->
-                    throw new IllegalEventException("Not supported event with type = '" + eventById.getEventType() + "'");
+        if (authorizationService.isLoggedUserEventOwner(eventId) || authorizationService.isLoggedUserAdmin()) {
+            Event eventById = eventService.getEventById(eventId);
+            DisplayEventResponseDto displayEventResponseDto = null;
+            switch (eventById.getEventType()) {
+                case EVENT -> displayEventResponseDto = EventMapper.mapEventToEventResponseDto(eventById);
+                case EXTERNAL_EVENT ->
+                        displayEventResponseDto = EventMapper.mapExternalEventToEventResponseDto((ExternalEvent) eventById);
+                case INTERNAL_EVENT ->
+                        displayEventResponseDto = EventMapper.mapInternalEventToEventResponseDto((InternalEvent) eventById);
+                case CYCLIC_EVENT ->
+                        displayEventResponseDto = EventMapper.mapCyclicEventToEventResponseDto((CyclicEvent) eventById);
+                default ->
+                        throw new IllegalEventException("Not supported event with type = '" + eventById.getEventType() + "'");
+            }
+            log.info("EventController - getEventById() return {}", displayEventResponseDto);
+            return ResponseEntity.ok(displayEventResponseDto);
+
         }
-        log.info("EventController - getEventById() return {}", displayEventResponseDto);
-        return displayEventResponseDto == null ? ResponseEntity.badRequest().build() : ResponseEntity.ok(displayEventResponseDto);
+        throw new UnauthorizedRequestException("Access denied!");
     }
 
     @PatchMapping("/events/{eventId}/ownership")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<String> updateEventOwnershipById(@RequestBody EventOwnershipRequestDto eventOwnershipRequestDto,
                                                            @PathVariable Long eventId) {
-        log.info("EventController - updateEventOwnershipById()");
-        Long currentEventOwnerUserId = eventService.getEventOwnerUserIdByEventId(eventId);
-        User loggedInUser = authenticatedUser.getAuthenticatedUser();
-        if (basicUserService.isBasicUserEventOwner(loggedInUser, currentEventOwnerUserId)
-                || loggedInUser.getRole().name().equals("ROLE_ADMIN")) {
+        log.info("EventController - updateEventOwnershipById(), - eventId = {}", eventId);
+        if (authorizationService.isLoggedUserEventOwner(eventId) || authorizationService.isLoggedUserAdmin()) {
             Long newOwnerUserId = eventOwnershipRequestDto.getNewOwnerUserId();
-            if (basicUserService.checkIfBasicUserExistsById(newOwnerUserId)) {
-                EventOwner eventOwner = eventService.getEventOwnerByUserId(newOwnerUserId);
-                eventService.updateEventOwnershipByEventId(eventId, eventOwner, currentEventOwnerUserId);
-            } else {
-                log.error("EventController - updateEventOwnershipById()", new UnauthorizedRequestException("Unauthorized request"));
-                throw new UnauthorizedRequestException("The id of the new event owner does not belong to any user account");
-            }
+        if (basicUserService.checkIfBasicUserExistsById(newOwnerUserId)) {
+            EventOwner newEventOwner = eventService.getEventOwnerByUserId(newOwnerUserId);
+            Long currentEventOwnerUserId = eventService.getEventOwnerUserIdByEventId(eventId);
+            eventService.updateEventOwnershipByEventId(eventId, newEventOwner, currentEventOwnerUserId);
         } else {
             log.error("EventController - updateEventOwnershipById()", new UnauthorizedRequestException("Unauthorized request"));
-            throw new UnauthorizedRequestException("Logged in user is not authorized to change the event owner of the event with id: " + eventId);
+            throw new UnauthorizedRequestException("The id of the new event owner does not belong to any user account");
         }
-        return ResponseEntity.ok().build();
+    } else {
+        log.error("EventController - updateEventOwnershipById()", new UnauthorizedRequestException("Unauthorized request"));
+        throw new UnauthorizedRequestException("Logged in user is not authorized to change the event owner of the event with id: " + eventId);
     }
+        return ResponseEntity.ok().
+
+    build();
+
+}
 
     @PutMapping("/events/{eventId}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<String> updateEventById(@PathVariable Long eventId, @RequestBody EventRequestDto eventRequestDto) {
         log.info("EventController - updateEventById() - eventId = {}", eventId);
         if (eventService.checkIfEventExistsById(eventId)) {
-            Long currentEventOwnerUserId = eventService.getEventOwnerUserIdByEventId(eventId);
-            User loggedInUser = authenticatedUser.getAuthenticatedUser();
-            if (basicUserService.isBasicUserEventOwner(loggedInUser, currentEventOwnerUserId)) {
+            if (authorizationService.isLoggedUserEventOwner(eventId)) {
                 EventMapperInterface eventMapper = new EventMapper();
                 Event eventFromDto = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.EVENT);
-                eventService.updateEventById(eventId, eventFromDto, loggedInUser.getId());
+                eventService.updateEventById(eventId, eventFromDto, authorizationService.getLoggedUserId());
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Logged in user is not authorized to update the  with id: " + eventId);
             }

@@ -29,9 +29,9 @@ public class BasicUserService {
         }
     }
 
-    public boolean isBasicUserEventOwner(User user, Long eventOwnerUserId) {
+    public boolean isBasicUserOwner(User user, Long ownerUserId) {
         return user.getRole().name().equals("ROLE_USER") &&
-                user.getId().equals(eventOwnerUserId);
+                user.getId().equals(ownerUserId);
     }
 }
 
