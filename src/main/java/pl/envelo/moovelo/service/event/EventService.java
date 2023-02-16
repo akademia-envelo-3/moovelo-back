@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
 import pl.envelo.moovelo.CommentPage;
 import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
 import pl.envelo.moovelo.entity.Comment;
