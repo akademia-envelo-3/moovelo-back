@@ -3,6 +3,7 @@ package pl.envelo.moovelo.controller.dto.event;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import pl.envelo.moovelo.controller.dto.HashtagListResponseDto;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerListResponseDto;
@@ -11,7 +12,7 @@ import pl.envelo.moovelo.controller.dto.group.groupownership.GroupResponseDto;
 
 import java.util.List;
 
-@Builder
+@Setter
 @Getter
 public class DisplayEventResponseDto {
     @JsonProperty("eventId")

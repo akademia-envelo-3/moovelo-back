@@ -31,6 +31,15 @@ public class HashTagService {
         return hashtagsToAssign;
     }
 
+    public List<Hashtag> validateHashtagsForUpdateEvent(List<Hashtag> hashtagsFromDto, List<Hashtag> hashtagsFromEventInDb) {
+        log.info("HashtagService - validateHashtagsForUpdateEvent()");
+        List<Hashtag> recurringHashtags = getRecurringHashtags(hashtagsFromDto, hashtagsFromEventInDb);
+        decrementHashtagsNoLongerPresentInEvent(hashtagsFromDto, hashtagsFromEventInDb);
+        List<Hashtag> hashtagsToAssign = joinHashtagListsForUpdateEvent(hashtagsFromDto, recurringHashtags);
+        log.info("HashtagService - validateHashtagsForUpdateEvent() - hashtagsToAssign - {}", hashtagsToAssign);
+        return hashtagsToAssign;
+    }
+
     private Hashtag incrementHashTagOccurrence(Hashtag hashtag) {
         Hashtag hashtagToIncrement = updateHashtagOccurrences(hashtag);
         return hashtagRepository.save(hashtagToIncrement);
@@ -57,15 +66,6 @@ public class HashTagService {
 
     private boolean checkIfHashtagExistByHashTagValue(Hashtag hashtag) {
         return hashtagRepository.findByHashtagValueIgnoreCase(hashtag.getHashtagValue()) != null;
-    }
-
-    public List<Hashtag> validateHashtagsForUpdateEvent(List<Hashtag> hashtagsFromDto, List<Hashtag> hashtagsFromEventInDb) {
-        log.info("HashtagService - validateHashtagsForUpdateEvent()");
-        List<Hashtag> recurringHashtags = getRecurringHashtags(hashtagsFromDto, hashtagsFromEventInDb);
-        decrementHashtagsNoLongerPresentInEvent(hashtagsFromDto, hashtagsFromEventInDb);
-        List<Hashtag> hashtagsToAssign = joinHashtagListsForUpdateEvent(hashtagsFromDto, recurringHashtags);
-        log.info("HashtagService - validateHashtagsForUpdateEvent() - hashtagsToAssign - {}", hashtagsToAssign);
-        return hashtagsToAssign;
     }
 
     private List<Hashtag> getRecurringHashtags(List<Hashtag> hashtagsFromDto, List<Hashtag> hashtagsFromEventInDb) {

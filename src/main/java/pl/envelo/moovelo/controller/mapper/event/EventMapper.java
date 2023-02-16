@@ -3,7 +3,6 @@ package pl.envelo.moovelo.controller.mapper.event;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventIdDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
-import pl.envelo.moovelo.controller.dto.group.groupownership.GroupResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventOwnerListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.HashtagListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
@@ -21,11 +20,52 @@ public class EventMapper implements EventMapperInterface {
 
     @Override
     public <T extends Event> T mapEventRequestDtoToEventByEventType(EventRequestDto eventRequestDto, EventType eventType) {
-        T event = getEventByEventType(eventType);
+        return getMappedEventByEventType(eventRequestDto, eventType);
+    }
+
+    private <T extends Event> T getMappedEventByEventType(EventRequestDto eventRequestDto, EventType eventType) {
+        T event = null;
+        switch (eventType) {
+            case EVENT -> event = (T) returnMappedEvent(eventRequestDto, eventType);
+            case INTERNAL_EVENT -> event = (T) returnMappedInternalEvent(eventRequestDto, eventType);
+            case CYCLIC_EVENT -> event = (T) returnMappedCyclicEvent(eventRequestDto, eventType);
+            case EXTERNAL_EVENT -> event = (T) returnMappedExternalEvent(eventRequestDto, eventType);
+        }
+        return event;
+    }
+
+    private static Event returnMappedEvent(EventRequestDto eventRequestDto, EventType eventType) {
+        Event event = new Event();
+        setMappedFieldsForEvent(eventRequestDto, eventType, event);
+        return event;
+    }
+
+    private InternalEvent returnMappedInternalEvent(EventRequestDto eventRequestDto, EventType eventType) {
+        InternalEvent internalEvent = new InternalEvent();
+        setMappedFieldsForInternalEvent(eventRequestDto, eventType, internalEvent);
+        return internalEvent;
+    }
+
+    private CyclicEvent returnMappedCyclicEvent(EventRequestDto eventRequestDto, EventType eventType) {
+        CyclicEvent cyclicEvent = new CyclicEvent();
+        setMappedFieldsForInternalEvent(eventRequestDto, eventType, cyclicEvent);
+        cyclicEvent.setFrequencyInDays(eventRequestDto.getFrequencyInDays());
+        cyclicEvent.setNumberOfRepeats(eventRequestDto.getNumberOfRepeats());
+        return cyclicEvent;
+    }
+
+    private ExternalEvent returnMappedExternalEvent(EventRequestDto eventRequestDto, EventType eventType) {
+        ExternalEvent externalEvent = new ExternalEvent();
+        setMappedFieldsForEvent(eventRequestDto, eventType, externalEvent);
+        return externalEvent;
+    }
+
+    private static <T extends Event> T setMappedFieldsForEvent(EventRequestDto eventRequestDto, EventType eventType, T event) {
         event.setEventOwner(new EventOwner());
         event.setEventInfo(EventInfoMapper.mapEventInfoDtoToEventInfo(eventRequestDto.getEventInfo()));
         event.setLimitedPlaces(eventRequestDto.getLimitedPlaces());
         event.setEventType(eventType);
+        // TODO: 16.02.2023 Zastanowic sie, co z updatem 
 //        event.setComments(new ArrayList<>());
 //        event.setUsersWithAccess(new ArrayList<>());
 //        event.setAcceptedStatusUsers(new HashSet<>());
@@ -38,87 +78,50 @@ public class EventMapper implements EventMapperInterface {
         return event;
     }
 
-    private <T extends Event> T getEventByEventType(EventType eventType) {
-        Event event = switch (eventType) {
-            case EVENT -> new Event();
-            case EXTERNAL_EVENT -> new ExternalEvent();
-            case INTERNAL_EVENT -> new InternalEvent();
-            case CYCLIC_EVENT -> new CyclicEvent();
-        };
-        return (T) event;
+    private static void setMappedFieldsForInternalEvent(EventRequestDto eventRequestDto, EventType eventType,
+                                                        InternalEvent internalEvent) {
+        setMappedFieldsForEvent(eventRequestDto, eventType, internalEvent);
+        internalEvent.setPrivate(eventRequestDto.isPrivate());
+        internalEvent.setGroup(new Group());
     }
 
     public static DisplayEventResponseDto mapEventToEventResponseDto(Event event) {
-        return DisplayEventResponseDto.builder()
-                .id(event.getId())
-                .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()))
-                .eventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(event.getEventInfo()))
-                .limitedPlaces(event.getLimitedPlaces())
-                .usersWithAccess(event.getUsersWithAccess().stream().map(BasicUserMapper::map).collect(Collectors.toList()))
-                //TODO Wysypuje blad
-                .eventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(event))
-                .isPrivate(false)
-                .isCyclic(false)
-                .group(null)
-                .frequencyInDays(0)
-                .numberOfRepeats(0)
-                .hashtags(event.getHashtags().stream().map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
-                        .collect(Collectors.toList()))
-                .build();
+        DisplayEventResponseDto displayEventResponseDto = new DisplayEventResponseDto();
+        displayEventResponseDto.setId(event.getId());
+        displayEventResponseDto.setEventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()));
+        displayEventResponseDto.setEventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(event.getEventInfo()));
+        displayEventResponseDto.setLimitedPlaces(event.getLimitedPlaces());
+        displayEventResponseDto.setUsersWithAccess(event.getUsersWithAccess().stream().map(BasicUserMapper::map).collect(Collectors.toList()));
+        displayEventResponseDto.setEventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(event));
+        displayEventResponseDto.setPrivate(false);
+        displayEventResponseDto.setCyclic(false);
+        displayEventResponseDto.setHashtags(event.getHashtags().stream().map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
+                .collect(Collectors.toList()));
+        return displayEventResponseDto;
     }
 
     public static DisplayEventResponseDto mapInternalEventToEventResponseDto(InternalEvent internalEvent) {
-        return DisplayEventResponseDto.builder()
-                .id(internalEvent.getId())
-                .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(internalEvent.getEventOwner()))
-                .eventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(internalEvent.getEventInfo()))
-                .limitedPlaces(internalEvent.getLimitedPlaces())
-                .eventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(internalEvent))
-                .isPrivate(internalEvent.isPrivate())
-                .isCyclic(false)
-                .group(getGroupResponseDto(internalEvent.getGroup()))
-                .frequencyInDays(0)
-                .numberOfRepeats(0)
-                .hashtags(internalEvent.getHashtags().stream().map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
-                        .collect(Collectors.toList()))
-                .build();
+        DisplayEventResponseDto displayEventResponseDto = mapEventToEventResponseDto(internalEvent);
+        // TODO: 16.02.2023 Na ten moment nie mamy grup 
+//        displayEventResponseDto.setGroup(GroupResponseMapper.mapGroupToGroupResponseMapper(internalEvent.getGroup()));
+        displayEventResponseDto.setPrivate(internalEvent.isPrivate());
+        return displayEventResponseDto;
     }
 
-    private static GroupResponseDto getGroupResponseDto(Group group) {
-        return group != null ? GroupResponseMapper.mapGroupToGroupResponseMapper(group) : null;
-    }
+    // TODO: 16.02.2023 Czemu tutaj?
+//    private static GroupResponseDto getGroupResponseDto(Group group) {
+//        return group != null ? GroupResponseMapper.mapGroupToGroupResponseMapper(group) : null;
+//    }
 
     public static DisplayEventResponseDto mapCyclicEventToEventResponseDto(CyclicEvent cyclicEvent) {
-        return DisplayEventResponseDto.builder()
-                .id(cyclicEvent.getId())
-                .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(cyclicEvent.getEventOwner()))
-                .eventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(cyclicEvent.getEventInfo()))
-                .limitedPlaces(cyclicEvent.getLimitedPlaces())
-                .eventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(cyclicEvent))
-                .isPrivate(cyclicEvent.isPrivate())
-                .isCyclic(true)
-                .group(GroupResponseMapper.mapGroupToGroupResponseMapper(cyclicEvent.getGroup()))
-                .frequencyInDays(cyclicEvent.getFrequencyInDays())
-                .numberOfRepeats(cyclicEvent.getNumberOfRepeats())
-                .hashtags(cyclicEvent.getHashtags().stream().map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
-                        .collect(Collectors.toList()))
-                .build();
+        DisplayEventResponseDto displayEventResponseDto = new DisplayEventResponseDto();
+        mapInternalEventToEventResponseDto(cyclicEvent);
+        displayEventResponseDto.setFrequencyInDays(cyclicEvent.getFrequencyInDays());
+        displayEventResponseDto.setNumberOfRepeats(cyclicEvent.getNumberOfRepeats());
+        return displayEventResponseDto;
     }
 
     public static DisplayEventResponseDto mapExternalEventToEventResponseDto(ExternalEvent externalEvent) {
-        return DisplayEventResponseDto.builder()
-                .id(externalEvent.getId())
-                .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(externalEvent.getEventOwner()))
-                .eventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(externalEvent.getEventInfo()))
-                .limitedPlaces(externalEvent.getLimitedPlaces())
-                .eventParticipationStats(EventParticipationStatsMapper.mapExternalEventToEventParticipationStatsDto(externalEvent))
-                .isPrivate(false)
-                .isCyclic(false)
-                .group(null)
-                .frequencyInDays(0)
-                .numberOfRepeats(0)
-                .hashtags(externalEvent.getHashtags().stream().map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
-                        .collect(Collectors.toList()))
-                .build();
+        return mapEventToEventResponseDto(externalEvent);
     }
 }

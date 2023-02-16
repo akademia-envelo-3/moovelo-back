@@ -24,14 +24,14 @@ public class WebSecurityConfig {
     private AuthenticationConfiguration authenticationConfiguration;
 
     private static final String[] AUTH_WHITELIST = {
-        "/api/login/**",
-        "/api/refreshToken/**",
-        "/v2/api-docs",
-        "/v3/api-docs",
-        "/swagger-resources/**",
-        "/swagger-ui/**",
-        "/h2/**",
-        "/api/v1/externalEvents/**"
+            "/api/login/**",
+            "/api/refreshToken/**",
+            "/v2/api-docs",
+            "/v3/api-docs",
+            "/swagger-resources/**",
+            "/swagger-ui/**",
+            "/h2/**",
+            "/api/v1/externalEvents/**"
     };
 
     @Bean

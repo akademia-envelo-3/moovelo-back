@@ -18,7 +18,7 @@ public class EventParticipationStatsMapper {
         PENDING,
         REJECTED
     }
-    
+
     public static EventParticipationStatsDto mapEventToEventParticipationStatsDto(Event event) {
         Set<BasicUser> acceptedStatuses = validateEmptyList(event, EventStatus.ACCEPTED);
         Set<BasicUser> pendingStatuses = validateEmptyList(event, EventStatus.PENDING);
