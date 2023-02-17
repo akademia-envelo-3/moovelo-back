@@ -9,18 +9,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
-import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
-import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
-import pl.envelo.moovelo.controller.mapper.event.EventMapper;
+import pl.envelo.moovelo.controller.mapper.event.manager.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
 import pl.envelo.moovelo.entity.events.CyclicEvent;
-import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.service.event.CyclicEventService;
 
 import java.net.URI;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -53,7 +49,7 @@ public class CyclicEventController {
                 .buildAndExpand(newEvent.getId())
                 .toUri();
 
-        log.info("EventController - () return createNewEvent() - dto {}", displayEventResponseDto);
+        log.info("CyclicEventController - () return createNewEvent() - dto {}", displayEventResponseDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(uri)

@@ -13,7 +13,6 @@ import java.util.List;
 @Getter
 public class EventInfoDto {
     private Long id;
-    private long eventId;
     private String name;
     private String description;
     private CategoryListResponseDto category;

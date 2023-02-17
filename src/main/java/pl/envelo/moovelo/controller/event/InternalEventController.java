@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
-import pl.envelo.moovelo.controller.mapper.event.EventMapper;
+import pl.envelo.moovelo.controller.mapper.event.manager.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
 import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.entity.events.InternalEvent;

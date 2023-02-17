@@ -34,7 +34,7 @@ public class EventService<I extends Event> {
 
     public I createNewEvent(I event, EventType eventType, Long userId) {
         log.info("EventService - createNewEvent()");
-        if (checkIfEntityExist(event)) {
+        if (checkIfEventExistsById(event.getId(), eventType)) {
             throw new EntityExistsException(EVENT_EXIST_MESSAGE);
         } else {
             List<Hashtag> hashtagsToAssign = hashTagService.getHashtagsToAssign(event.getHashtags());
@@ -49,6 +49,36 @@ public class EventService<I extends Event> {
                     .getRepositoryForSpecificEvent(eventType)
                     .save(eventAfterFieldValidation);
         }
+    }
+
+    public void updateEventById(Long eventId, I eventFromDto, EventType eventType, Long userId) {
+        log.info("EventService - updateEventById() - eventId = {}", eventId);
+        I eventInDb = getEventById(eventId, eventType);
+        Location formerLocation = eventInDb.getEventInfo().getLocation();
+        Long eventInfoInDbId = eventInDb.getEventInfo().getId();
+        List<Hashtag> hashtagsToAssign = hashTagService.validateHashtagsForUpdateEvent(eventFromDto.getHashtags(), eventInDb.getHashtags());
+        EventInfo validatedEventInfo = eventInfoService.validateEventInfoForUpdateEvent(eventFromDto.getEventInfo(), eventInfoInDbId);
+        setValidatedEntitiesForUpdateEvent(eventInDb, eventFromDto, userId);
+        eventInDb.setHashtags(hashtagsToAssign);
+        eventInDb.setEventInfo(validatedEventInfo);
+        eventRepositoryManager
+                .getRepositoryForSpecificEvent(eventType)
+                .save(eventInDb);
+        eventInfoService.removeLocationWithNoEvents(formerLocation);
+        log.info("EventService - updateEventById() - eventId = {} updated", eventId);
+    }
+
+    public I getEventById(Long id, EventType eventType) {
+        log.info("EventService - getEventById()");
+        Optional<I> eventOptional = eventRepositoryManager
+                .getRepositoryForSpecificEvent(eventType)
+                .findById(id);
+
+        if (eventOptional.isEmpty()) {
+            throw new NoSuchElementException("No event with id: " + id);
+        }
+        log.info("EventService - getEventById() return {}", eventOptional.get());
+        return eventOptional.get();
     }
 
 //    public void removeEventById(long id) {
@@ -68,7 +98,6 @@ public class EventService<I extends Event> {
 //        }
 //        log.info("EventService - removeEventById() - event with id = {} removed", id);
 //    }
-
 //    public Page<? extends Event> getAllEvents(String privacy, String group, String cat, String sort, String sortOrder, int page) {
 //        log.info("EventService - getAllEvents()");
 //
@@ -78,33 +107,18 @@ public class EventService<I extends Event> {
 //        Page<? extends Event> allEvents = eventRepository.findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat), pageable);
 //
 //        log.info("EventService - getAllEvents() return {}", allEvents.toString());
+
 //        return allEvents;
 //    }
-
 //    public List<? extends Event> getAllEventsByEventOwnerBasicUserId(Long basicUserId) {
 //        log.info("EventService - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
 //        List<? extends Event> events = eventRepository.findByEventOwner_UserId(basicUserId);
 //
 //        log.info("EventService - getAllEventsByEventOwnerBasicUserId() return {}", events);
+
 //        return events;
+
 //    }
-
-    public I getEventById(Long id) {
-        log.info("EventService - getEventById()");
-        Optional<I> eventOptional = eventRepositoryManager.getRepositoryForSpecificEvent(EventType.EVENT).findById(id);
-        if (eventOptional.isEmpty()) {
-            throw new NoSuchElementException("No event with id: " + id);
-        }
-        log.info("EventService - getEventById() return {}", eventOptional.get());
-        return eventOptional.get();
-    }
-
-    boolean checkIfEntityExist(I event) {
-        if (event.getId() == null) {
-            return false;
-        }
-        return eventRepositoryManager.getRepositoryForSpecificEvent(EventType.EVENT).findById(event.getId()).isPresent();
-    }
 
     I validateAggregatedEntitiesForCreateEvent(I event, EventType eventType, Long userId) {
         I eventWithFieldsAfterValidation = getEventByEventType(eventType);
@@ -129,22 +143,6 @@ public class EventService<I extends Event> {
         eventWithFieldsAfterValidation.setUsersWithAccess(basicUserService.getAllBasicUsers());
     }
 
-    public void updateEventById(Long eventId, I eventFromDto, Long userId) {
-        log.info("EventService - updateEventById() - eventId = {}", eventId);
-        I eventInDb = getEventById(eventId);
-        Location formerLocation = eventInDb.getEventInfo().getLocation();
-        Long eventInfoInDbId = eventInDb.getEventInfo().getId();
-        List<Hashtag> hashtagsToAssign = hashTagService.validateHashtagsForUpdateEvent(eventFromDto.getHashtags(), eventInDb.getHashtags());
-        EventInfo validatedEventInfo = eventInfoService.validateEventInfoForUpdateEvent(eventFromDto.getEventInfo(), eventInfoInDbId);
-        setValidatedEntitiesForUpdateEvent(eventInDb, eventFromDto, userId);
-        eventInDb.setHashtags(hashtagsToAssign);
-        eventInDb.setEventInfo(validatedEventInfo);
-        eventRepositoryManager.getRepositoryForSpecificEvent(eventFromDto.getEventType())
-                .save(eventInDb);
-        eventInfoService.removeLocationWithNoEvents(formerLocation);
-        log.info("EventService - updateEventById() - eventId = {} updated", eventId);
-    }
-
     private I setValidatedEntitiesForUpdateEvent(I eventInDb, I event, Long userId) {
         setValidatedBasicEventFields(event, userId, eventInDb);
         return eventInDb;
@@ -162,7 +160,8 @@ public class EventService<I extends Event> {
         return eventOwnerService.getEventOwnerByUserId(userId);
     }
 
-//    @Transactional
+
+    //    @Transactional
 //    public void updateEventOwnershipByEventId(Long eventId, EventOwner eventOwner, Long currentEventOwnerUserId) {
 //        log.info("EventService - updateEventOwnershipById() - eventId = {}", eventId);
 //        Event event = getEventById(eventId);
@@ -172,12 +171,20 @@ public class EventService<I extends Event> {
 //        eventOwnerService.removeEventOwnerWithNoEvents(getEventOwnerByUserId(currentEventOwnerUserId));
 //        log.info("EventService - updateEventOwnershipById() - eventId = {} updated", eventId);
 //    }
+    // TODO: 17.02.2023 Stare, niepotrzebne?
+//    boolean checkIfEntityExist(Long event) {
+
+//        return eventRepositoryManager.getRepositoryForSpecificEvent(EventType.EVENT).findById(event.getId()).isPresent();
+//    }
 
     public boolean checkIfEventExistsById(Long eventId, EventType eventType) {
-        return eventRepositoryManager
-                .getRepositoryForSpecificEvent(eventType)
-                .findById(eventId)
-                .isPresent();
+        if (eventId != null) {
+            return eventRepositoryManager
+                    .getRepositoryForSpecificEvent(eventType)
+                    .findById(eventId)
+                    .isPresent();
+        }
+        return false;
     }
 
 //    public Page<BasicUser> getUsersWithAccess(Long eventId, int page, int size) {

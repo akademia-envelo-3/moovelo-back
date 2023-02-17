@@ -1,4 +1,4 @@
-package pl.envelo.moovelo.controller.mapper.event;
+package pl.envelo.moovelo.controller.mapper.event.manager;
 
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventIdDto;
@@ -6,13 +6,16 @@ import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.mapper.EventOwnerListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.HashtagListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
-import pl.envelo.moovelo.controller.mapper.group.GroupResponseMapper;
+import pl.envelo.moovelo.controller.mapper.event.EventInfoMapper;
+import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
+import pl.envelo.moovelo.controller.mapper.event.EventParticipationStatsMapper;
 import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.entity.groups.Group;
 
 import java.util.stream.Collectors;
 
 public class EventMapper implements EventMapperInterface {
+    private final EventMapperManager eventMapperManager = new EventMapperManager();
 
     public static EventIdDto mapEventToEventIdDto(Event event) {
         return new EventIdDto(event.getId());
@@ -20,52 +23,15 @@ public class EventMapper implements EventMapperInterface {
 
     @Override
     public <T extends Event> T mapEventRequestDtoToEventByEventType(EventRequestDto eventRequestDto, EventType eventType) {
-        return getMappedEventByEventType(eventRequestDto, eventType);
+        return eventMapperManager.getMappedEventByEventType(eventRequestDto, eventType);
     }
 
-    private <T extends Event> T getMappedEventByEventType(EventRequestDto eventRequestDto, EventType eventType) {
-        T event = null;
-        switch (eventType) {
-            case EVENT -> event = (T) returnMappedEvent(eventRequestDto, eventType);
-            case INTERNAL_EVENT -> event = (T) returnMappedInternalEvent(eventRequestDto, eventType);
-            case CYCLIC_EVENT -> event = (T) returnMappedCyclicEvent(eventRequestDto, eventType);
-            case EXTERNAL_EVENT -> event = (T) returnMappedExternalEvent(eventRequestDto, eventType);
-        }
-        return event;
-    }
-
-    private static Event returnMappedEvent(EventRequestDto eventRequestDto, EventType eventType) {
-        Event event = new Event();
-        setMappedFieldsForEvent(eventRequestDto, eventType, event);
-        return event;
-    }
-
-    private InternalEvent returnMappedInternalEvent(EventRequestDto eventRequestDto, EventType eventType) {
-        InternalEvent internalEvent = new InternalEvent();
-        setMappedFieldsForInternalEvent(eventRequestDto, eventType, internalEvent);
-        return internalEvent;
-    }
-
-    private CyclicEvent returnMappedCyclicEvent(EventRequestDto eventRequestDto, EventType eventType) {
-        CyclicEvent cyclicEvent = new CyclicEvent();
-        setMappedFieldsForInternalEvent(eventRequestDto, eventType, cyclicEvent);
-        cyclicEvent.setFrequencyInDays(eventRequestDto.getFrequencyInDays());
-        cyclicEvent.setNumberOfRepeats(eventRequestDto.getNumberOfRepeats());
-        return cyclicEvent;
-    }
-
-    private ExternalEvent returnMappedExternalEvent(EventRequestDto eventRequestDto, EventType eventType) {
-        ExternalEvent externalEvent = new ExternalEvent();
-        setMappedFieldsForEvent(eventRequestDto, eventType, externalEvent);
-        return externalEvent;
-    }
-
-    private static <T extends Event> T setMappedFieldsForEvent(EventRequestDto eventRequestDto, EventType eventType, T event) {
+    static <T extends Event> T mapEventRequestDtoToEvent(EventRequestDto eventRequestDto, EventType eventType, T event) {
         event.setEventOwner(new EventOwner());
         event.setEventInfo(EventInfoMapper.mapEventInfoDtoToEventInfo(eventRequestDto.getEventInfo()));
         event.setLimitedPlaces(eventRequestDto.getLimitedPlaces());
         event.setEventType(eventType);
-        // TODO: 16.02.2023 Zastanowic sie, co z updatem 
+        // TODO: 16.02.2023 Zastanowic sie, co z updatem
 //        event.setComments(new ArrayList<>());
 //        event.setUsersWithAccess(new ArrayList<>());
 //        event.setAcceptedStatusUsers(new HashSet<>());
@@ -78,12 +44,21 @@ public class EventMapper implements EventMapperInterface {
         return event;
     }
 
-    private static void setMappedFieldsForInternalEvent(EventRequestDto eventRequestDto, EventType eventType,
-                                                        InternalEvent internalEvent) {
-        setMappedFieldsForEvent(eventRequestDto, eventType, internalEvent);
+    static <T extends InternalEvent> T mapEventRequestDtoToInternalEvent(EventRequestDto eventRequestDto, EventType eventType,
+                                                                         T internalEvent) {
+        mapEventRequestDtoToEvent(eventRequestDto, eventType, internalEvent);
         internalEvent.setPrivate(eventRequestDto.isPrivate());
         internalEvent.setGroup(new Group());
+        return internalEvent;
     }
+
+    static CyclicEvent setMappedFieldsForCyclicEvent(EventRequestDto eventRequestDto, EventType eventType, CyclicEvent cyclicEvent) {
+        mapEventRequestDtoToInternalEvent(eventRequestDto, eventType, cyclicEvent);
+        cyclicEvent.setFrequencyInDays(eventRequestDto.getFrequencyInDays());
+        cyclicEvent.setNumberOfRepeats(eventRequestDto.getNumberOfRepeats());
+        return cyclicEvent;
+    }
+
 
     public static DisplayEventResponseDto mapEventToEventResponseDto(Event event) {
         DisplayEventResponseDto displayEventResponseDto = new DisplayEventResponseDto();
