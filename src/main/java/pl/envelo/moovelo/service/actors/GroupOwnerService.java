@@ -24,8 +24,20 @@ public class GroupOwnerService {
             throw new NoSuchElementException("No group owner for the group with id: : " + groupId + " found");
         } else {
             GroupOwner groupOwner = groupOwnerOptional.get();
-            log.info("GroupOwnerService - getGroupOwnerByGroupId() - groupId {} = ,  return {}", groupId, groupOwner);
+            log.info("GroupOwnerService - getGroupOwnerByGroupId() - groupId = {} ,  return groupOwner = {}", groupId, groupOwner);
             return groupOwner;
         }
+    }
+
+    public GroupOwner getGroupOwnerByUserId(Long userId) {
+        log.info("GroupOwnerService - getGroupOwnerByUserId() - userId = {}", userId);
+        Optional<GroupOwner> groupOwnerOptional = groupOwnerRepository.findByUserId(userId);
+        return groupOwnerOptional.orElseGet(() -> createNewGroupOwner(userId));
+    }
+
+    private GroupOwner createNewGroupOwner(Long userId) {
+        GroupOwner groupOwner = new GroupOwner();
+        groupOwner.setUserId(userId);
+        return groupOwnerRepository.save(groupOwner);
     }
 }

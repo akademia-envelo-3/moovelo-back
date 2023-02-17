@@ -2,7 +2,6 @@ package pl.envelo.moovelo.controller.mapper.group.groupownership;
 
 import pl.envelo.moovelo.controller.dto.group.groupownership.GroupOwnerDto;
 import pl.envelo.moovelo.controller.dto.group.groupownership.GroupOwnershipRequestDto;
-import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.groups.GroupOwner;
 
 public class GroupOwnerMapper {
@@ -14,8 +13,7 @@ public class GroupOwnerMapper {
 
     public static GroupOwner mapGroupOwnershipRequestDtoToGroupOwner(GroupOwnershipRequestDto groupOwnershipRequestDto) {
         GroupOwner groupOwner = new GroupOwner();
-        groupOwner.setUserId(groupOwnershipRequestDto.getNewOwnerId());
-
+        groupOwner.setUserId(groupOwnershipRequestDto.getNewOwnerUserId());
         return groupOwner;
     }
 }
