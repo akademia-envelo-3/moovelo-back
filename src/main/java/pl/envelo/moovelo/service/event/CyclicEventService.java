@@ -1,31 +1,36 @@
 package pl.envelo.moovelo.service.event;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
 import pl.envelo.moovelo.entity.events.CyclicEvent;
-import pl.envelo.moovelo.repository.event.CyclicEventRepository;
+import pl.envelo.moovelo.repository.event.EventRepositoryManager;
+import pl.envelo.moovelo.service.HashTagService;
+import pl.envelo.moovelo.service.actors.BasicUserService;
+import pl.envelo.moovelo.service.actors.EventOwnerService;
 
-import java.util.List;
-
-@RequiredArgsConstructor
 @Service
 @Slf4j
-public class CyclicEventService {
-
-    private CyclicEventRepository cyclicEventRepository;
-
-    @Autowired
-    public CyclicEventService(CyclicEventRepository cyclicEventRepository) {
-        this.cyclicEventRepository = cyclicEventRepository;
+public class CyclicEventService extends InternalEventService<CyclicEvent> {
+    public CyclicEventService(EventRepositoryManager eventRepositoryManager, EventInfoService eventInfoService,
+                              EventOwnerService eventOwnerService, HashTagService hashTagService,
+                              BasicUserService basicUserService, EventSearchSpecification eventSearchSpecification) {
+        super(eventRepositoryManager, eventInfoService, eventOwnerService, hashTagService, basicUserService,
+                eventSearchSpecification);
     }
 
-    public List<CyclicEvent> getAllCyclicEvents() {
-        log.info("CyclicEventService - getAllCyclicEvents()");
-        List<CyclicEvent> allCyclicEvents = cyclicEventRepository.findAll();
-
-        log.info("CyclicEventService - getAllCyclicEvents() return {}", allCyclicEvents.toString());
-        return allCyclicEvents;
+    @Override
+    protected void setValidatedBasicEventFields(CyclicEvent event, Long userId, CyclicEvent eventWithFieldsAfterValidation) {
+        super.setValidatedBasicEventFields(event, userId, eventWithFieldsAfterValidation);
+        eventWithFieldsAfterValidation.setNumberOfRepeats(event.getNumberOfRepeats());
+        eventWithFieldsAfterValidation.setFrequencyInDays(event.getFrequencyInDays());
     }
+
+    //    public List<CyclicEvent> getAllCyclicEvents() {
+//        log.info("CyclicEventService - getAllCyclicEvents()");
+//        List<CyclicEvent> allCyclicEvents = cyclicEventRepository.findAll();
+//
+//        log.info("CyclicEventService - getAllCyclicEvents() return {}", allCyclicEvents.toString());
+//        return allCyclicEvents;
+//    }
 }

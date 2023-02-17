@@ -27,6 +27,7 @@ import java.util.List;
 @RequestMapping("api/v1")
 @Slf4j
 public class CyclicEventController {
+    private static final EventType eventType = EventType.CYCLIC_EVENT;
     private static final Long USER_ID = 1L;
     private CyclicEventService cyclicEventService;
 
@@ -35,42 +36,40 @@ public class CyclicEventController {
         this.cyclicEventService = cyclicEventService;
     }
 
-//    @PostMapping("/cyclicEvents")
-//    @PreAuthorize("hasRole('ROLE_USER')")
-//    public ResponseEntity<DisplayEventResponseDto> createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
-//        log.info("CyclicEventController - createNewEvent()");
-//
-//        //TODO do powalczenia z wyborem Rodzaju eventu? albo usunac
-//        EventMapperInterface eventMapper = new EventMapper();
-//        Event event = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.CYCLIC_EVENT);
-//        Event newEvent = cyclicEventService.createNewEvent(event, USER_ID);
-//        DisplayEventResponseDto displayEventResponseDto = EventMapper.mapEventToEventResponseDto(newEvent);
-//
-//        URI uri = ServletUriComponentsBuilder
-//                .fromCurrentRequest()
-//                .path("/{id}")
-//                .buildAndExpand(newEvent.getId())
-//                .toUri();
-//
-//        log.info("EventController - () return createNewEvent() - dto {}", displayEventResponseDto);
-//
-//        return ResponseEntity.status(HttpStatus.CREATED)
-//                .location(uri)
-//                .body(displayEventResponseDto);
-//    }
+    @PostMapping("/cyclicEvents")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<DisplayEventResponseDto> createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
+        log.info("CyclicEventController - createNewEvent()");
 
+        //TODO do powalczenia z wyborem Rodzaju eventu? albo usunac
+        EventMapperInterface eventMapper = new EventMapper();
+        CyclicEvent event = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.CYCLIC_EVENT);
+        CyclicEvent newEvent = cyclicEventService.createNewEvent(event, eventType, USER_ID);
+        DisplayEventResponseDto displayEventResponseDto = EventMapper.mapCyclicEventToEventResponseDto(newEvent);
 
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(newEvent.getId())
+                .toUri();
 
-    @GetMapping("/cyclicEvents")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<List<EventListResponseDto>> getAllCyclicEvents() {
-        log.info("CyclicEventController - getAllCyclicEvents()");
-        List<CyclicEvent> allCyclicEvents = cyclicEventService.getAllCyclicEvents();
+        log.info("EventController - () return createNewEvent() - dto {}", displayEventResponseDto);
 
-        List<EventListResponseDto> cyclicEventsDto = allCyclicEvents.stream()
-                .map(EventListResponseMapper::mapCyclicEventToEventListResponseDto).toList();
-
-        log.info("CyclicEventController - getAllCyclicEvents() return {}", cyclicEventsDto);
-        return ResponseEntity.ok(cyclicEventsDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .location(uri)
+                .body(displayEventResponseDto);
     }
+
+//    @GetMapping("/cyclicEvents")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    public ResponseEntity<List<EventListResponseDto>> getAllCyclicEvents() {
+//        log.info("CyclicEventController - getAllCyclicEvents()");
+//        List<CyclicEvent> allCyclicEvents = cyclicEventService.getAllCyclicEvents();
+//
+//        List<EventListResponseDto> cyclicEventsDto = allCyclicEvents.stream()
+//                .map(EventListResponseMapper::mapCyclicEventToEventListResponseDto).toList();
+//
+//        log.info("CyclicEventController - getAllCyclicEvents() return {}", cyclicEventsDto);
+//        return ResponseEntity.ok(cyclicEventsDto);
+//    }
 }

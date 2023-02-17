@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
 import pl.envelo.moovelo.entity.events.InternalEvent;
-import pl.envelo.moovelo.repository.event.RepositoryManager;
+import pl.envelo.moovelo.repository.event.EventRepositoryManager;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
@@ -12,11 +12,13 @@ import pl.envelo.moovelo.service.actors.EventOwnerService;
 @Service
 @Slf4j
 public class InternalEventService<C extends InternalEvent> extends EventService<C> {
-    private static final String EVENT_EXIST_MESSAGE = "Internal Event Exists in DB";
 
-    public InternalEventService(RepositoryManager repositoryManager, EventInfoService eventInfoService, EventOwnerService eventOwnerService,
-                                HashTagService hashTagService, BasicUserService basicUserService, EventSearchSpecification eventSearchSpecification) {
-        super(repositoryManager, eventInfoService, eventOwnerService, hashTagService, basicUserService, eventSearchSpecification);
+    public InternalEventService(EventRepositoryManager eventRepositoryManager, EventInfoService eventInfoService,
+                                EventOwnerService eventOwnerService,
+                                HashTagService hashTagService, BasicUserService basicUserService,
+                                EventSearchSpecification eventSearchSpecification) {
+        super(eventRepositoryManager, eventInfoService, eventOwnerService, hashTagService,
+                basicUserService, eventSearchSpecification);
     }
 
     @Override

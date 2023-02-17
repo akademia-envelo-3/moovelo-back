@@ -114,8 +114,7 @@ public class EventMapper implements EventMapperInterface {
 //    }
 
     public static DisplayEventResponseDto mapCyclicEventToEventResponseDto(CyclicEvent cyclicEvent) {
-        DisplayEventResponseDto displayEventResponseDto = new DisplayEventResponseDto();
-        mapInternalEventToEventResponseDto(cyclicEvent);
+        DisplayEventResponseDto displayEventResponseDto = mapInternalEventToEventResponseDto(cyclicEvent);
         displayEventResponseDto.setFrequencyInDays(cyclicEvent.getFrequencyInDays());
         displayEventResponseDto.setNumberOfRepeats(cyclicEvent.getNumberOfRepeats());
         return displayEventResponseDto;

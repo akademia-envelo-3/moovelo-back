@@ -13,6 +13,7 @@ import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.actors.Visitor;
+import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.exception.AvailablePlacesExceededException;
 import pl.envelo.moovelo.exception.EventDateException;
@@ -37,6 +38,7 @@ import java.util.Map;
 @Slf4j
 public class ExternalEventController {
 
+    private static final EventType eventType = EventType.EXTERNAL_EVENT;
     private ExternalEventService externalEventService;
     private VisitorService visitorService;
     private AuthenticatedUser authenticatedUser;

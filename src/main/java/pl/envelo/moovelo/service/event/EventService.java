@@ -10,7 +10,7 @@ import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.events.*;
-import pl.envelo.moovelo.repository.event.RepositoryManager;
+import pl.envelo.moovelo.repository.event.EventRepositoryManager;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
@@ -24,7 +24,7 @@ import java.util.Optional;
 @Slf4j
 @AllArgsConstructor
 public class EventService<I extends Event> {
-    RepositoryManager repositoryManager;
+    EventRepositoryManager eventRepositoryManager;
     private static final String EVENT_EXIST_MESSAGE = "Entity exists in Database";
     protected final EventInfoService eventInfoService;
     protected final EventOwnerService eventOwnerService;
@@ -32,7 +32,7 @@ public class EventService<I extends Event> {
     protected final BasicUserService basicUserService;
     protected EventSearchSpecification eventSearchSpecification;
 
-    public I createNewEvent(I event, Long userId) {
+    public I createNewEvent(I event, EventType eventType, Long userId) {
         log.info("EventService - createNewEvent()");
         if (checkIfEntityExist(event)) {
             throw new EntityExistsException(EVENT_EXIST_MESSAGE);
@@ -40,13 +40,13 @@ public class EventService<I extends Event> {
             List<Hashtag> hashtagsToAssign = hashTagService.getHashtagsToAssign(event.getHashtags());
             EventInfo validatedEventInfo = eventInfoService.validateEventInfoForCreateEvent(event.getEventInfo());
 
-            I eventAfterFieldValidation = validateAggregatedEntitiesForCreateEvent(event, userId);
+            I eventAfterFieldValidation = validateAggregatedEntitiesForCreateEvent(event, eventType, userId);
             eventAfterFieldValidation.setHashtags(hashtagsToAssign);
             eventAfterFieldValidation.setEventInfo(validatedEventInfo);
 
             log.info("EventService - createNewEvent() return {}", eventAfterFieldValidation);
-            return (I) repositoryManager
-                    .getRepositoryForSpecificEvent(event.getEventType())
+            return (I) eventRepositoryManager
+                    .getRepositoryForSpecificEvent(eventType)
                     .save(eventAfterFieldValidation);
         }
     }
@@ -91,7 +91,7 @@ public class EventService<I extends Event> {
 
     public I getEventById(Long id) {
         log.info("EventService - getEventById()");
-        Optional<I> eventOptional = repositoryManager.getRepositoryForSpecificEvent(EventType.EVENT).findById(id);
+        Optional<I> eventOptional = eventRepositoryManager.getRepositoryForSpecificEvent(EventType.EVENT).findById(id);
         if (eventOptional.isEmpty()) {
             throw new NoSuchElementException("No event with id: " + id);
         }
@@ -103,21 +103,21 @@ public class EventService<I extends Event> {
         if (event.getId() == null) {
             return false;
         }
-        return repositoryManager.getRepositoryForSpecificEvent(EventType.EVENT).findById(event.getId()).isPresent();
+        return eventRepositoryManager.getRepositoryForSpecificEvent(EventType.EVENT).findById(event.getId()).isPresent();
     }
 
-    I validateAggregatedEntitiesForCreateEvent(I event, Long userId) {
-        I eventWithFieldsAfterValidation = getEventByEventType(event.getEventType());
+    I validateAggregatedEntitiesForCreateEvent(I event, EventType eventType, Long userId) {
+        I eventWithFieldsAfterValidation = getEventByEventType(eventType);
         setValidatedBasicEventFields(event, userId, eventWithFieldsAfterValidation);
         return eventWithFieldsAfterValidation;
     }
 
     private <I extends Event> I getEventByEventType(EventType eventType) {
         Event event = switch (eventType) {
-            case EVENT -> event = new Event();
-            case EXTERNAL_EVENT -> event = new ExternalEvent();
-            case INTERNAL_EVENT -> event = new InternalEvent();
-            case CYCLIC_EVENT -> event = new CyclicEvent();
+            case EVENT -> new Event();
+            case EXTERNAL_EVENT -> new ExternalEvent();
+            case INTERNAL_EVENT -> new InternalEvent();
+            case CYCLIC_EVENT -> new CyclicEvent();
         };
         return (I) event;
     }
@@ -139,7 +139,7 @@ public class EventService<I extends Event> {
         setValidatedEntitiesForUpdateEvent(eventInDb, eventFromDto, userId);
         eventInDb.setHashtags(hashtagsToAssign);
         eventInDb.setEventInfo(validatedEventInfo);
-        repositoryManager.getRepositoryForSpecificEvent(eventFromDto.getEventType())
+        eventRepositoryManager.getRepositoryForSpecificEvent(eventFromDto.getEventType())
                 .save(eventInDb);
         eventInfoService.removeLocationWithNoEvents(formerLocation);
         log.info("EventService - updateEventById() - eventId = {} updated", eventId);
@@ -173,9 +173,9 @@ public class EventService<I extends Event> {
 //        log.info("EventService - updateEventOwnershipById() - eventId = {} updated", eventId);
 //    }
 
-    public boolean checkIfEventExistsById(Long eventId) {
-        return repositoryManager
-                .getRepositoryForSpecificEvent(EventType.EVENT)
+    public boolean checkIfEventExistsById(Long eventId, EventType eventType) {
+        return eventRepositoryManager
+                .getRepositoryForSpecificEvent(eventType)
                 .findById(eventId)
                 .isPresent();
     }
@@ -193,7 +193,6 @@ public class EventService<I extends Event> {
 
     public static <T> Page<T> listToPage(final Pageable pageable, List<T> list) {
         int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());
-        ;
         int last = Math.min(first + pageable.getPageSize(), list.size());
         return new PageImpl<>(list.subList(first, last), pageable, list.size());
     }
