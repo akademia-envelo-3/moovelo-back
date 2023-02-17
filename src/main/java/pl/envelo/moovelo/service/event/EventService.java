@@ -97,15 +97,15 @@ public class EventService {
         return eventRepository.findById(event.getId()).isPresent();
     }
 
-    public Page<Comment> getCommentsByEvent(Event event, CommentPage commentPage){
-        log.info("EventService - getComments()");
-        Page<Comment> comments = commentService.getCommentsByEvent(event, commentPage);
+    public Page<Comment> getAllCommentsByEvent(Event event, CommentPage commentPage){
+        log.info("EventService - getAllCommentsByEvent()");
+        Page<Comment> comments = commentService.getAllCommentsByEvent(event, commentPage);
 
         if (comments.isEmpty()) {
             throw new NoSuchElementException("No Event comments with id: " + event.getId());
         }
 
-        log.info("EventService - getAllComments() return {}", comments);
+        log.info("EventService - getAllCommentsByEvent() return {}", comments);
         return comments;
     }
 

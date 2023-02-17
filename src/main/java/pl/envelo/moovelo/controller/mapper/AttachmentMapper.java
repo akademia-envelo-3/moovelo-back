@@ -2,20 +2,20 @@ package pl.envelo.moovelo.controller.mapper;
 
 import pl.envelo.moovelo.controller.dto.AttachmentDto;
 import pl.envelo.moovelo.entity.Attachment;
+import pl.envelo.moovelo.service.CommentService;
+import pl.envelo.moovelo.service.event.EventInfoService;
 
+import java.util.ArrayList;
 import java.util.List;
 
+
 public class AttachmentMapper {
+    private final EventInfoService eventInfoService;
+    private final CommentService commentService;
 
-    public static AttachmentDto mapFromAttachmentToAttachmentDto(Attachment attachment) {
-        AttachmentDto attachmentDto = AttachmentDto.builder()
-                .id(attachment.getId())
-                .eventInfoId(attachment.getEventInfo().getId())
-                .commentId(attachment.getComment().getId())
-                .filePath(attachment.getFilePath())
-                .build();
-
-        return attachmentDto;
+    public AttachmentMapper(EventInfoService eventInfoService, CommentService commentService) {
+        this.eventInfoService = eventInfoService;
+        this.commentService = commentService;
     }
 
     public static List<AttachmentDto> mapFromAttachmentListToAttachmentDtoList(List<Attachment> attachments) {
@@ -28,6 +28,20 @@ public class AttachmentMapper {
                 .toList();
 
         return attachmentDtoList;
+    }
+
+    public List<Attachment> mapFromAttachmentDtoListToAttachmentList(List<AttachmentDto> attachmentDtoList) {
+
+        List<Attachment> attachments = attachmentDtoList.stream()
+                .map(attachmentDto -> new Attachment
+                        (attachmentDto.getId()
+                                , attachmentDto.getFilePath()
+                                , eventInfoService.getEventInfoById(attachmentDto.getEventInfoId())
+                                , commentService.getCommentById(attachmentDto.getCommentId())))
+                .toList();
+
+        return attachments;
+
     }
 
 }
