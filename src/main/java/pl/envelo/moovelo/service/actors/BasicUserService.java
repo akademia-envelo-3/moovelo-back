@@ -22,11 +22,7 @@ public class BasicUserService {
 
     public boolean checkIfBasicUserExistsById(Long userId) {
         Optional<BasicUser> basicUserOptional = basicUserRepository.findById(userId);
-        if (basicUserOptional.isPresent()) {
-            return true;
-        } else {
-            throw new NoSuchElementException("No BasicUser with id: " + userId);
-        }
+        return basicUserOptional.isPresent();
     }
 
     public boolean isBasicUserOwner(User user, Long ownerUserId) {
