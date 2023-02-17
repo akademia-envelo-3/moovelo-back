@@ -26,7 +26,7 @@ public class EventMapper implements EventMapperInterface {
         return eventMapperManager.getMappedEventByEventType(eventRequestDto, eventType);
     }
 
-    static <T extends Event> T mapEventRequestDtoToEvent(EventRequestDto eventRequestDto, EventType eventType, T event) {
+    static <T extends Event> void mapEventRequestDtoToEvent(EventRequestDto eventRequestDto, EventType eventType, T event) {
         event.setEventOwner(new EventOwner());
         event.setEventInfo(EventInfoMapper.mapEventInfoDtoToEventInfo(eventRequestDto.getEventInfo()));
         event.setLimitedPlaces(eventRequestDto.getLimitedPlaces());
@@ -41,22 +41,19 @@ public class EventMapper implements EventMapperInterface {
                 .map(HashtagListResponseMapper::mapHashTagDtoToHashtag)
                 .collect(Collectors.toList())
         );
-        return event;
     }
 
-    static <T extends InternalEvent> T mapEventRequestDtoToInternalEvent(EventRequestDto eventRequestDto, EventType eventType,
-                                                                         T internalEvent) {
+    static <T extends InternalEvent> void mapEventRequestDtoToInternalEvent(EventRequestDto eventRequestDto, EventType eventType,
+                                                                            T internalEvent) {
         mapEventRequestDtoToEvent(eventRequestDto, eventType, internalEvent);
         internalEvent.setPrivate(eventRequestDto.isPrivate());
         internalEvent.setGroup(new Group());
-        return internalEvent;
     }
 
-    static CyclicEvent setMappedFieldsForCyclicEvent(EventRequestDto eventRequestDto, EventType eventType, CyclicEvent cyclicEvent) {
+    static void mapEventRequestDtoToCyclicEvent(EventRequestDto eventRequestDto, EventType eventType, CyclicEvent cyclicEvent) {
         mapEventRequestDtoToInternalEvent(eventRequestDto, eventType, cyclicEvent);
         cyclicEvent.setFrequencyInDays(eventRequestDto.getFrequencyInDays());
         cyclicEvent.setNumberOfRepeats(eventRequestDto.getNumberOfRepeats());
-        return cyclicEvent;
     }
 
 
