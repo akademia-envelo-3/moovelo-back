@@ -23,7 +23,6 @@ public class GroupService {
     private GroupInfoService groupInfoService;
     private GroupRepository groupRepository;
 
-
     public Group createNewGroup(Group group, Long userId) {
         log.info("GroupService - createNewGroup() - groupOwnerUserId = {}", userId);
         Group newGroup = setNewGroupFields(group, userId);
@@ -31,7 +30,6 @@ public class GroupService {
         log.info("GroupService - createNewGroup() - return group = {}", newGroup);
         return newGroup;
     }
-
 
     private Group setNewGroupFields(Group group, Long userId) {
         GroupOwner groupOwner = groupOwnerService.getGroupOwnerByUserId(userId);

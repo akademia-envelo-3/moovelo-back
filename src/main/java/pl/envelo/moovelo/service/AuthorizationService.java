@@ -36,7 +36,6 @@ public class AuthorizationService {
         return isUserGroupMember;
     }
 
-
     public boolean isLoggedUserGroupOwner(Long groupId) {
         log.info("AuthorizationService - isLoggedUserGroupOwner() - groupId = {}", groupId);
         User loggedInUser = authenticatedUser.getAuthenticatedUser();
