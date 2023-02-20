@@ -1,7 +1,7 @@
 package pl.envelo.moovelo.controller.mapper.group;
 
 import org.junit.jupiter.api.Test;
-import pl.envelo.moovelo.controller.dto.group.GroupDto;
+import pl.envelo.moovelo.controller.dto.group.GroupResponseDto;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.group.groupownership.GroupOwnerMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;
@@ -51,7 +51,7 @@ class GroupMapperTest {
         entity.setEvents(List.of(event1, event2));
 
 
-        GroupDto dto = GroupMapper.mapGroupToGroupDto(entity);
+        GroupResponseDto dto = GroupMapper.mapGroupToGroupResponseDto(entity);
 
 
         assertEquals(entity.getId(), dto.getId());

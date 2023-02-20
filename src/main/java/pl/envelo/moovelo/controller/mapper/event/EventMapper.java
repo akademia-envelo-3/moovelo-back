@@ -3,11 +3,12 @@ package pl.envelo.moovelo.controller.mapper.event;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventIdDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
-import pl.envelo.moovelo.controller.dto.group.groupownership.GroupResponseDto;
+import pl.envelo.moovelo.controller.dto.group.GroupListResponseDto;
+import pl.envelo.moovelo.controller.dto.group.GroupResponseDtoForEvent;
 import pl.envelo.moovelo.controller.mapper.EventOwnerListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.HashtagListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
-import pl.envelo.moovelo.controller.mapper.group.GroupResponseMapper;
+import pl.envelo.moovelo.controller.mapper.group.GroupMapper;
 import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.entity.groups.Group;
 
@@ -84,8 +85,8 @@ public class EventMapper implements EventMapperInterface {
                 .build();
     }
 
-    private static GroupResponseDto getGroupResponseDto(Group group) {
-        return group != null ? GroupResponseMapper.mapGroupToGroupResponseMapper(group) : null;
+    private static GroupResponseDtoForEvent getGroupResponseDto(Group group) {
+        return group != null ? GroupMapper.mapGroupToGroupResponseDtoForEvent(group) : null;
     }
 
     public static DisplayEventResponseDto mapCyclicEventToEventResponseDto(CyclicEvent cyclicEvent) {
@@ -97,7 +98,7 @@ public class EventMapper implements EventMapperInterface {
                 .eventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(cyclicEvent))
                 .isPrivate(cyclicEvent.isPrivate())
                 .isCyclic(true)
-                .group(GroupResponseMapper.mapGroupToGroupResponseMapper(cyclicEvent.getGroup()))
+                .group(GroupMapper.mapGroupToGroupResponseDtoForEvent(cyclicEvent.getGroup()))
                 .frequencyInDays(cyclicEvent.getFrequencyInDays())
                 .numberOfRepeats(cyclicEvent.getNumberOfRepeats())
                 .hashtags(cyclicEvent.getHashtags().stream().map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
