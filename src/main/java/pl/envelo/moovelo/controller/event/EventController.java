@@ -21,6 +21,7 @@ import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
 import pl.envelo.moovelo.controller.mapper.survey.EventSurveyMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.*;
+import pl.envelo.moovelo.entity.surveys.Answer;
 import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
@@ -241,18 +242,25 @@ public class EventController {
 
     @GetMapping("/events/{eventId}/surveys")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<List<EventSurvey>> getEventSurveysByEventId(@PathVariable Long eventId) {
+    public ResponseEntity<List<EventSurveyDto>> getEventSurveysByEventId(@PathVariable Long eventId) {
         log.info("EventController - getEventSurveysByEventId");
         List<EventSurvey> surveys = eventService.getEventSurveysByEventId(eventId);
 
         List<EventSurveyDto> surveysDto = surveys
                 .stream()
                 .map(EventSurveyMapper::mapEventSurveyToEventSurveyDto)
-                .collect(Collectors.toList());
+                .peek(eventSurveyDto -> {
+                    BasicUser user = authorizationService.getLoggedBasicUser();
+                    List<Long> answersIds = user.getSurveyAnswers()
+                            .stream()
+                            .filter(answer -> answer.getEventSurvey().getId().equals(eventSurveyDto.getId()))
+                            .map(Answer::getId)
+                            .collect(Collectors.toList());
+                    eventSurveyDto.setYourAnswerIds(answersIds);
+                }).toList();
 
-
-        log.info("EventController - getEventSurveysByEventId() return {}");
-        return ResponseEntity.ok().build();
+        log.info("EventController - getEventSurveysByEventId() return {}", surveysDto);
+        return ResponseEntity.ok(surveysDto);
     }
 }
 
