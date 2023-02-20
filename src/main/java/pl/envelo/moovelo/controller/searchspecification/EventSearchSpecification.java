@@ -6,11 +6,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.InternalEvent;
-import pl.envelo.moovelo.model.EventsForUserCriteria;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import pl.envelo.moovelo.model.EventsForUserCriteria;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -29,7 +30,7 @@ public class EventSearchSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             predicateByPrivacy(privacy, root, criteriaBuilder, predicates);
-            predicateGroupNotNull(group, internalEventRoot, criteriaBuilder, predicates);
+            predicateGroupNotNull(group, internalEventRoot, criteriaBuilder,  predicates);
             predicateCategoryLike(cat, root, criteriaBuilder, predicates);
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
@@ -72,11 +73,11 @@ public class EventSearchSpecification {
         if (Objects.nonNull(privacy)) {
             if (privacy.toLowerCase().equals("true")) {
                 predicates.add(
-                        criteriaBuilder.isTrue(root.get("isPrivate"))
+                    criteriaBuilder.isTrue(root.get("isPrivate"))
                 );
             } else if (privacy.toLowerCase().equals("false")) {
                 predicates.add(
-                        criteriaBuilder.isFalse(root.get("isPrivate"))
+                    criteriaBuilder.isFalse(root.get("isPrivate"))
                 );
             }
         }

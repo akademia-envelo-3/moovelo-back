@@ -1,16 +1,18 @@
 package pl.envelo.moovelo.controller.dto.group.groupownership;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.Objects;
 
 @Getter
-public class GroupOwnershipRequestDto {
-    private final long groupId;
-    private final long userId;
-    private final long newOwnerId;
+@NoArgsConstructor
+public final class GroupOwnershipRequestDto {
+    private Long newOwnerUserId;
 
-    public GroupOwnershipRequestDto(long groupId, long userId, long newOwnerId) {
-        this.groupId = groupId;
-        this.userId = userId;
-        this.newOwnerId = newOwnerId;
+    @Override
+    public String toString() {
+        return "GroupOwnershipRequestDto[" +
+                "newOwnerUserId=" + newOwnerUserId + ']';
     }
 }
