@@ -225,9 +225,8 @@ public class EventController {
             @RequestParam String status) {
 
         log.info("EventController - setStatus()");
-        User loggedInUser = authenticatedUser.getAuthenticatedUser();
 
-        if (loggedInUser.getId().equals(userId)) {
+        if (authorizationService.getLoggedBasicUserId().equals(userId)) {
             eventService.setStatus(eventId, userId, status);
         } else {
             log.error("EventController - setStatus()", new UnauthorizedRequestException("Unauthorized request"));

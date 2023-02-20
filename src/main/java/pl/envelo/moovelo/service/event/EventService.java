@@ -13,6 +13,8 @@ import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.exception.NoContentException;
+import pl.envelo.moovelo.exception.StatusNotExistsException;
+import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.LocationService;
@@ -194,6 +196,10 @@ public class EventService {
         Event event = getEventById(eventId);
         BasicUser user = basicUserService.getBasicUserById(userId);
 
+        if (!event.getUsersWithAccess().contains(user)) {
+            throw new UnauthorizedRequestException("User with id " + userId + " does not have an access to event with id " + eventId);
+        }
+
         Set<BasicUser> setOfAccepted = event.getAcceptedStatusUsers();
         Set<BasicUser> setOfPending = event.getPendingStatusUsers();
         Set<BasicUser> setOfRejected = event.getRejectedStatusUsers();
@@ -202,6 +208,7 @@ public class EventService {
             case "accepted" -> setAcceptedStatus(user, setOfAccepted, setOfPending, setOfRejected);
             case "pending" -> setPendingStatus(user, setOfAccepted, setOfPending, setOfRejected);
             case "rejected" -> setRejectedStatus(user, setOfAccepted, setOfPending, setOfRejected);
+            default -> throw new StatusNotExistsException("Status " + status + " does not exist");
         }
 
         event.setAcceptedStatusUsers(setOfAccepted);
