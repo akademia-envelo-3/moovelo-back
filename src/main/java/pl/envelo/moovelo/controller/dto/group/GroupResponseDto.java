@@ -11,14 +11,11 @@ import java.util.Objects;
 
 @Builder
 @Getter
-public class GroupDto {
-    private long id;
-
+public class GroupResponseDto {
+    private Long id;
     private String name;
     private String description;
     private GroupOwnerDto groupOwner;
-    private boolean isUserMember;
-    private int numberOfMembers;
     private List<BasicUserDto> groupMembers;
     private List<DisplayEventResponseDto> events;
 
@@ -30,8 +27,8 @@ public class GroupDto {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        GroupDto groupDto = (GroupDto) o;
-        return id == groupDto.id;
+        GroupResponseDto groupResponseDto = (GroupResponseDto) o;
+        return id.equals(groupResponseDto.id);
     }
 
     @Override

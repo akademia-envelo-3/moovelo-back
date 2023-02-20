@@ -130,7 +130,7 @@ public class ExternalEventController {
         ExternalEvent event = externalEventService.getExternalEventById(eventId);
         User user = authenticatedUser.getAuthenticatedUser();
 
-        if (basicUserService.isBasicUserEventOwner(user, event.getEventOwner().getUserId())) {
+        if (basicUserService.isBasicUserOwner(user, event.getEventOwner().getUserId())) {
             throw new UnauthorizedRequestException("You are not the owner of this event!");
         }
 
