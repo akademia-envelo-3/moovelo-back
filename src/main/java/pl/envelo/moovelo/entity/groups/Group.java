@@ -3,6 +3,7 @@ package pl.envelo.moovelo.entity.groups;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.InternalEvent;
@@ -16,6 +17,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Table(name = "api_group")
+@ToString
 public class Group {
 
     @Id
@@ -33,7 +35,7 @@ public class Group {
     )
     private List<BasicUser> members;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private GroupInfo groupInfo;
 
     @OneToMany(mappedBy = "group")

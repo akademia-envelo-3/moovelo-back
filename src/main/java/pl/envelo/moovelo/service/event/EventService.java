@@ -155,14 +155,15 @@ public class EventService {
         return eventOwnerService.getEventOwnerByUserId(userId);
     }
 
-    @Transactional
-    public void updateEventOwnershipByEventId(Long eventId, EventOwner eventOwner, Long currentEventOwnerUserId) {
+    public void updateEventOwnershipByEventId(Long eventId, Long newOwnerUserId) {
+        EventOwner newEventOwner = getEventOwnerByUserId(newOwnerUserId);
+        Long currentEventOwnerUserId = getEventOwnerUserIdByEventId(eventId);
         log.info("EventService - updateEventOwnershipById() - eventId = {}", eventId);
         Event event = getEventById(eventId);
-        eventOwnerService.createEventOwner(eventOwner);
-        event.setEventOwner(eventOwner);
-        eventOwnerService.removeEventFromEventOwnerEvents(event, currentEventOwnerUserId);
+        eventOwnerService.createEventOwner(newEventOwner);
+        event.setEventOwner(newEventOwner);
         eventOwnerService.removeEventOwnerWithNoEvents(getEventOwnerByUserId(currentEventOwnerUserId));
+        eventRepository.save(event);
         log.info("EventService - updateEventOwnershipById() - eventId = {} updated", eventId);
     }
 
