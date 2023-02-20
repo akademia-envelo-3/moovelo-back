@@ -216,4 +216,22 @@ public class EventController {
         log.info("EventController - getUsersWithAccess() return {}", usersWithAccessDto);
         return ResponseEntity.ok(usersWithAccessDto);
     }
+
+    @PatchMapping("events/{eventId}/users/{userId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<String> setStatus(
+            @PathVariable Long eventId,
+            @PathVariable Long userId,
+            @RequestParam String status) {
+
+        log.info("EventController - setStatus()");
+
+        if (authorizationService.getLoggedBasicUserId().equals(userId)) {
+            eventService.setStatus(eventId, userId, status);
+        } else {
+            log.error("EventController - setStatus()", new UnauthorizedRequestException("Unauthorized request"));
+            throw new UnauthorizedRequestException("Logged in user is not authorized to change status of other users");
+        }
+        return ResponseEntity.ok().build();
+    }
 }
