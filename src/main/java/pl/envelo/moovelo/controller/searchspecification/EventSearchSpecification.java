@@ -6,7 +6,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.InternalEvent;
-import javax.persistence.criteria.*;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

@@ -24,16 +24,12 @@ public class BasicUserService {
 
     public boolean checkIfBasicUserExistsById(Long userId) {
         Optional<BasicUser> basicUserOptional = basicUserRepository.findById(userId);
-        if (basicUserOptional.isPresent()) {
-            return true;
-        } else {
-            throw new NoSuchElementException("No BasicUser with id: " + userId);
-        }
+        return basicUserOptional.isPresent();
     }
 
-    public boolean isBasicUserEventOwner(User user, Long eventOwnerUserId) {
+    public boolean isBasicUserOwner(User user, Long ownerUserId) {
         return user.getRole().name().equals("ROLE_USER") &&
-                user.getId().equals(eventOwnerUserId);
+                user.getId().equals(ownerUserId);
     }
 
     public BasicUser getBasicUserById(Long id) {
