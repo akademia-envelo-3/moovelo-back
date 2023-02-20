@@ -14,16 +14,18 @@ import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.NoContentException;
+import pl.envelo.moovelo.exception.StatusNotExistsException;
+import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.LocationService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
-
 import javax.persistence.EntityExistsException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 @AllArgsConstructor
 @Service
@@ -188,6 +190,69 @@ public class EventService {
         return new PageImpl<>(list.subList(first, last), pageable, list.size());
     }
 
+    @Transactional
+    public void setStatus(Long eventId, Long userId, String status) {
+        log.info("EventService - setStatus()");
+
+        Event event = getEventById(eventId);
+        BasicUser user = basicUserService.getBasicUserById(userId);
+
+        if (!event.getUsersWithAccess().contains(user)) {
+            throw new UnauthorizedRequestException("User with id " + userId + " does not have an access to event with id " + eventId);
+        }
+
+        Set<BasicUser> setOfAccepted = event.getAcceptedStatusUsers();
+        Set<BasicUser> setOfPending = event.getPendingStatusUsers();
+        Set<BasicUser> setOfRejected = event.getRejectedStatusUsers();
+
+        switch (status.toLowerCase()) {
+            case "accepted" -> setAcceptedStatus(user, setOfAccepted, setOfPending, setOfRejected);
+            case "pending" -> setPendingStatus(user, setOfAccepted, setOfPending, setOfRejected);
+            case "rejected" -> setRejectedStatus(user, setOfAccepted, setOfPending, setOfRejected);
+            default -> throw new StatusNotExistsException("Status " + status + " does not exist");
+        }
+
+        event.setAcceptedStatusUsers(setOfAccepted);
+        event.setPendingStatusUsers(setOfPending);
+        event.setRejectedStatusUsers(setOfRejected);
+    }
+
+    private void setAcceptedStatus(BasicUser user,
+                                   Set<BasicUser> setOfAccepted,
+                                   Set<BasicUser> setOfPending,
+                                   Set<BasicUser> setOfRejected) {
+
+        if (!setOfAccepted.contains(user)) {
+            setOfAccepted.add(user);
+            setOfPending.remove(user);
+            setOfRejected.remove(user);
+        }
+    }
+
+    private void setPendingStatus(BasicUser user,
+                                  Set<BasicUser> setOfAccepted,
+                                  Set<BasicUser> setOfPending,
+                                  Set<BasicUser> setOfRejected) {
+
+        if (!setOfPending.contains(user)) {
+            setOfPending.add(user);
+            setOfAccepted.remove(user);
+            setOfRejected.remove(user);
+        }
+    }
+
+    private void setRejectedStatus(BasicUser user,
+                                   Set<BasicUser> setOfAccepted,
+                                   Set<BasicUser> setOfPending,
+                                   Set<BasicUser> setOfRejected) {
+
+        if (!setOfRejected.contains(user)) {
+            setOfRejected.add(user);
+            setOfPending.remove(user);
+            setOfAccepted.remove(user);
+        }
+    }
+
     public List<EventSurvey> getEventSurveysByEventId(Long eventId) {
         log.info("EventService - getEventSurveysByEventId()");
         Event event = getEventById(eventId);
@@ -197,7 +262,4 @@ public class EventService {
         log.info("EventService - getEventSurveysByEventId() return {}", surveys);
         return surveys;
     }
-
 }
-
-
