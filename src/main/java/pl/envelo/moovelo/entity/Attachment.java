@@ -17,17 +17,16 @@ public class Attachment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String filePath;
+    private String fileName;
+
+    private String fileType;
+
+    @Lob
+    private byte[] data;
 
     @ManyToOne
     private EventInfo eventInfo;
 
     @ManyToOne
     private Comment comment;
-
-    public Attachment(EventInfo info) {
-    }
-
-    public Attachment(Comment comment) {
-    }
 }
