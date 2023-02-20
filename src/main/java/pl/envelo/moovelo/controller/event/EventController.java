@@ -66,12 +66,13 @@ public class EventController {
             String privacy,
             String group,
             String cat,
+            Long groupId,
             String sort,
             String sortOrder,
             @RequestParam(defaultValue = "0") Integer page) {
         log.info("EventController - getAllEvents()");
 
-        Page<? extends Event> events = eventService.getAllEvents(privacy, group, cat, sort, sortOrder, page);
+        Page<? extends Event> events = eventService.getAllEvents(privacy, group, cat, groupId, sort, sortOrder, page);
 
         Page<EventListResponseDto> eventsDto = mapEventToEventListResponseDto(events);
 
@@ -143,7 +144,7 @@ public class EventController {
         log.info("EventController - getEventById()");
         if (authorizationService.isLoggedUserEventOwner(eventId) || authorizationService.isLoggedUserAdmin()) {
             Event eventById = eventService.getEventById(eventId);
-            DisplayEventResponseDto displayEventResponseDto = null;
+            DisplayEventResponseDto displayEventResponseDto;
             switch (eventById.getEventType()) {
                 case EVENT -> displayEventResponseDto = EventMapper.mapEventToEventResponseDto(eventById);
                 case EXTERNAL_EVENT ->

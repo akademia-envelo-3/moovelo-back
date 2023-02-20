@@ -56,7 +56,6 @@ public class EventMapper implements EventMapperInterface {
                 .eventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(event.getEventInfo()))
                 .limitedPlaces(event.getLimitedPlaces())
                 .usersWithAccess(event.getUsersWithAccess().stream().map(BasicUserMapper::map).collect(Collectors.toList()))
-                //TODO Wysypuje blad
                 .eventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(event))
                 .isPrivate(false)
                 .isCyclic(false)
