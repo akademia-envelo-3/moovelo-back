@@ -193,15 +193,13 @@ public class EventService {
             EventsForUserCriteria filterCriteria,
             SortingAndPagingCriteria sortingAndPagingCriteria
     ) {
+        log.info("EventService - getEventsForUser(userId = '{}', filterCriteria = '{}', sortingAndPagingCriteria = '{}')",
+                userId, filterCriteria, sortingAndPagingCriteria);
+
         Pageable pageable = PageRequest.of(
                 sortingAndPagingCriteria.getPageNumber(),
                 sortingAndPagingCriteria.getPageSize(),
-                Sort.by(
-                        eventSearchSpecification.createSortOrder(
-                                sortingAndPagingCriteria.getSortBy(),
-                                sortingAndPagingCriteria.getSortDirection().toString()
-                        )
-                )
+                Sort.by(new Sort.Order(sortingAndPagingCriteria.getSortDirection(), sortingAndPagingCriteria.getSortBy()))
         );
 
         Page<? extends Event> allEvents = eventRepository.findAll(
@@ -211,6 +209,9 @@ public class EventService {
                 ),
                 pageable
         );
+
+        log.info("EventService - getEventsForUser(userId = '{}', filterCriteria = '{}', sortingAndPagingCriteria = '{}') return '{}'",
+                userId, filterCriteria, sortingAndPagingCriteria, allEvents);
 
         return allEvents;
     }

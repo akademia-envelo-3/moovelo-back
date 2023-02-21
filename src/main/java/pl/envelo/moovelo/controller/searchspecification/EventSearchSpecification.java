@@ -40,23 +40,6 @@ public class EventSearchSpecification {
         return specification;
     }
 
-    public Specification<Event> getEventsAvailableForUserSpecification(Long userId, EventsForUserCriteria filterCriteria) {
-        log.info("Makler mam dość");
-
-        Specification<Event> specification = (root, query, criteriaBuilder) -> {
-            Root<InternalEvent> internalEventRoot = criteriaBuilder.treat(root, InternalEvent.class);
-            List<Predicate> predicates = new ArrayList<>();
-
-            getEventsAvailableForUserPredicates(userId, filterCriteria, root, criteriaBuilder, predicates);
-            getInternalEventsAvailableForUserPredicates(filterCriteria, internalEventRoot, criteriaBuilder, predicates);
-
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        };
-
-        log.info("Makler mam dość");
-        return specification;
-    }
-
     public Sort.Order createSortOrder(String sort, String sortOrder) {
         log.info("EventSearchSpecification - createSortOrder()");
 
@@ -130,6 +113,26 @@ public class EventSearchSpecification {
         }
     }
 
+    public Specification<Event> getEventsAvailableForUserSpecification(Long userId, EventsForUserCriteria filterCriteria) {
+        log.info("EventSearchSpecification - getEventsAvailableForUserSpecification(userId = '{}', filterCriteria = '{}')",
+                userId, filterCriteria);
+
+        Specification<Event> specification = (root, query, criteriaBuilder) -> {
+            Root<InternalEvent> internalEventRoot = criteriaBuilder.treat(root, InternalEvent.class);
+            List<Predicate> predicates = new ArrayList<>();
+
+            getEventsAvailableForUserPredicates(userId, filterCriteria, root, criteriaBuilder, predicates);
+            getInternalEventsAvailableForUserPredicates(filterCriteria, internalEventRoot, criteriaBuilder, predicates);
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        log.info("EventSearchSpecification - getEventsAvailableForUserSpecification(userId = '{}', filterCriteria = '{}') return '{}'",
+                userId, filterCriteria, specification);
+
+        return specification;
+    }
+
     private void getEventsAvailableForUserPredicates(
             Long userId,
             EventsForUserCriteria filterCriteria,
@@ -139,56 +142,56 @@ public class EventSearchSpecification {
     ) {
         if (filterCriteria.isAcceptedEvents()) {
             predicates.add(
-                    criteriaBuilder.like(
-                            eventRoot.get("acceptedStatusUsers").get("id"),
-                            userId.toString()
-                    )
+                    criteriaBuilder.in(
+                            eventRoot.join("acceptedStatusUsers").get("id")
+                    ).value(userId)
             );
         } else if (filterCriteria.isPendingEvents()) {
             predicates.add(
-                    criteriaBuilder.like(
-                            eventRoot.get("pendingStatusUsers").get("id"),
-                            userId.toString()
-                    )
+                    criteriaBuilder.in(
+                            eventRoot.join("pendingStatusUsers").get("id")
+                    ).value(userId)
             );
         } else if (filterCriteria.isRejectedEvents()) {
             predicates.add(
-                    criteriaBuilder.like(
-                            eventRoot.get("rejectedStatusUsers").get("id"),
-                            userId.toString()
-                    )
+                    criteriaBuilder.in(
+                            eventRoot.join("rejectedStatusUsers").get("id")
+                    ).value(userId)
             );
         } else {
             predicates.add(
-                    criteriaBuilder.equal(
-                            eventRoot.join("usersWithAccess").get("id"),
-                            userId
-                    )
+                    criteriaBuilder.in(
+                            eventRoot.join("usersWithAccess").get("id")
+                    ).value(userId)
             );
         }
 
         if (filterCriteria.isOwner()) {
             predicates.add(
-                    criteriaBuilder.like(
+                    criteriaBuilder.equal(
                             eventRoot.get("eventOwner").get("id"),
-                            userId.toString()
+                            userId
                     )
             );
         }
 
-        predicates.add(
-                criteriaBuilder.like(
-                        eventRoot.get("eventInfo").get("category").get("name"),
-                        "%" + filterCriteria.getCategory() + "%"
-                )
-        );
+        if (filterCriteria.getCategory() != null) {
+            predicates.add(
+                    criteriaBuilder.like(
+                            eventRoot.get("eventInfo").get("category").get("name"),
+                            "%" + filterCriteria.getCategory().toLowerCase() + "%"
+                    )
+            );
+        }
 
-        predicates.add(
-                criteriaBuilder.like(
-                        eventRoot.get("eventInfo").get("name"),
-                        "%" + filterCriteria.getName() + "%"
-                )
-        );
+        if (filterCriteria.getName() != null) {
+            predicates.add(
+                    criteriaBuilder.like(
+                            eventRoot.get("eventInfo").get("name"),
+                            "%" + filterCriteria.getName().toLowerCase() + "%"
+                    )
+            );
+        }
     }
 
     private void getInternalEventsAvailableForUserPredicates(
@@ -199,8 +202,27 @@ public class EventSearchSpecification {
     ) {
         if (filterCriteria.isGroup()) {
             predicates.add(
-                    criteriaBuilder.isNotEmpty(
+                    criteriaBuilder.isNotNull(
                             eventRoot.get("group")
+                    )
+            );
+        }
+
+        if (filterCriteria.getGroupId() != null) {
+            predicates.add(
+                    criteriaBuilder.equal(
+                            eventRoot.get("group").get("id"),
+                            filterCriteria.getGroupId()
+                    )
+            );
+        }
+
+        if (filterCriteria.getGroupName() != null) {
+            String groupName = filterCriteria.getGroupName().toLowerCase();
+            predicates.add(
+                    criteriaBuilder.like(
+                            eventRoot.get("group").get("groupInfo").get("name"),
+                            "%" + groupName + "%"
                     )
             );
         }

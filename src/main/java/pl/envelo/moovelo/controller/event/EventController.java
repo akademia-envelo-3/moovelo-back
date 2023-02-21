@@ -21,10 +21,9 @@ import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
-import pl.envelo.moovelo.service.AuthorizationService;
 import pl.envelo.moovelo.model.EventsForUserCriteria;
 import pl.envelo.moovelo.model.SortingAndPagingCriteria;
-import pl.envelo.moovelo.service.actors.BasicUserService;
+import pl.envelo.moovelo.service.AuthorizationService;
 import pl.envelo.moovelo.service.event.EventService;
 
 import java.net.URI;
@@ -230,6 +229,21 @@ public class EventController {
     ) {
         log.info("EventController - getAllEventsAvailableForUser");
         Page<? extends Event> eventsAvailableForUser = eventService.getEventsForUser(userId, filterCriteria, sortingAndPagingCriteria);
-        return ResponseEntity.ok(eventsAvailableForUser);
+
+        Page<EventListResponseDto> eventAvailableForUserDto = eventsAvailableForUser.map(event ->
+            switch (event.getEventType()) {
+                case EVENT ->
+                        EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
+                case INTERNAL_EVENT ->
+                        EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
+                case CYCLIC_EVENT ->
+                        EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) event);
+                case EXTERNAL_EVENT ->atus
+
+                        EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
+            }
+        );
+
+        return ResponseEntity.ok(eventAvailableForUserDto);
     }
 }

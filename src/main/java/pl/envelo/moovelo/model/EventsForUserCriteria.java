@@ -10,6 +10,8 @@ public class EventsForUserCriteria {
     private boolean pendingEvents;
     private boolean rejectedEvents;
     private boolean group;
+    private Long groupId;
+    private String groupName;
     private boolean owner;
     private String category;
     private String name;
