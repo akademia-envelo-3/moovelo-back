@@ -43,4 +43,11 @@ public class Group {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime creationDate;
+
+    @Column(name = "group_size")
+    private int groupSize;
+
+    public int getGroupSize() {
+        return members.size();
+    }
 }

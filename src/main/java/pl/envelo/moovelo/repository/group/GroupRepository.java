@@ -1,7 +1,11 @@
 package pl.envelo.moovelo.repository.group;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.groups.Group;
 
 import java.util.Optional;

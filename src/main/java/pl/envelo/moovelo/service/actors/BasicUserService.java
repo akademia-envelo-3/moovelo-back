@@ -2,9 +2,12 @@ package pl.envelo.moovelo.service.actors;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.User;
+import pl.envelo.moovelo.entity.groups.Group;
 import pl.envelo.moovelo.repository.actors.BasicUserRepository;
 
 import java.util.List;
@@ -40,6 +43,11 @@ public class BasicUserService {
         }
         log.info("BasicUserService - getBasicUserById() return {}", basicUserOptional.get());
         return basicUserOptional.get();
+    }
+
+    public List<Group> getAllBasicUserGroups(Long basicUserId) {
+        BasicUser basicUserById = getBasicUserById(basicUserId);
+        return basicUserById.getGroups();
     }
 }
 

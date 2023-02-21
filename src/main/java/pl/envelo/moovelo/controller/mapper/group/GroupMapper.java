@@ -31,7 +31,7 @@ public class GroupMapper {
     public static GroupListResponseDto mapGroupToGroupListResponseDto(Group group, boolean isGroupMember) {
         return GroupListResponseDto.builder()
                 .id(group.getId())
-                .groupOwnerDto(GroupOwnerMapper.mapGroupOwnerToGroupOwnerDto(group.getGroupOwner()))
+                .groupOwner(GroupOwnerMapper.mapGroupOwnerToGroupOwnerDto(group.getGroupOwner()))
                 .isUserMember(isGroupMember)
                 .name(group.getGroupInfo().getName())
                 .description(group.getGroupInfo().getDescription())

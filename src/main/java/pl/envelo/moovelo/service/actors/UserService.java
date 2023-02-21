@@ -18,22 +18,22 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
+    public User getUserByEmail(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+
+        if (userOptional.isEmpty()) {
+            throw new UsernameNotFoundException("Not user not found!");
+        }
+
+        return userOptional.get();
+    }
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<User> userOptional = userRepository.findByEmail(email);
 
         if (userOptional.isEmpty()) {
             throw new UsernameNotFoundException("Not found!");
-        }
-
-        return userOptional.get();
-    }
-
-    public User getUserByEmail(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-
-        if (userOptional.isEmpty()) {
-            throw new UsernameNotFoundException("Not user not found!");
         }
 
         return userOptional.get();
