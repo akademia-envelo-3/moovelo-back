@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import pl.envelo.moovelo.CommentPage;
+import pl.envelo.moovelo.controller.dto.AttachmentDto;
 import pl.envelo.moovelo.controller.dto.CommentRequestDto;
 import pl.envelo.moovelo.controller.dto.CommentResponseDto;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
@@ -25,10 +26,14 @@ public class CommentMapper {
     }
 
     public static CommentRequestDto mapFromCommentToCommentRequestDto(Comment comment){
+        List<AttachmentDto> attachmentDtoList = comment.getAttachments().stream()
+                .map(AttachmentMapper::mapFromAttachmentToAttachmentDto)
+                .toList();
+
         return CommentRequestDto.builder()
                 .basicUserId(comment.getBasicUser().getId())
                 .text(comment.getText())
-                .attachments(AttachmentMapper.mapFromAttachmentListToAttachmentDtoList(comment.getAttachments()))
+                .attachments(attachmentDtoList)
                 .build();
     }
 }

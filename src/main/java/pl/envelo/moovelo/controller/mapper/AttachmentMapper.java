@@ -10,38 +10,17 @@ import java.util.List;
 
 
 public class AttachmentMapper {
-    private final EventInfoService eventInfoService;
-    private final CommentService commentService;
 
-    public AttachmentMapper(EventInfoService eventInfoService, CommentService commentService) {
-        this.eventInfoService = eventInfoService;
-        this.commentService = commentService;
-    }
 
-    public static List<AttachmentDto> mapFromAttachmentListToAttachmentDtoList(List<Attachment> attachments) {
-        List<AttachmentDto> attachmentDtoList = attachments.stream()
-                .map(attachment -> new AttachmentDto
-                        (attachment.getId()
-                                , attachment.getEventInfo().getId()
-                                , attachment.getComment().getId()
-                                , attachment.getFilePath()))
-                .toList();
+    public static AttachmentDto mapFromAttachmentToAttachmentDto(Attachment attachment) {
+        AttachmentDto attachmentDto = AttachmentDto.builder()
+                .id(attachment.getId())
+                .eventInfoId(attachment.getEventInfo().getId())
+                .commentId(attachment.getComment().getId())
+                .filePath(attachment.getFilePath())
+                .build();
 
-        return attachmentDtoList;
-    }
-
-    public List<Attachment> mapFromAttachmentDtoListToAttachmentList(List<AttachmentDto> attachmentDtoList) {
-
-        List<Attachment> attachments = attachmentDtoList.stream()
-                .map(attachmentDto -> new Attachment
-                        (attachmentDto.getId()
-                                , attachmentDto.getFilePath()
-                                , eventInfoService.getEventInfoById(attachmentDto.getEventInfoId())
-                                , commentService.getCommentById(attachmentDto.getCommentId())))
-                .toList();
-
-        return attachments;
-
+        return attachmentDto;
     }
 
 }

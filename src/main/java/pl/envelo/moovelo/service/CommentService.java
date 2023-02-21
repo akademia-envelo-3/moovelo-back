@@ -5,21 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.CommentPage;
-import pl.envelo.moovelo.controller.AuthenticatedUser;
-import pl.envelo.moovelo.controller.dto.AttachmentDto;
 import pl.envelo.moovelo.controller.dto.CommentRequestDto;
-import pl.envelo.moovelo.controller.mapper.AttachmentMapper;
-import pl.envelo.moovelo.entity.Attachment;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.actors.BasicUser;
-import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.Event;
-import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.repository.CommentRepository;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -29,19 +22,15 @@ import java.util.Optional;
 @Slf4j
 public class CommentService {
     private CommentRepository commentRepository;
-    private AuthenticatedUser authenticatedUser;
+    private AuthorizationService authorizationService;
     private BasicUserService basicUserService;
 
-    public Comment addComment(Long eventID, CommentRequestDto commentRequestDto) {
+    public Comment addComment(Event event, CommentRequestDto commentRequestDto) {
         log.info("CommentService - addComment(eventID = {} ,commentRequestDto = {} )"
-                , eventID, commentRequestDto);
+                , event, commentRequestDto);
 
-        User user = authenticatedUser.getAuthenticatedUser();
-        BasicUser basicUser = basicUserService.getBasicUserById(user.getId());
-        List<Attachment> attachments;
-
-        Event event = new Event();
-        event.setId(1L);
+        Long basicUserId = authorizationService.getLoggedBasicUserId();
+        BasicUser basicUser = basicUserService.getBasicUserById(basicUserId);
 
         Comment comment = new Comment();
         comment.setEvent(event);
@@ -51,8 +40,7 @@ public class CommentService {
 
 
         if (commentRequestDto.getAttachments() == null) {
-            attachments = new ArrayList<>();
-            comment.setAttachments(attachments);
+            comment.setAttachments(List.of());
         }
 
         log.info("CommentService - return comment = {}", comment);
