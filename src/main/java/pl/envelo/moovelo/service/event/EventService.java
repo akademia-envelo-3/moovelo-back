@@ -2,14 +2,14 @@ package pl.envelo.moovelo.service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
+import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.*;
+import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.repository.event.EventRepositoryManager;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
@@ -81,44 +81,52 @@ public class EventService<I extends Event> {
         return eventOptional.get();
     }
 
-//    public void removeEventById(long id) {
-//        log.info("EventService - removeEventById() - id = {}", id);
-//        Optional<Event> eventOptional = eventRepository.findById(id);
-//        if (eventOptional.isEmpty()) {
-//            throw new NoContentException("Event with id = " + id + " doesn't exist!");
-//        } else {
-//            Event event = eventOptional.get();
-//            Location location = event.getEventInfo().getLocation();
-//            EventOwner eventOwner = event.getEventOwner();
-//            List<Hashtag> hashtags = event.getHashtags();
-//            eventRepository.delete(event);
-//            eventInfoService.removeLocationWithNoEvents(location);
-//            eventOwnerService.removeEventOwnerWithNoEvents(eventOwner);
-//            hashtags.forEach(hashTagService::decrementHashtagOccurrence);
-//        }
-//        log.info("EventService - removeEventById() - event with id = {} removed", id);
-//    }
-//    public Page<? extends Event> getAllEvents(String privacy, String group, String cat, String sort, String sortOrder, int page) {
-//        log.info("EventService - getAllEvents()");
-//
-//        int sizeOfPage = 10;
-//
-//        Pageable pageable = PageRequest.of(page, sizeOfPage, Sort.by(eventSearchSpecification.createSortOrder(sort, sortOrder)));
-//        Page<? extends Event> allEvents = eventRepository.findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat), pageable);
-//
-//        log.info("EventService - getAllEvents() return {}", allEvents.toString());
+    public void removeEventById(long id, EventType eventType) {
+        log.info("EventService - removeEventById() - id = {}", id);
+        Optional<I> eventOptional = eventRepositoryManager
+                .getRepositoryForSpecificEvent(eventType)
+                .findById(id);
+        if (eventOptional.isEmpty()) {
+            throw new NoContentException("Event with id = " + id + " doesn't exist!");
+        } else {
+            I event = eventOptional.get();
+            Location location = event.getEventInfo().getLocation();
+            EventOwner eventOwner = event.getEventOwner();
+            List<Hashtag> hashtags = event.getHashtags();
+            eventRepositoryManager.getRepositoryForSpecificEvent(eventType).delete(event);
+            eventInfoService.removeLocationWithNoEvents(location);
+            eventOwnerService.removeEventOwnerWithNoEvents(eventOwner);
+            hashtags.forEach(hashTagService::decrementHashtagOccurrence);
+        }
+        log.info("EventService - removeEventById() - event with id = {} removed", id);
+    }
 
-//        return allEvents;
-//    }
-//    public List<? extends Event> getAllEventsByEventOwnerBasicUserId(Long basicUserId) {
-//        log.info("EventService - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
-//        List<? extends Event> events = eventRepository.findByEventOwner_UserId(basicUserId);
-//
-//        log.info("EventService - getAllEventsByEventOwnerBasicUserId() return {}", events);
+    public Page<I> getAllEvents(String privacy, String group, String cat, String sort, String sortOrder, int page, EventType eventType) {
+        log.info("EventService - getAllEvents()");
 
-//        return events;
+        int sizeOfPage = 10;
 
-//    }
+        Pageable pageable = PageRequest.of(page, sizeOfPage, Sort.by(eventSearchSpecification.createSortOrder(sort, sortOrder)));
+        Page<I> allEvents = eventRepositoryManager
+                .getRepositoryForSpecificEvent(eventType)
+                .findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat), pageable);
+
+        log.info("EventService - getAllEvents() return {}", allEvents.toString());
+
+        return allEvents;
+    }
+
+    public List<I> getAllEventsByEventOwnerBasicUserId(Long basicUserId) {
+        log.info("EventService - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
+        List<I> events = eventRepositoryManager
+                .getRepositoryForSpecificEvent()
+                .findByEventOwner_UserId(basicUserId);
+
+        log.info("EventService - getAllEventsByEventOwnerBasicUserId() return {}", events);
+
+        return events;
+
+    }
 
     I validateAggregatedEntitiesForCreateEvent(I event, EventType eventType, Long userId) {
         I eventWithFieldsAfterValidation = getEventByEventType(eventType);
@@ -160,21 +168,15 @@ public class EventService<I extends Event> {
         return eventOwnerService.getEventOwnerByUserId(userId);
     }
 
-
-    //    @Transactional
+//    @Transactional
 //    public void updateEventOwnershipByEventId(Long eventId, EventOwner eventOwner, Long currentEventOwnerUserId) {
 //        log.info("EventService - updateEventOwnershipById() - eventId = {}", eventId);
-//        Event event = getEventById(eventId);
+//        I event = getEventById(eventId);
 //        eventOwnerService.createEventOwner(eventOwner);
 //        event.setEventOwner(eventOwner);
 //        eventOwnerService.removeEventFromEventOwnerEvents(event, currentEventOwnerUserId);
 //        eventOwnerService.removeEventOwnerWithNoEvents(getEventOwnerByUserId(currentEventOwnerUserId));
 //        log.info("EventService - updateEventOwnershipById() - eventId = {} updated", eventId);
-//    }
-    // TODO: 17.02.2023 Stare, niepotrzebne?
-//    boolean checkIfEntityExist(Long event) {
-
-//        return eventRepositoryManager.getRepositoryForSpecificEvent(EventType.EVENT).findById(event.getId()).isPresent();
 //    }
 
     public boolean checkIfEventExistsById(Long eventId, EventType eventType) {
@@ -187,16 +189,16 @@ public class EventService<I extends Event> {
         return false;
     }
 
-//    public Page<BasicUser> getUsersWithAccess(Long eventId, int page, int size) {
-//        log.info("EventService - getUsersWithAccess()");
-//        Event event = getEventById(eventId);
-//        List<BasicUser> usersWithAccessList = event.getUsersWithAccess();
-//
-//        Pageable pageable = PageRequest.of(page, size);
-//        Page<BasicUser> usersWithAccess = listToPage(pageable, usersWithAccessList);
-//        log.info("EventService - getUsersWithAccess() return {}", usersWithAccess);
-//        return usersWithAccess;
-//    }
+    public Page<BasicUser> getUsersWithAccess(Long eventId, int page, int size, EventType eventType) {
+        log.info("EventService - getUsersWithAccess()");
+        I event = getEventById(eventId, eventType);
+        List<BasicUser> usersWithAccessList = event.getUsersWithAccess();
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<BasicUser> usersWithAccess = listToPage(pageable, usersWithAccessList);
+        log.info("EventService - getUsersWithAccess() return {}", usersWithAccess);
+        return usersWithAccess;
+    }
 
     public static <T> Page<T> listToPage(final Pageable pageable, List<T> list) {
         int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());

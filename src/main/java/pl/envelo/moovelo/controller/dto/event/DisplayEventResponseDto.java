@@ -20,12 +20,12 @@ public class DisplayEventResponseDto {
     private EventOwnerListResponseDto eventOwner;
     private EventInfoDto eventInfo;
     private int limitedPlaces;
-    private boolean isCyclic;
     private boolean isPrivate;
     private GroupResponseDto group;
     private List<HashtagListResponseDto> hashtags;
     private List<BasicUserDto> usersWithAccess;
     private EventParticipationStatsDto eventParticipationStats;
+    private boolean isCyclic;
     private int frequencyInDays;
     private int numberOfRepeats;
 
