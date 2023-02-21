@@ -10,10 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
+import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.mapper.event.manager.EventMapper;
-import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
 import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.service.event.InternalEventService;
@@ -29,29 +28,29 @@ public class InternalEventController {
     private static final Long USER_ID = 1L;
     private InternalEventService<InternalEvent> internalEventService;
 
-    @PostMapping("/internalEvents")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<DisplayEventResponseDto> createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
-        log.info("InternalEventController - createNewEvent()");
-
-        //TODO do powalczenia z wyborem Rodzaju eventu? albo usunac
-        EventMapperInterface eventMapper = new EventMapper();
-        InternalEvent internalEvent = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.INTERNAL_EVENT);
-        InternalEvent newEvent = internalEventService.createNewEvent(internalEvent, eventType, USER_ID);
-        DisplayEventResponseDto displayEventResponseDto = EventMapper.mapInternalEventToEventResponseDto(newEvent);
-
-        URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(newEvent.getId())
-                .toUri();
-
-        log.info("EventController - () return createNewEvent() - dto {}", displayEventResponseDto);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .location(uri)
-                .body(displayEventResponseDto);
-    }
+//    @PostMapping("/internalEvents")
+//    @PreAuthorize("hasRole('ROLE_USER')")
+//    public ResponseEntity<EventResponseDto> createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
+//        log.info("InternalEventController - createNewEvent()");
+//
+//        //TODO do powalczenia z wyborem Rodzaju eventu? albo usunac
+//        EventMapper eventMapper = new EventMapper();
+//        InternalEvent internalEvent = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.INTERNAL_EVENT);
+//        InternalEvent newEvent = internalEventService.createNewEvent(internalEvent, eventType, USER_ID);
+//        EventResponseDto eventResponseDto = eventMapper.mapInternalEventToEventResponseDto(newEvent);
+//
+//        URI uri = ServletUriComponentsBuilder
+//                .fromCurrentRequest()
+//                .path("/{id}")
+//                .buildAndExpand(newEvent.getId())
+//                .toUri();
+//
+//        log.info("EventController - () return createNewEvent() - dto {}", eventResponseDto);
+//
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .location(uri)
+//                .body(eventResponseDto);
+//    }
 
 //    @GetMapping("/internalEvents")
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")

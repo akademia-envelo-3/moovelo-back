@@ -1,6 +1,6 @@
 package pl.envelo.moovelo.controller.mapper.event;
 
-import pl.envelo.moovelo.controller.dto.event.EventOwnerDto;
+import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerDto;
 import pl.envelo.moovelo.controller.mapper.event.manager.EventMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.EventOwner;

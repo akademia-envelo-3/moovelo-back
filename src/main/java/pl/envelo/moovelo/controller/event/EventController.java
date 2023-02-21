@@ -1,7 +1,8 @@
 package pl.envelo.moovelo.controller.event;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,35 +11,34 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.envelo.moovelo.controller.AuthenticatedUser;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
-import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
-import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
-import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
+import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
+import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
-import pl.envelo.moovelo.controller.mapper.event.manager.EventMapper;
+import pl.envelo.moovelo.controller.mapper.event.EventListMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
+import pl.envelo.moovelo.controller.mapper.event.manager.EventMapper;
+import pl.envelo.moovelo.controller.mapper.event.manager.EventMapperManager;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
-import pl.envelo.moovelo.entity.events.*;
-import pl.envelo.moovelo.exception.IllegalEventException;
+import pl.envelo.moovelo.entity.events.Event;
+import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.event.EventService;
 
 import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static pl.envelo.moovelo.controller.mapper.EventListResponseMapper.mapEventToEventListResponseDto;
-
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("api/v1")
 @Slf4j
 public class EventController {
-
     private static final EventType eventType = EventType.EVENT;
+    EventMapperInterface eventMapperInterface;
+    private EventMapperManager eventMapperManager;
 
     //    TODO : Tymaczasowa imitacja ID usera wyciaganego z security
     private static final Long USER_ID = 1L;
@@ -46,16 +46,23 @@ public class EventController {
     private AuthenticatedUser authenticatedUser;
     private BasicUserService basicUserService;
 
+    @Autowired
+    public EventController(EventMapperManager eventMapperManager, EventService<Event> eventService, AuthenticatedUser authenticatedUser, BasicUserService basicUserService) {
+        this.eventMapperManager = eventMapperManager;
+        this.eventService = eventService;
+        this.authenticatedUser = authenticatedUser;
+        this.basicUserService = basicUserService;
+    }
+
     @PostMapping("/events")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<DisplayEventResponseDto> createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
+    public ResponseEntity<EventResponseDto> createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
         log.info("EventController - createNewEvent()");
+        eventMapperInterface = new EventMapper();
 
-        //TODO do powalczenia z wyborem Rodzaju eventu? albo usunac
-        EventMapperInterface eventMapper = new EventMapper();
-        Event mappedEventFromRequest = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, eventType);
+        Event mappedEventFromRequest = eventMapperManager.mapEventRequestDtoToEventByEventType(eventRequestDto, eventType);
         Event createdEvent = eventService.createNewEvent(mappedEventFromRequest, eventType, USER_ID);
-        DisplayEventResponseDto displayEventResponseDto = EventMapper.mapEventToEventResponseDto(createdEvent);
+        EventResponseDto eventResponseDto = eventMapperManager.getResponseForSpecificEvent(eventMapperInterface, createdEvent);
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -63,82 +70,83 @@ public class EventController {
                 .buildAndExpand(createdEvent.getId())
                 .toUri();
 
-        log.info("EventController - () return createNewEvent() - dto {}", displayEventResponseDto);
+        log.info("EventController - () return createNewEvent() - dto {}", eventResponseDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(uri)
-                .body(displayEventResponseDto);
+                .body(eventResponseDto);
     }
 
-    @PutMapping("/events/{eventId}")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<String> updateEventById(@PathVariable Long eventId, @RequestBody EventRequestDto eventRequestDto) {
-        log.info("EventController - updateEventById() - eventId = {}", eventId);
-        if (eventService.checkIfEventExistsById(eventId, eventType)) {
-            Long currentEventOwnerUserId = eventService.getEventOwnerUserIdByEventId(eventId);
-            User loggedInUser = authenticatedUser.getAuthenticatedUser();
-            if (basicUserService.isBasicUserEventOwner(loggedInUser, currentEventOwnerUserId)) {
-                EventMapperInterface eventMapper = new EventMapper();
-                Event eventFromDto = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, eventType);
-                eventService.updateEventById(eventId, eventFromDto, eventType, loggedInUser.getId());
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Logged in user is not authorized to update the  with id: " + eventId);
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event with id " + eventId + " does not exist");
-        }
-        log.info("EventController - updateEventById() - event with eventId = {} updated", eventId);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
+//    @PutMapping("/events/{eventId}")
+//    @PreAuthorize("hasRole('ROLE_USER')")
+//    public ResponseEntity<String> updateEventById(@PathVariable Long eventId, @RequestBody EventRequestDto eventRequestDto) {
+//        log.info("EventController - updateEventById() - eventId = {}", eventId);
+//        if (eventService.checkIfEventExistsById(eventId, eventType)) {
+//            Long currentEventOwnerUserId = eventService.getEventOwnerUserIdByEventId(eventId);
+//            User loggedInUser = authenticatedUser.getAuthenticatedUser();
+//            if (basicUserService.isBasicUserEventOwner(loggedInUser, currentEventOwnerUserId)) {
+//                EventMapper eventMapper = new EventMapper();
+//                Event eventFromDto = eventMapper.mapEventRequestDtoToEventByEventType(eventRequestDto, eventType);
+//                eventService.updateEventById(eventId, eventFromDto, eventType, loggedInUser.getId());
+//            } else {
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Logged in user is not authorized to update the  with id: " + eventId);
+//            }
+//        } else {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event with id " + eventId + " does not exist");
+//        }
+//        log.info("EventController - updateEventById() - event with eventId = {} updated", eventId);
+//        return ResponseEntity.status(HttpStatus.OK).build();
+//    }
+//
+//    @GetMapping("/events/{eventId}")
+//    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+//    public ResponseEntity<EventResponseDto> getEventById(@PathVariable Long eventId) {
+//        log.info("EventController - getEventById()");
+//        Event eventById = eventService.getEventById(eventId, eventType);
+//        EventMapper eventMapper = new EventMapper();
+//        EventResponseDto eventResponseDto = eventMapper.mapEventToEventResponseDto(eventById);
+//        log.info("EventController - getEventById() return {}", eventResponseDto);
+//        return eventResponseDto == null ? ResponseEntity.badRequest().build() : ResponseEntity.ok(eventResponseDto);
+//    }
+//
+//    @DeleteMapping("/events/{eventId}")
+//    @PreAuthorize("hasRole('ROLE_USER')")
+//    public ResponseEntity<?> removeEventById(@PathVariable long eventId) throws IllegalAccessException {
+//        log.info("EventController - removeEventById() - eventId = {}", eventId);
+//
+//        User user = authenticatedUser.getAuthenticatedUser();
+//        Event event = eventService.getEventById(eventId, eventType);
+//
+//        if (!event.getEventOwner().getUserId().equals(user.getId())) {
+//            throw new UnauthorizedRequestException("Access denied!");
+//        }
+//        if (event.getEventInfo().getStartDate().isBefore(LocalDateTime.now())) {
+//            throw new IllegalEventException("Can't delete an event that has already taken place!");
+//        }
+//
+//        eventService.removeEventById(eventId, eventType);
+//        log.info("EventController - removeEventById() - event with eventId = {} removed", eventId);
+//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+//    }
 
-    @GetMapping("/events/{eventId}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public ResponseEntity<DisplayEventResponseDto> getEventById(@PathVariable Long eventId) {
-        log.info("EventController - getEventById()");
-        Event eventById = eventService.getEventById(eventId, eventType);
-        DisplayEventResponseDto displayEventResponseDto = EventMapper.mapEventToEventResponseDto(eventById);
-        log.info("EventController - getEventById() return {}", displayEventResponseDto);
-        return displayEventResponseDto == null ? ResponseEntity.badRequest().build() : ResponseEntity.ok(displayEventResponseDto);
-    }
-
-    @DeleteMapping("/events/{eventId}")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> removeEventById(@PathVariable long eventId) throws IllegalAccessException {
-        log.info("EventController - removeEventById() - eventId = {}", eventId);
-
-        User user = authenticatedUser.getAuthenticatedUser();
-        Event event = eventService.getEventById(eventId, eventType);
-
-        if (!event.getEventOwner().getUserId().equals(user.getId())) {
-            throw new UnauthorizedRequestException("Access denied!");
-        }
-        if (event.getEventInfo().getStartDate().isBefore(LocalDateTime.now())) {
-            throw new IllegalEventException("Can't delete an event that has already taken place!");
-        }
-
-        eventService.removeEventById(eventId, eventType);
-        log.info("EventController - removeEventById() - event with eventId = {} removed", eventId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    @GetMapping("/events")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Page<EventListResponseDto>> getAllEvents(
-            String privacy,
-            String group,
-            String cat,
-            String sort,
-            String sortOrder,
-            @RequestParam(defaultValue = "0") Integer page) {
-        log.info("EventController - getAllEvents()");
-
-        Page<? extends Event> events = eventService.getAllEvents(privacy, group, cat, sort, sortOrder, page, eventType);
-
-        Page<EventListResponseDto> eventsDto = mapEventToEventListResponseDto(events);
-
-        log.info("EventController - getAllEvents() return {}", eventsDto);
-        return ResponseEntity.ok(eventsDto);
-    }
+//    @GetMapping("/events")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    public ResponseEntity<Page<EventListResponseDto>> getAllEvents(
+//            String privacy,
+//            String group,
+//            String cat,
+//            String sort,
+//            String sortOrder,
+//            @RequestParam(defaultValue = "0") Integer page) {
+//        log.info("EventController - getAllEvents()");
+//
+//        Page<? extends Event> events = eventService.getAllEvents(privacy, group, cat, sort, sortOrder, page, eventType);
+//
+//        Page<EventListResponseDto> eventsDto = mapEventToEventListResponseDto(events);
+//
+//        log.info("EventController - getAllEvents() return {}", eventsDto);
+//        return ResponseEntity.ok(eventsDto);
+//    }
 
     @GetMapping("/events/{eventId}/users")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
@@ -161,41 +169,44 @@ public class EventController {
     public ResponseEntity<List<EventListResponseDto>> getAllEventsByEventOwnerBasicUserId(@PathVariable("userId") Long basicUserId) {
         log.info("EventController - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
 
+        eventMapperInterface = new EventListMapper();
+
         User user = authenticatedUser.getAuthenticatedUser();
         if (user.getRole().equals(Role.ROLE_USER) && !user.getId().equals(basicUserId)) {
             throw new UnauthorizedRequestException("Access denied");
         }
 
-        List<? extends Event> allEvents = eventService.getAllEventsByEventOwnerBasicUserId(basicUserId);
+        List<? extends Event> allEvents = eventService.getAllEventsByEventOwnerBasicUserId(basicUserId, eventType);
 
-        List<EventListResponseDto> eventsDto = mapEventToEventListResponseDto(allEvents);
+        List<EventListResponseDto> eventsDto = eventMapperManager.mapEventToEventListResponseDto(allEvents, eventMapperInterface);
 
         return ResponseEntity.ok(eventsDto);
     }
 
-    private List<EventListResponseDto> mapEventToEventListResponseDto(List<? extends Event> allEvents) {
-        List<EventListResponseDto> eventsDto = allEvents.stream().map(event -> switch (event.getEventType()) {
-            case EVENT -> EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
-            case INTERNAL_EVENT ->
-                    EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
-            case CYCLIC_EVENT -> EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) event);
-            case EXTERNAL_EVENT ->
-                    EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
-        }).toList();
-        return eventsDto;
-    }
+    // TODO: 21.02.2023 testowane
+//    private List<EventListResponseDto> mapEventToEventListResponseDto(List<? extends Event> allEvents) {
+//        List<EventListResponseDto> eventsDto = allEvents.stream().map(event -> switch (event.getEventType()) {
+//            case EVENT -> EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
+//            case INTERNAL_EVENT ->
+//                    EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
+//            case CYCLIC_EVENT -> EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) event);
+//            case EXTERNAL_EVENT ->
+//                    EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
+//        }).toList();
+//        return eventsDto;
+//    }
 
-    private Page<EventListResponseDto> mapEventToEventListResponseDto(Page<? extends Event> allEvents) {
-        Page<EventListResponseDto> eventsDto = allEvents.map(event -> switch (event.getEventType()) {
-            case EVENT -> EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
-            case INTERNAL_EVENT ->
-                    EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
-            case CYCLIC_EVENT -> EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) event);
-            case EXTERNAL_EVENT ->
-                    EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
-        });
-        return eventsDto;
-    }
+//    private Page<EventListResponseDto> mapEventToEventListResponseDto(Page<? extends Event> allEvents) {
+//        Page<EventListResponseDto> eventsDto = allEvents.map(event -> switch (event.getEventType()) {
+//            case EVENT -> EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
+//            case INTERNAL_EVENT ->
+//                    EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
+//            case CYCLIC_EVENT -> EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) event);
+//            case EXTERNAL_EVENT ->
+//                    EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
+//        });
+//        return eventsDto;
+//    }
 //    @PatchMapping("/events/{eventId}/ownership")
 //    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
 //    public ResponseEntity<String> updateEventOwnershipById(@RequestBody EventOwnershipRequestDto eventOwnershipRequestDto,

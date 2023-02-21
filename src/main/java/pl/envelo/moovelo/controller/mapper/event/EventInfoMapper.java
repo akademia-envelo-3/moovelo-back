@@ -1,6 +1,6 @@
 package pl.envelo.moovelo.controller.mapper.event;
 
-import pl.envelo.moovelo.controller.dto.event.EventInfoDto;
+import pl.envelo.moovelo.controller.dto.event.eventInfo.EventInfoDto;
 import pl.envelo.moovelo.controller.mapper.CategoryListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.LocationMapper;
 import pl.envelo.moovelo.controller.mapper.category.CategoryMapper;

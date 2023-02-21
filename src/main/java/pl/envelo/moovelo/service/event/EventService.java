@@ -116,16 +116,15 @@ public class EventService<I extends Event> {
         return allEvents;
     }
 
-    public List<I> getAllEventsByEventOwnerBasicUserId(Long basicUserId) {
+    public List<I> getAllEventsByEventOwnerBasicUserId(Long basicUserId, EventType eventType) {
         log.info("EventService - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
         List<I> events = eventRepositoryManager
-                .getRepositoryForSpecificEvent()
+                .getRepositoryForSpecificEvent(eventType)
                 .findByEventOwner_UserId(basicUserId);
 
         log.info("EventService - getAllEventsByEventOwnerBasicUserId() return {}", events);
 
         return events;
-
     }
 
     I validateAggregatedEntitiesForCreateEvent(I event, EventType eventType, Long userId) {

@@ -1,7 +1,11 @@
-package pl.envelo.moovelo.controller.mapper;
+package pl.envelo.moovelo.controller.mapper.event;
 
+import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
+import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
+import pl.envelo.moovelo.controller.mapper.EventInfoListResponseMapper;
+import pl.envelo.moovelo.controller.mapper.EventOwnerListResponseMapper;
+import pl.envelo.moovelo.controller.mapper.HashtagListResponseMapper;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.*;
@@ -9,14 +13,16 @@ import pl.envelo.moovelo.entity.events.*;
 import java.util.List;
 import java.util.Set;
 
-public class EventListResponseMapper {
+public class EventListMapper implements EventMapperInterface {
 
-    public static EventListResponseDto mapBasicEventToEventListResponseDto(Event event) {
-        return mapEventToEventListResponseDto(event.getId(), event.getEventOwner(), event.getEventInfo(),
+    @Override
+    public EventListResponseDto mapEventToEventResponseDto(Event event) {
+        return mapBasicEventToEventListResponseDto(event.getId(), event.getEventOwner(), event.getEventInfo(),
                 event.getHashtags(), event.getAcceptedStatusUsers(), event);
     }
 
-    public static EventListResponseDto mapInternalEventToEventListResponseDto(InternalEvent event) {
+    @Override
+    public EventListResponseDto mapInternalEventToEventResponseDto(InternalEvent event) {
         return EventListResponseDto.builder()
                 .id(event.getId())
                 .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()))
@@ -34,7 +40,8 @@ public class EventListResponseMapper {
                 .build();
     }
 
-    public static EventListResponseDto mapCyclicEventToEventListResponseDto(CyclicEvent event) {
+    @Override
+    public EventListResponseDto mapCyclicEventToEventResponseDto(CyclicEvent event) {
         return EventListResponseDto.builder()
                 .id(event.getId())
                 .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()))
@@ -52,12 +59,13 @@ public class EventListResponseMapper {
                 .build();
     }
 
-    public static EventListResponseDto mapExternalEventToEventListResponseDto(ExternalEvent event) {
-        return mapEventToEventListResponseDto(event.getId(), event.getEventOwner(), event.getEventInfo(),
+    @Override
+    public EventListResponseDto mapExternalEventToEventResponseDto(ExternalEvent event) {
+        return mapBasicEventToEventListResponseDto(event.getId(), event.getEventOwner(), event.getEventInfo(),
                 event.getHashtags(), event.getAcceptedStatusUsers(), event);
     }
 
-    private static EventListResponseDto mapEventToEventListResponseDto(
+    private EventListResponseDto mapBasicEventToEventListResponseDto(
             Long id, EventOwner eventOwner, EventInfo eventInfo,
             List<Hashtag> hashtags, Set<BasicUser> acceptedStatusUsers, Event event) {
         return EventListResponseDto.builder()

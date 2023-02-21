@@ -9,8 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
-import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
+import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
+import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -85,7 +85,7 @@ class EventControllerTest {
         //given
 
         //when
-        ResponseEntity<DisplayEventResponseDto> result = eventController.getEventById(1L);
+        ResponseEntity<EventResponseDto> result = eventController.getEventById(1L);
 
         //then
         assertTrue(result.hasBody());
