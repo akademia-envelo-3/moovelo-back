@@ -7,7 +7,6 @@ public class AnswerMapper {
     public static AnswerResponseDto mapAnswerToAnswerResponseDto(Answer answer) {
         return AnswerResponseDto.builder()
                 .id(answer.getId())
-                .eventSurveyId(answer.getEventSurvey().getId())
                 .value(answer.getAnswerValue())
                 .voted(answer.getBasicUsers().size())
                 .build();

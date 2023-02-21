@@ -244,20 +244,23 @@ public class EventController {
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<List<EventSurveyDto>> getEventSurveysByEventId(@PathVariable Long eventId) {
         log.info("EventController - getEventSurveysByEventId");
-        List<EventSurvey> surveys = eventService.getEventSurveysByEventId(eventId);
+
+        BasicUser user = authorizationService.getLoggedBasicUser();
+
+
+        List<EventSurvey> surveys = eventService.getEventSurveysByEventId(eventId, user);
 
         List<EventSurveyDto> surveysDto = surveys
                 .stream()
-                .map(EventSurveyMapper::mapEventSurveyToEventSurveyDto)
-                .peek(eventSurveyDto -> {
-                    BasicUser user = authorizationService.getLoggedBasicUser();
-                    List<Long> answersIds = user.getSurveyAnswers()
-                            .stream()
-                            .filter(answer -> answer.getEventSurvey().getId().equals(eventSurveyDto.getId()))
-                            .map(Answer::getId)
-                            .collect(Collectors.toList());
-                    eventSurveyDto.setYourAnswerIds(answersIds);
-                }).toList();
+                .map(surveyDto -> {
+                    if(authorizationService.isLoggedUserAdmin()) {
+                        return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto);
+                    } else {
+                        return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto, user);
+                    }
+                })
+                .toList();
+
 
         log.info("EventController - getEventSurveysByEventId() return {}", surveysDto);
         return ResponseEntity.ok(surveysDto);
