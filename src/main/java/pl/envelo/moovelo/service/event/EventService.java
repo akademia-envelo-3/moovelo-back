@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
@@ -116,16 +117,17 @@ public class EventService<I extends Event> {
         return allEvents;
     }
 
-    public List<I> getAllEventsByEventOwnerBasicUserId(Long basicUserId, EventType eventType) {
-        log.info("EventService - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
-        List<I> events = eventRepositoryManager
-                .getRepositoryForSpecificEvent(eventType)
-                .findByEventOwner_UserId(basicUserId);
-
-        log.info("EventService - getAllEventsByEventOwnerBasicUserId() return {}", events);
-
-        return events;
-    }
+    // TODO: 21.02.2023 Z List dziala, Page trzeba powalczyc
+//    public Page<I> getAllEventsByEventOwnerBasicUserId(Long basicUserId, EventType eventType) {
+//        log.info("EventService - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
+//        Page<I> events = eventRepositoryManager
+//                .getRepositoryForSpecificEvent(eventType)
+//                .findByEventOwner_UserId(basicUserId);
+//
+//        log.info("EventService - getAllEventsByEventOwnerBasicUserId() return {}", events);
+//
+//        return events;
+//    }
 
     I validateAggregatedEntitiesForCreateEvent(I event, EventType eventType, Long userId) {
         I eventWithFieldsAfterValidation = getEventByEventType(eventType);
@@ -167,16 +169,16 @@ public class EventService<I extends Event> {
         return eventOwnerService.getEventOwnerByUserId(userId);
     }
 
-//    @Transactional
-//    public void updateEventOwnershipByEventId(Long eventId, EventOwner eventOwner, Long currentEventOwnerUserId) {
-//        log.info("EventService - updateEventOwnershipById() - eventId = {}", eventId);
-//        I event = getEventById(eventId);
-//        eventOwnerService.createEventOwner(eventOwner);
-//        event.setEventOwner(eventOwner);
-//        eventOwnerService.removeEventFromEventOwnerEvents(event, currentEventOwnerUserId);
-//        eventOwnerService.removeEventOwnerWithNoEvents(getEventOwnerByUserId(currentEventOwnerUserId));
-//        log.info("EventService - updateEventOwnershipById() - eventId = {} updated", eventId);
-//    }
+    @Transactional
+    public void updateEventOwnershipByEventId(Long eventId, EventOwner eventOwner, Long currentEventOwnerUserId, EventType eventType) {
+        log.info("EventService - updateEventOwnershipById() - eventId = {}", eventId);
+        I event = getEventById(eventId, eventType);
+        eventOwnerService.createEventOwner(eventOwner);
+        event.setEventOwner(eventOwner);
+        eventOwnerService.removeEventFromEventOwnerEvents(event, currentEventOwnerUserId);
+        eventOwnerService.removeEventOwnerWithNoEvents(getEventOwnerByUserId(currentEventOwnerUserId));
+        log.info("EventService - updateEventOwnershipById() - eventId = {} updated", eventId);
+    }
 
     public boolean checkIfEventExistsById(Long eventId, EventType eventType) {
         if (eventId != null) {

@@ -1,87 +1,59 @@
 package pl.envelo.moovelo.controller.mapper.event;
 
-import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventInfoListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.EventOwnerListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.HashtagListResponseMapper;
-import pl.envelo.moovelo.entity.Hashtag;
-import pl.envelo.moovelo.entity.actors.BasicUser;
-import pl.envelo.moovelo.entity.events.*;
-
-import java.util.List;
-import java.util.Set;
+import pl.envelo.moovelo.entity.events.CyclicEvent;
+import pl.envelo.moovelo.entity.events.Event;
+import pl.envelo.moovelo.entity.events.ExternalEvent;
+import pl.envelo.moovelo.entity.events.InternalEvent;
 
 public class EventListMapper implements EventMapperInterface {
 
     @Override
     public EventListResponseDto mapEventToEventResponseDto(Event event) {
-        return mapBasicEventToEventListResponseDto(event.getId(), event.getEventOwner(), event.getEventInfo(),
-                event.getHashtags(), event.getAcceptedStatusUsers(), event);
+        return mapBasicEventToEventListResponseDto(event);
     }
 
     @Override
     public EventListResponseDto mapInternalEventToEventResponseDto(InternalEvent event) {
-        return EventListResponseDto.builder()
-                .id(event.getId())
-                .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()))
-                .eventInfo(EventInfoListResponseMapper.mapEventInfoToEventInfoListResponseDto(event.getEventInfo()))
-                .hashtags(event.getHashtags().stream()
-                        .map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
-                        .toList())
-                .startDate(event.getEventInfo().getStartDate().toString())
-                .isConfirmationRequired(event.getEventInfo().getIsConfirmationRequired())
-                .isPrivate(event.isPrivate())
-                .group(!ObjectUtils.isEmpty(event.getGroup()))
-                .isCyclic(false)
-                .city(event.getEventInfo().getLocation().getCity())
-                .acceptedStatusUsers(event.getAcceptedStatusUsers().size())
-                .build();
+        EventListResponseDto internalEventListResponseDto = mapBasicEventToEventListResponseDto(event);
+        internalEventListResponseDto.setPrivate(event.isPrivate());
+        internalEventListResponseDto.setGroup((!ObjectUtils.isEmpty(event.getGroup())));
+        return internalEventListResponseDto;
     }
 
     @Override
     public EventListResponseDto mapCyclicEventToEventResponseDto(CyclicEvent event) {
-        return EventListResponseDto.builder()
-                .id(event.getId())
-                .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()))
-                .eventInfo(EventInfoListResponseMapper.mapEventInfoToEventInfoListResponseDto(event.getEventInfo()))
-                .hashtags(event.getHashtags().stream()
-                        .map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
-                        .toList())
-                .startDate(event.getEventInfo().getStartDate().toString())
-                .isConfirmationRequired(event.getEventInfo().getIsConfirmationRequired())
-                .isPrivate(event.isPrivate())
-                .group(!ObjectUtils.isEmpty(event.getGroup()))
-                .isCyclic(event.getNumberOfRepeats() > 0)
-                .city(event.getEventInfo().getLocation().getCity())
-                .acceptedStatusUsers(event.getAcceptedStatusUsers().size())
-                .build();
+        EventListResponseDto cyclicEventListResponseDto = mapInternalEventToEventResponseDto(event);
+        cyclicEventListResponseDto.setCyclic(event.getNumberOfRepeats() > 0);
+        return cyclicEventListResponseDto;
     }
 
+    // TODO: 21.02.2023  ogarnac External
     @Override
     public EventListResponseDto mapExternalEventToEventResponseDto(ExternalEvent event) {
-        return mapBasicEventToEventListResponseDto(event.getId(), event.getEventOwner(), event.getEventInfo(),
-                event.getHashtags(), event.getAcceptedStatusUsers(), event);
+        EventListResponseDto eventListResponseDto = mapBasicEventToEventListResponseDto(event);
+        return eventListResponseDto;
     }
 
-    private EventListResponseDto mapBasicEventToEventListResponseDto(
-            Long id, EventOwner eventOwner, EventInfo eventInfo,
-            List<Hashtag> hashtags, Set<BasicUser> acceptedStatusUsers, Event event) {
-        return EventListResponseDto.builder()
-                .id(id)
-                .eventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(eventOwner))
-                .eventInfo(EventInfoListResponseMapper.mapEventInfoToEventInfoListResponseDto(eventInfo))
-                .hashtags(hashtags.stream()
-                        .map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
-                        .toList())
-                .startDate(event.getEventInfo().getStartDate().toString())
-                .isConfirmationRequired(eventInfo.getIsConfirmationRequired())
-                .isPrivate(false)
-                .group(false)
-                .isCyclic(false)
-                .city(eventInfo.getLocation().getCity())
-                .acceptedStatusUsers(acceptedStatusUsers.size())
-                .build();
+    private EventListResponseDto mapBasicEventToEventListResponseDto(Event event) {
+        EventListResponseDto eventListResponseDto = new EventListResponseDto();
+        eventListResponseDto.setId(event.getId());
+        eventListResponseDto.setEventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()));
+        eventListResponseDto.setEventInfo(EventInfoListResponseMapper.mapEventInfoToEventInfoListResponseDto(event.getEventInfo()));
+        eventListResponseDto.setHashtags(event.getHashtags().stream()
+                .map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
+                .toList());
+        eventListResponseDto.setStartDate(event.getEventInfo().getStartDate().toString());
+        eventListResponseDto.setConfirmationRequired(event.getEventInfo().getIsConfirmationRequired());
+        eventListResponseDto.setPrivate(false);
+        eventListResponseDto.setGroup(false);
+        eventListResponseDto.setCyclic(false);
+        eventListResponseDto.setCity(event.getEventInfo().getLocation().getCity());
+        eventListResponseDto.setAcceptedStatusUsers(event.getAcceptedStatusUsers().size());
+        return eventListResponseDto;
     }
 }
