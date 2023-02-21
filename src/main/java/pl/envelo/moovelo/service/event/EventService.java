@@ -37,16 +37,15 @@ public class EventService {
     private final EventOwnerService eventOwnerService;
     private final HashTagService hashTagService;
     private final BasicUserService basicUserService;
-    private LocationService locationService;
     private EventSearchSpecification eventSearchSpecification;
 
-    public Page<? extends Event> getAllEvents(String privacy, String group, String cat, String sort, String sortOrder, int page) {
+    public Page<? extends Event> getAllEvents(String privacy, String group, String cat, Long groupId, String sort, String sortOrder, int page) {
         log.info("EventService - getAllEvents()");
 
         int sizeOfPage = 10;
 
         Pageable pageable = PageRequest.of(page, sizeOfPage, Sort.by(eventSearchSpecification.createSortOrder(sort, sortOrder)));
-        Page<? extends Event> allEvents = eventRepository.findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat), pageable);
+        Page<? extends Event> allEvents = eventRepository.findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat, groupId), pageable);
 
         log.info("EventService - getAllEvents() return {}", allEvents.toString());
         return allEvents;

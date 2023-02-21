@@ -19,6 +19,8 @@ import pl.envelo.moovelo.service.actors.GroupOwnerService;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.List;
 
 @AllArgsConstructor
@@ -49,6 +51,19 @@ public class GroupService {
         newGroup.setMembers(new ArrayList<>());
         newGroup.setEvents(new ArrayList<>());
         return newGroup;
+    }
+
+    public Group getGroupById(Long groupId) {
+        log.info("GroupService - getGroupById() - groupId = {}", groupId);
+        Optional<Group> groupOptional = groupRepository.findById(groupId);
+        if (groupOptional.isPresent()) {
+            Group group = groupOptional.get();
+            log.info("GroupService - getGroupById() - groupId = {} - return group = {}", groupId, group);
+            return group;
+        } else {
+            log.error("No group with id = {}", groupId, new NoSuchElementException());
+            throw new NoSuchElementException("No group with id: " + groupId);
+        }
     }
 
     public Page<Group> getAllGroupsForBasicUser(Long basicUserId, Boolean membership, GroupPage groupPage) {

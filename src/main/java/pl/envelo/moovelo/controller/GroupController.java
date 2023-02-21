@@ -63,4 +63,14 @@ public class GroupController {
                 groups.map(group -> GroupMapper.mapGroupToGroupListResponseDto(group, authorizationService.isLoggedUserGroupMember(group)));
         return new ResponseEntity<>(groupListResponseDtoPage, HttpStatus.OK);
     }
+
+    @GetMapping("/{groupId}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    public ResponseEntity<GroupResponseDto> getGroupById(@PathVariable Long groupId) {
+        log.info("GroupController - () - getGroupById() - groupId = {}", groupId);
+        Group group = groupService.getGroupById(groupId);
+        GroupResponseDto groupResponseDto = GroupMapper.mapGroupToGroupResponseDto(group);
+        log.info("GroupController - () - getGroupById() - groupId = {} - return = {}", groupId, groupResponseDto);
+        return ResponseEntity.ok(groupResponseDto);
+    }
 }
