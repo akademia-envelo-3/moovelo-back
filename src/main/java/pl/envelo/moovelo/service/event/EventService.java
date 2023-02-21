@@ -12,6 +12,8 @@ import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventOwner;
+import pl.envelo.moovelo.entity.surveys.Answer;
+import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.exception.StatusNotExistsException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
@@ -249,5 +251,16 @@ public class EventService {
             setOfPending.remove(user);
             setOfAccepted.remove(user);
         }
+    }
+
+    private EventSurvey createNewSurvey(EventSurvey eventSurvey) {
+
+        if (checkIfEntityExist(eventSurvey)) {
+            throw new EntityExistsException("Survey already exists in database");
+        } else {
+
+
+
+
     }
 }

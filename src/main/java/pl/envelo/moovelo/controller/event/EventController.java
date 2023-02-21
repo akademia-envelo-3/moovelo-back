@@ -13,12 +13,15 @@ import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
+import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;
+import pl.envelo.moovelo.controller.dto.survey.EventSurveyRequestDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.*;
+import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.AuthorizationService;
@@ -234,5 +237,30 @@ public class EventController {
             throw new UnauthorizedRequestException("Logged in user is not authorized to change status of other users");
         }
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("events/{eventId}/surveys")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<EventSurveyDto> createNewSurvey(@RequestBody EventSurveyRequestDto eventSurveyRequestDto){
+        log.info("EventController - createNewSurvey");
+
+        EventSurvey eventSurvey = SurveyMapper.map();
+
+        EventSurvey newEventSurvey = eventService.createNewSurvey(eventSurvey);
+
+        EventSurveyDto newEventSurveyDto = SurveyMapper.map();
+
+
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(eventSurvey.getId())
+                .toUri();
+
+        log.info("EventController - () return createNewEventSurvey() - dto {}", newEventSurveyDto);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .location(uri)
+                .body(newEventSurveyDto);
     }
 }
