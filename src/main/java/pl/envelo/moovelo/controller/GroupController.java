@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.envelo.moovelo.controller.dto.group.GroupRequestDto;
 import pl.envelo.moovelo.controller.dto.group.GroupResponseDto;
@@ -47,5 +44,15 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(uri)
                 .body(groupResponseDto);
+    }
+
+    @GetMapping("/{groupId}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    public ResponseEntity<GroupResponseDto> getGroupById(@PathVariable Long groupId) {
+        log.info("GroupController - () - getGroupById() - groupId = {}", groupId);
+        Group group = groupService.getGroupById(groupId);
+        GroupResponseDto groupResponseDto = GroupMapper.mapGroupToGroupResponseDto(group);
+        log.info("GroupController - () - getGroupById() - groupId = {} - return = {}", groupId, groupResponseDto);
+        return ResponseEntity.ok(groupResponseDto);
     }
 }

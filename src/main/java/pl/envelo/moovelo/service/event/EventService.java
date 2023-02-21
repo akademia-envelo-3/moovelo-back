@@ -6,16 +6,12 @@ import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import pl.envelo.moovelo.controller.dto.CommentResponseDto;
-import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
 import pl.envelo.moovelo.CommentPage;
 import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.actors.BasicUser;
-import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventOwner;
@@ -30,7 +26,10 @@ import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 
 import javax.persistence.EntityExistsException;
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
 
 @AllArgsConstructor
 @Service
@@ -47,13 +46,13 @@ public class EventService {
     private EventSearchSpecification eventSearchSpecification;
     private CommentService commentService;
 
-    public Page<? extends Event> getAllEvents(String privacy, String group, String cat, String sort, String sortOrder, int page) {
+    public Page<? extends Event> getAllEvents(String privacy, String group, String cat, Long groupId, String sort, String sortOrder, int page) {
         log.info("EventService - getAllEvents()");
 
         int sizeOfPage = 10;
 
         Pageable pageable = PageRequest.of(page, sizeOfPage, Sort.by(eventSearchSpecification.createSortOrder(sort, sortOrder)));
-        Page<? extends Event> allEvents = eventRepository.findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat), pageable);
+        Page<? extends Event> allEvents = eventRepository.findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat, groupId), pageable);
 
         log.info("EventService - getAllEvents() return {}", allEvents.toString());
         return allEvents;
@@ -199,15 +198,6 @@ public class EventService {
         return usersWithAccess;
     }
 
-    public List<BasicUser> getUsersWithAccessList(Long eventId) {
-        log.info("EventService - List<BasicUser> getUsersWithAccess()");
-        Event event = getEventById(eventId);
-        List<BasicUser> usersWithAccessList = event.getUsersWithAccess();
-
-        log.info("EventService - getUsersWithAccess() return {}", usersWithAccessList);
-        return usersWithAccessList;
-    }
-
     public static <T> Page<T> listToPage(final Pageable pageable, List<T> list) {
         int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());
         int last = Math.min(first + pageable.getPageSize(), list.size());
@@ -276,19 +266,4 @@ public class EventService {
             setOfAccepted.remove(user);
         }
     }
-
-   /* public List<Long> mapFromBasicUserWithAccessListToUsersIdList(List<BasicUser> basicUsersWithAccess) {
-        List<Long> basicUsersId;
-
-        if (basicUsersWithAccess.isEmpty()) {
-            basicUsersId = new ArrayList<>();
-            return basicUsersId;
-        } else {
-            basicUsersId = basicUsersWithAccess.stream()
-                    .map(User::getId)
-                    .toList();
-        }
-        return basicUsersId;
-    }*/
-
 }
