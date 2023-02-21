@@ -101,10 +101,6 @@ public class EventService {
         log.info("EventService - getAllCommentsByEvent()");
         Page<Comment> comments = commentService.getAllCommentsByEvent(event, commentPage);
 
-        if (comments.isEmpty()) {
-            throw new NoSuchElementException("No Event comments with id: " + event.getId());
-        }
-
         log.info("EventService - getAllCommentsByEvent() return {}", comments);
         return comments;
     }
