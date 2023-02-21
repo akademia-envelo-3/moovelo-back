@@ -8,6 +8,7 @@ import pl.envelo.moovelo.entity.categories.CategoryProposal;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.groups.Group;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
@@ -27,7 +28,7 @@ public class BasicUser extends User {
     @OneToMany
     private List<Comment> comments;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH})
     private List<Group> groups;
 
     @ManyToMany(mappedBy = "acceptedStatusUsers")

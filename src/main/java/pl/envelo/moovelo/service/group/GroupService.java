@@ -42,4 +42,12 @@ public class GroupService {
         newGroup.setEvents(new ArrayList<>());
         return newGroup;
     }
+
+    public void removeGroup(Long groupId) {
+        log.info("GroupService - removeGroup(groupId = '{}')", groupId);
+        GroupOwner groupOwner = groupOwnerService.getGroupOwnerByGroupId(groupId);
+        groupRepository.deleteById(groupId);
+        groupOwnerService.removeGroupOwnerOwnerWithNoGroups(groupOwner);
+        log.info("GroupService - removeGroup(groupId = '{}') - group removed", groupId);
+    }
 }
