@@ -66,12 +66,13 @@ public class EventController {
             String privacy,
             String group,
             String cat,
+            Long groupId,
             String sort,
             String sortOrder,
             @RequestParam(defaultValue = "0") Integer page) {
         log.info("EventController - getAllEvents()");
 
-        Page<? extends Event> events = eventService.getAllEvents(privacy, group, cat, sort, sortOrder, page);
+        Page<? extends Event> events = eventService.getAllEvents(privacy, group, cat, groupId, sort, sortOrder, page);
 
         Page<EventListResponseDto> eventsDto = mapEventToEventListResponseDto(events);
 
@@ -143,7 +144,7 @@ public class EventController {
         log.info("EventController - getEventById()");
         if (authorizationService.isLoggedUserEventOwner(eventId) || authorizationService.isLoggedUserAdmin()) {
             Event eventById = eventService.getEventById(eventId);
-            DisplayEventResponseDto displayEventResponseDto = null;
+            DisplayEventResponseDto displayEventResponseDto;
             switch (eventById.getEventType()) {
                 case EVENT -> displayEventResponseDto = EventMapper.mapEventToEventResponseDto(eventById);
                 case EXTERNAL_EVENT ->
@@ -215,5 +216,23 @@ public class EventController {
 
         log.info("EventController - getUsersWithAccess() return {}", usersWithAccessDto);
         return ResponseEntity.ok(usersWithAccessDto);
+    }
+
+    @PatchMapping("events/{eventId}/users/{userId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<String> setStatus(
+            @PathVariable Long eventId,
+            @PathVariable Long userId,
+            @RequestParam String status) {
+
+        log.info("EventController - setStatus()");
+
+        if (authorizationService.getLoggedBasicUserId().equals(userId)) {
+            eventService.setStatus(eventId, userId, status);
+        } else {
+            log.error("EventController - setStatus()", new UnauthorizedRequestException("Unauthorized request"));
+            throw new UnauthorizedRequestException("Logged in user is not authorized to change status of other users");
+        }
+        return ResponseEntity.ok().build();
     }
 }

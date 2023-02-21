@@ -17,7 +17,6 @@ public class GroupResponseDto {
     private String description;
     private GroupOwnerDto groupOwner;
     private List<BasicUserDto> groupMembers;
-    private List<DisplayEventResponseDto> events;
 
     @Override
     public boolean equals(Object o) {

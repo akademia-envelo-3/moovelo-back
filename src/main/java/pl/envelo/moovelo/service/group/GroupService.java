@@ -9,10 +9,11 @@ import pl.envelo.moovelo.entity.groups.GroupOwner;
 import pl.envelo.moovelo.repository.group.GroupRepository;
 import pl.envelo.moovelo.service.actors.GroupOwnerService;
 
-import javax.persistence.EntityExistsException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -49,5 +50,18 @@ public class GroupService {
         groupRepository.deleteById(groupId);
         groupOwnerService.removeGroupOwnerOwnerWithNoGroups(groupOwner);
         log.info("GroupService - removeGroup(groupId = '{}') - group removed", groupId);
+    }
+
+    public Group getGroupById(Long groupId) {
+        log.info("GroupService - getGroupById() - groupId = {}", groupId);
+        Optional<Group> groupOptional = groupRepository.findById(groupId);
+        if (groupOptional.isPresent()) {
+            Group group = groupOptional.get();
+            log.info("GroupService - getGroupById() - groupId = {} - return group = {}", groupId, group);
+            return group;
+        } else {
+            log.error("No group with id = {}", groupId, new NoSuchElementException());
+            throw new NoSuchElementException("No group with id: " + groupId);
+        }
     }
 }
