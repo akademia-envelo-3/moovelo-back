@@ -9,9 +9,12 @@ import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.actors.BasicUser;
+import pl.envelo.moovelo.entity.actors.Role;
+import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventOwner;
+import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.exception.StatusNotExistsException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
@@ -21,10 +24,7 @@ import pl.envelo.moovelo.service.LocationService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 import javax.persistence.EntityExistsException;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @AllArgsConstructor
 @Service
@@ -195,9 +195,7 @@ public class EventService {
         Event event = getEventById(eventId);
         BasicUser user = basicUserService.getBasicUserById(userId);
 
-        if (!event.getUsersWithAccess().contains(user)) {
-            throw new UnauthorizedRequestException("User with id " + userId + " does not have an access to event with id " + eventId);
-        }
+        checkIfUserHasAccessToEvent(event, user);
 
         Set<BasicUser> setOfAccepted = event.getAcceptedStatusUsers();
         Set<BasicUser> setOfPending = event.getPendingStatusUsers();
@@ -248,6 +246,26 @@ public class EventService {
             setOfRejected.add(user);
             setOfPending.remove(user);
             setOfAccepted.remove(user);
+        }
+    }
+
+    public List<EventSurvey> getEventSurveysByEventId(Long eventId, User user) {
+        log.info("EventService - getEventSurveysByEventId()");
+        Event event = getEventById(eventId);
+
+        if (user.getRole().equals(Role.ROLE_USER)) {
+            checkIfUserHasAccessToEvent(event, (BasicUser) user);
+        }
+
+        List<EventSurvey> surveys = event.getEventSurveys();
+
+        log.info("EventService - getEventSurveysByEventId() return {}", surveys);
+        return surveys;
+    }
+
+    private void checkIfUserHasAccessToEvent(Event event, BasicUser user) {
+        if (!event.getUsersWithAccess().contains(user)) {
+            throw new UnauthorizedRequestException("User with id " + user.getId() + " does not have an access to event with id " + event.getId());
         }
     }
 }

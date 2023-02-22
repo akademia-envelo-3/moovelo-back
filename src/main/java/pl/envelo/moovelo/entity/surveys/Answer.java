@@ -23,6 +23,6 @@ public class Answer {
 
     private String answerValue;
 
-    @OneToMany
+    @ManyToMany(mappedBy = "surveyAnswers")
     private List<BasicUser> basicUsers;
 }

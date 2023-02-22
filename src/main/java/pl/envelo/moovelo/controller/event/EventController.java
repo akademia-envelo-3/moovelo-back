@@ -13,12 +13,17 @@ import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
+import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;
 import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
+import pl.envelo.moovelo.controller.mapper.survey.EventSurveyMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;
+import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.*;
+import pl.envelo.moovelo.entity.surveys.Answer;
+import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.AuthorizationService;
@@ -27,6 +32,7 @@ import pl.envelo.moovelo.service.event.EventService;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
@@ -234,5 +240,31 @@ public class EventController {
             throw new UnauthorizedRequestException("Logged in user is not authorized to change status of other users");
         }
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/events/{eventId}/surveys")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    public ResponseEntity<List<EventSurveyDto>> getEventSurveysByEventId(@PathVariable Long eventId) {
+        log.info("EventController - getEventSurveysByEventId");
+
+        User user = authorizationService.getLoggedUser();
+
+        List<EventSurvey> surveys = eventService.getEventSurveysByEventId(eventId, user);
+
+        List<EventSurveyDto> surveysDto = surveys
+                .stream()
+                .map(surveyDto -> {
+                    if (authorizationService.isLoggedUserAdmin() ||
+                        authorizationService.isLoggedUserEventOwner(eventId)) {
+                        return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto);
+                    } else {
+                        BasicUser basicUser = (BasicUser) user;
+                        return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto, basicUser);
+                    }
+                })
+                .toList();
+
+        log.info("EventController - getEventSurveysByEventId() return {}", surveysDto);
+        return ResponseEntity.ok(surveysDto);
     }
 }

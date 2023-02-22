@@ -77,6 +77,14 @@ public class AuthorizationService {
         }
     }
 
+    public User getLoggedUser() {
+        log.info("AuthorizationService - getLoggedUser()");
+        User loggedUser = authenticatedUser.getAuthenticatedUser();
+
+        log.info("AuthorizationService - getLoggedUser() - return loggedUser = {}", loggedUser);
+        return loggedUser;
+    }
+
     public boolean authorizeGetByOwnerBasicUserId(Long basicUserId) {
         log.info("AuthorizationService - authorizeGetByOwnerBasicUserId() - basicUserId = {}", basicUserId);
         User user = authenticatedUser.getAuthenticatedUser();
