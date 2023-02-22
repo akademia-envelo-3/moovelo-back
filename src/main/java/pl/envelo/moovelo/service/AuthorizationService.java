@@ -77,16 +77,12 @@ public class AuthorizationService {
         }
     }
 
-    public BasicUser getLoggedBasicUser() {
-        log.info("AuthorizationService - getLoggedBasicUser()");
+    public User getLoggedUser() {
+        log.info("AuthorizationService - getLoggedUser()");
         User loggedUser = authenticatedUser.getAuthenticatedUser();
-        if (checkIfBasicUserExistsById(loggedUser.getId())) {
-            BasicUser loggedBasicUser = (BasicUser) loggedUser;
-            log.info("AuthorizationService - getLoggedBasicUserId() - return loggedUserId = {}", loggedBasicUser);
-            return loggedBasicUser;
-        } else {
-            throw new NoSuchElementException("Access denied. Logged in user in unauthorized to for the action called!");
-        }
+
+        log.info("AuthorizationService - getLoggedUser() - return loggedUser = {}", loggedUser);
+        return loggedUser;
     }
 
     public boolean authorizeGetByOwnerBasicUserId(Long basicUserId) {

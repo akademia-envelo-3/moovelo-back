@@ -9,6 +9,8 @@ import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.actors.BasicUser;
+import pl.envelo.moovelo.entity.actors.Role;
+import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventOwner;
@@ -248,12 +250,12 @@ public class EventService {
         }
     }
 
-    public List<EventSurvey> getEventSurveysByEventId(Long eventId, BasicUser user) {
+    public List<EventSurvey> getEventSurveysByEventId(Long eventId, User user) {
         log.info("EventService - getEventSurveysByEventId()");
         Event event = getEventById(eventId);
 
-        if (Objects.nonNull(user)) {
-            checkIfUserHasAccessToEvent(event, user);
+        if (user.getRole().equals(Role.ROLE_USER)) {
+            checkIfUserHasAccessToEvent(event, (BasicUser) user);
         }
 
         List<EventSurvey> surveys = event.getEventSurveys();

@@ -20,6 +20,7 @@ import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
 import pl.envelo.moovelo.controller.mapper.survey.EventSurveyMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;
+import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.entity.surveys.Answer;
 import pl.envelo.moovelo.entity.surveys.EventSurvey;
@@ -245,25 +246,24 @@ public class EventController {
     public ResponseEntity<List<EventSurveyDto>> getEventSurveysByEventId(@PathVariable Long eventId) {
         log.info("EventController - getEventSurveysByEventId");
 
-        BasicUser user = authorizationService.getLoggedBasicUser();
-
+        User user = authorizationService.getLoggedUser();
 
         List<EventSurvey> surveys = eventService.getEventSurveysByEventId(eventId, user);
 
         List<EventSurveyDto> surveysDto = surveys
                 .stream()
                 .map(surveyDto -> {
-                    if(authorizationService.isLoggedUserAdmin()) {
+                    if (authorizationService.isLoggedUserAdmin() ||
+                        authorizationService.isLoggedUserEventOwner(eventId)) {
                         return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto);
                     } else {
-                        return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto, user);
+                        BasicUser basicUser = (BasicUser) user;
+                        return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto, basicUser);
                     }
                 })
                 .toList();
-
 
         log.info("EventController - getEventSurveysByEventId() return {}", surveysDto);
         return ResponseEntity.ok(surveysDto);
     }
 }
-
