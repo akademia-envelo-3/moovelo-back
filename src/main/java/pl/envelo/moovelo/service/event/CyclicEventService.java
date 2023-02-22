@@ -26,7 +26,8 @@ public class CyclicEventService extends InternalEventService<CyclicEvent> {
         eventWithFieldsAfterValidation.setFrequencyInDays(event.getFrequencyInDays());
     }
 
-    //    public List<CyclicEvent> getAllCyclicEvents() {
+    // TODO: 22.02.2023  
+//        public List<CyclicEvent> getAllCyclicEvents() {
 //        log.info("CyclicEventService - getAllCyclicEvents()");
 //        List<CyclicEvent> allCyclicEvents = cyclicEventRepository.findAll();
 //

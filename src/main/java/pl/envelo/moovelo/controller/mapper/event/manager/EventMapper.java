@@ -1,15 +1,14 @@
 package pl.envelo.moovelo.controller.mapper.event.manager;
 
-import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
-import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventIdDto;
+import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
 import pl.envelo.moovelo.controller.mapper.EventOwnerListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.HashtagListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventInfoMapper;
-import pl.envelo.moovelo.controller.mapper.event.EventParticipationStatsMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
+import pl.envelo.moovelo.controller.mapper.event.EventParticipationStatsMapper;
 import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.entity.groups.Group;
 
@@ -26,7 +25,7 @@ public class EventMapper implements EventMapperInterface {
         event.setEventInfo(EventInfoMapper.mapEventInfoDtoToEventInfo(eventRequestDto.getEventInfo()));
         event.setLimitedPlaces(eventRequestDto.getLimitedPlaces());
         event.setEventType(eventType);
-        // TODO: 16.02.2023 Zastanowic sie, co z updatem
+        // TODO: 16.02.2023 przenosimy do EventService
 //        event.setComments(new ArrayList<>());
 //        event.setUsersWithAccess(new ArrayList<>());
 //        event.setAcceptedStatusUsers(new HashSet<>());
@@ -87,6 +86,7 @@ public class EventMapper implements EventMapperInterface {
     }
 
     public EventResponseDto mapExternalEventToEventResponseDto(ExternalEvent externalEvent) {
+        // TODO: 22.02.2023 mappaer dla externl event z EventPArticipationStats
         return mapEventToEventResponseDto(externalEvent);
     }
 }

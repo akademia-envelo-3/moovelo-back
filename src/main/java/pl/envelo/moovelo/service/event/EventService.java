@@ -190,6 +190,8 @@ public class EventService<I extends Event> {
         return false;
     }
 
+
+
     public Page<BasicUser> getUsersWithAccess(Long eventId, int page, int size, EventType eventType) {
         log.info("EventService - getUsersWithAccess()");
         I event = getEventById(eventId, eventType);

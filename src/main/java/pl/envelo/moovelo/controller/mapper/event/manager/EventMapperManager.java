@@ -22,7 +22,6 @@ public class EventMapperManager {
             case INTERNAL_EVENT -> returnMappedInternalEvent(eventRequestDto, eventType);
             case CYCLIC_EVENT -> returnMappedCyclicEvent(eventRequestDto, eventType);
             case EXTERNAL_EVENT -> returnMappedExternalEvent(eventRequestDto, eventType);
-            default -> throw new IllegalEventException("Not supported event with type = '" + eventType + "'");
         };
         return (T) event;
     }
