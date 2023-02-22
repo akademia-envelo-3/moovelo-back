@@ -7,7 +7,7 @@ import pl.envelo.moovelo.controller.dto.HashtagListResponseDto;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.event.eventInfo.EventInfoDto;
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerListResponseDto;
-import pl.envelo.moovelo.controller.dto.group.groupownership.GroupResponseDto;
+import pl.envelo.moovelo.controller.dto.group.GroupResponseDtoForEvent;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class EventResponseDto {
     private EventInfoDto eventInfo;
     private int limitedPlaces;
     private boolean isPrivate;
-    private GroupResponseDto group;
+    private GroupResponseDtoForEvent group;
     private List<HashtagListResponseDto> hashtags;
     private List<BasicUserDto> usersWithAccess;
     private EventParticipationStatsDto eventParticipationStats;

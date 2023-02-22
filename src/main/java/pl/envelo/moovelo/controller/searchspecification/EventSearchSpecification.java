@@ -18,7 +18,7 @@ import java.util.Objects;
 @Slf4j
 public class EventSearchSpecification {
 
-    public Specification<Event> getEventsSpecification(String privacy, String group, String cat) {
+    public Specification<Event> getEventsSpecification(String privacy, String group, String cat, Long groupId) {
         log.info("EventSearchSpecification - getEventsSpecification()");
 
         Specification<Event> specification = (root, query, criteriaBuilder) -> {
@@ -28,7 +28,8 @@ public class EventSearchSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             predicateByPrivacy(privacy, root, criteriaBuilder, predicates);
-            predicateGroupNotNull(group, internalEventRoot, criteriaBuilder,  predicates);
+            predicateGroupNotNull(group, internalEventRoot, criteriaBuilder, predicates);
+            predicateByGroupId(groupId, internalEventRoot, criteriaBuilder, predicates);
             predicateCategoryLike(cat, root, criteriaBuilder, predicates);
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
@@ -54,11 +55,11 @@ public class EventSearchSpecification {
         if (Objects.nonNull(privacy)) {
             if (privacy.toLowerCase().equals("true")) {
                 predicates.add(
-                    criteriaBuilder.isTrue(root.get("isPrivate"))
+                        criteriaBuilder.isTrue(root.get("isPrivate"))
                 );
             } else if (privacy.toLowerCase().equals("false")) {
                 predicates.add(
-                    criteriaBuilder.isFalse(root.get("isPrivate"))
+                        criteriaBuilder.isFalse(root.get("isPrivate"))
                 );
             }
         }
@@ -69,6 +70,15 @@ public class EventSearchSpecification {
         if (Objects.nonNull(group) && group.equals("true")) {
             predicates.add(
                     criteriaBuilder.isNotNull(internalEventRoot.get("group"))
+            );
+        }
+    }
+
+    private static void predicateByGroupId(Long groupId, Root<InternalEvent> internalEventRoot,
+                                           CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (Objects.nonNull(groupId)) {
+            predicates.add(
+                    criteriaBuilder.equal(internalEventRoot.get("group").get("id"), groupId)
             );
         }
     }

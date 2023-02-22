@@ -11,6 +11,8 @@ import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.exception.NoContentException;
+import pl.envelo.moovelo.exception.StatusNotExistsException;
+import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.repository.event.EventRepositoryManager;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
@@ -20,6 +22,8 @@ import javax.persistence.EntityExistsException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
+
 
 @Service
 @Slf4j
@@ -102,7 +106,7 @@ public class EventService<I extends Event> {
         log.info("EventService - removeEventById() - event with id = {} removed", id);
     }
 
-    public Page<I> getAllEvents(String privacy, String group, String cat, String sort, String sortOrder, int page, EventType eventType) {
+    public Page<I> getAllEvents(String privacy, String group, String cat, Long groupId, String sort, String sortOrder, int page, EventType eventType) {
         log.info("EventService - getAllEvents()");
 
         int sizeOfPage = 10;
@@ -110,7 +114,7 @@ public class EventService<I extends Event> {
         Pageable pageable = PageRequest.of(page, sizeOfPage, Sort.by(eventSearchSpecification.createSortOrder(sort, sortOrder)));
         Page<I> allEvents = eventRepositoryManager
                 .getRepositoryForSpecificEvent(eventType)
-                .findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat), pageable);
+                .findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat, groupId), pageable);
 
         log.info("EventService - getAllEvents() return {}", allEvents.toString());
 
@@ -169,14 +173,18 @@ public class EventService<I extends Event> {
         return eventOwnerService.getEventOwnerByUserId(userId);
     }
 
-    @Transactional
-    public void updateEventOwnershipByEventId(Long eventId, EventOwner eventOwner, Long currentEventOwnerUserId, EventType eventType) {
+    public void updateEventOwnershipByEventId(Long eventId, Long newOwnerUserId, EventType eventType) {
+        EventOwner newEventOwner = getEventOwnerByUserId(newOwnerUserId);
+        Long currentEventOwnerUserId = getEventOwnerUserIdByEventId(eventId);
         log.info("EventService - updateEventOwnershipById() - eventId = {}", eventId);
         I event = getEventById(eventId, eventType);
-        eventOwnerService.createEventOwner(eventOwner);
-        event.setEventOwner(eventOwner);
-        eventOwnerService.removeEventFromEventOwnerEvents(event, currentEventOwnerUserId);
+        eventOwnerService.createEventOwner(newEventOwner);
+        event.setEventOwner(newEventOwner);
+        // TODO: 22.02.2023 repository manager
         eventOwnerService.removeEventOwnerWithNoEvents(getEventOwnerByUserId(currentEventOwnerUserId));
+        eventRepositoryManager
+                .getRepositoryForSpecificEvent(eventType)
+                .save(event);
         log.info("EventService - updateEventOwnershipById() - eventId = {} updated", eventId);
     }
 
@@ -189,8 +197,6 @@ public class EventService<I extends Event> {
         }
         return false;
     }
-
-
 
     public Page<BasicUser> getUsersWithAccess(Long eventId, int page, int size, EventType eventType) {
         log.info("EventService - getUsersWithAccess()");
@@ -208,6 +214,67 @@ public class EventService<I extends Event> {
         int last = Math.min(first + pageable.getPageSize(), list.size());
         return new PageImpl<>(list.subList(first, last), pageable, list.size());
     }
+
+    @Transactional
+    public void setStatus(Long eventId, Long userId, String status, EventType eventType) {
+        log.info("EventService - setStatus()");
+
+        I event = getEventById(eventId, eventType);
+        BasicUser user = basicUserService.getBasicUserById(userId);
+
+        if (!event.getUsersWithAccess().contains(user)) {
+            throw new UnauthorizedRequestException("User with id " + userId + " does not have an access to event with id " + eventId);
+        }
+
+        Set<BasicUser> setOfAccepted = event.getAcceptedStatusUsers();
+        Set<BasicUser> setOfPending = event.getPendingStatusUsers();
+        Set<BasicUser> setOfRejected = event.getRejectedStatusUsers();
+
+        switch (status.toLowerCase()) {
+            case "accepted" -> setAcceptedStatus(user, setOfAccepted, setOfPending, setOfRejected);
+            case "pending" -> setPendingStatus(user, setOfAccepted, setOfPending, setOfRejected);
+            case "rejected" -> setRejectedStatus(user, setOfAccepted, setOfPending, setOfRejected);
+            default -> throw new StatusNotExistsException("Status " + status + " does not exist");
+        }
+
+        event.setAcceptedStatusUsers(setOfAccepted);
+        event.setPendingStatusUsers(setOfPending);
+        event.setRejectedStatusUsers(setOfRejected);
+    }
+
+    private void setAcceptedStatus(BasicUser user,
+                                   Set<BasicUser> setOfAccepted,
+                                   Set<BasicUser> setOfPending,
+                                   Set<BasicUser> setOfRejected) {
+
+        if (!setOfAccepted.contains(user)) {
+            setOfAccepted.add(user);
+            setOfPending.remove(user);
+            setOfRejected.remove(user);
+        }
+    }
+
+    private void setPendingStatus(BasicUser user,
+                                  Set<BasicUser> setOfAccepted,
+                                  Set<BasicUser> setOfPending,
+                                  Set<BasicUser> setOfRejected) {
+
+        if (!setOfPending.contains(user)) {
+            setOfPending.add(user);
+            setOfAccepted.remove(user);
+            setOfRejected.remove(user);
+        }
+    }
+
+    private void setRejectedStatus(BasicUser user,
+                                   Set<BasicUser> setOfAccepted,
+                                   Set<BasicUser> setOfPending,
+                                   Set<BasicUser> setOfRejected) {
+
+        if (!setOfRejected.contains(user)) {
+            setOfRejected.add(user);
+            setOfPending.remove(user);
+            setOfAccepted.remove(user);
+        }
+    }
 }
-
-

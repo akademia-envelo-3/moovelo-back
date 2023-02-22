@@ -3,7 +3,6 @@ package pl.envelo.moovelo.controller.dto.group;
 import lombok.Builder;
 import lombok.Getter;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
-import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
 import pl.envelo.moovelo.controller.dto.group.groupownership.GroupOwnerDto;
 
 import java.util.List;
@@ -11,16 +10,12 @@ import java.util.Objects;
 
 @Builder
 @Getter
-public class GroupDto {
-    private long id;
-
+public class GroupResponseDto {
+    private Long id;
     private String name;
     private String description;
     private GroupOwnerDto groupOwner;
-    private boolean isUserMember;
-    private int numberOfMembers;
     private List<BasicUserDto> groupMembers;
-    private List<EventResponseDto> events;
 
     @Override
     public boolean equals(Object o) {
@@ -30,8 +25,8 @@ public class GroupDto {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        GroupDto groupDto = (GroupDto) o;
-        return id == groupDto.id;
+        GroupResponseDto groupResponseDto = (GroupResponseDto) o;
+        return id.equals(groupResponseDto.id);
     }
 
     @Override
