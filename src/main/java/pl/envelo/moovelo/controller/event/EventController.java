@@ -219,7 +219,6 @@ public class EventController {
         return ResponseEntity.ok(usersWithAccessDto);
     }
 
-    // TODO: 20.02.2023 uzyj authorization service
     @GetMapping("/events/users/{userId}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Page<?>> getAllEventsAvailableForUser(
@@ -238,8 +237,7 @@ public class EventController {
                         EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
                 case CYCLIC_EVENT ->
                         EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) event);
-                case EXTERNAL_EVENT ->atus
-
+                case EXTERNAL_EVENT ->
                         EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
             }
         );

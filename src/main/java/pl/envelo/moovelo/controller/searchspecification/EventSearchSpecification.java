@@ -178,7 +178,7 @@ public class EventSearchSpecification {
         if (filterCriteria.getCategory() != null) {
             predicates.add(
                     criteriaBuilder.like(
-                            eventRoot.get("eventInfo").get("category").get("name"),
+                            criteriaBuilder.lower(eventRoot.get("eventInfo").get("category").get("name")),
                             "%" + filterCriteria.getCategory().toLowerCase() + "%"
                     )
             );
@@ -187,7 +187,7 @@ public class EventSearchSpecification {
         if (filterCriteria.getName() != null) {
             predicates.add(
                     criteriaBuilder.like(
-                            eventRoot.get("eventInfo").get("name"),
+                            criteriaBuilder.lower(eventRoot.get("eventInfo").get("name")),
                             "%" + filterCriteria.getName().toLowerCase() + "%"
                     )
             );
@@ -218,11 +218,10 @@ public class EventSearchSpecification {
         }
 
         if (filterCriteria.getGroupName() != null) {
-            String groupName = filterCriteria.getGroupName().toLowerCase();
             predicates.add(
                     criteriaBuilder.like(
-                            eventRoot.get("group").get("groupInfo").get("name"),
-                            "%" + groupName + "%"
+                            criteriaBuilder.lower(eventRoot.get("group").get("groupInfo").get("name")),
+                            "%" + filterCriteria.getGroupName().toLowerCase() + "%"
                     )
             );
         }
