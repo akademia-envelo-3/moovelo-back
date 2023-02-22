@@ -53,11 +53,11 @@ public class EventSearchSpecification {
 
     private static void predicateByPrivacy(String privacy, Root<Event> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
         if (Objects.nonNull(privacy)) {
-            if (privacy.toLowerCase().equals("true")) {
+            if (privacy.equalsIgnoreCase("true")) {
                 predicates.add(
                         criteriaBuilder.isTrue(root.get("isPrivate"))
                 );
-            } else if (privacy.toLowerCase().equals("false")) {
+            } else if (privacy.equalsIgnoreCase("false")) {
                 predicates.add(
                         criteriaBuilder.isFalse(root.get("isPrivate"))
                 );

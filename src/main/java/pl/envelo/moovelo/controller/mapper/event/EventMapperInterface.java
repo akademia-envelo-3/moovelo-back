@@ -1,7 +1,9 @@
 package pl.envelo.moovelo.controller.mapper.event;
 
-import org.springframework.stereotype.Service;
-import pl.envelo.moovelo.entity.events.*;
+import pl.envelo.moovelo.entity.events.CyclicEvent;
+import pl.envelo.moovelo.entity.events.Event;
+import pl.envelo.moovelo.entity.events.ExternalEvent;
+import pl.envelo.moovelo.entity.events.InternalEvent;
 
 public interface EventMapperInterface {
 

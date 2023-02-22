@@ -6,7 +6,6 @@ import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
 import pl.envelo.moovelo.entity.events.*;
-import pl.envelo.moovelo.exception.IllegalEventException;
 
 import static pl.envelo.moovelo.controller.mapper.event.manager.EventMapper.mapEventRequestDtoToEvent;
 

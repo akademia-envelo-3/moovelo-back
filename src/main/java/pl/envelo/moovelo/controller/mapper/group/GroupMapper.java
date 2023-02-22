@@ -11,7 +11,7 @@ import pl.envelo.moovelo.entity.groups.Group;
 import java.util.stream.Collectors;
 
 public class GroupMapper {
-    private static final  int FIRST_THREE_GROUP_MEMBERS = 3;
+    private static final int FIRST_THREE_GROUP_MEMBERS = 3;
 
     public static GroupResponseDto mapGroupToGroupResponseDto(Group group) {
         return GroupResponseDto
