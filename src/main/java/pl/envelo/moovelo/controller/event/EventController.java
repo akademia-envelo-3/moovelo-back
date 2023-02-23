@@ -16,7 +16,6 @@ import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyRequestDto;
-import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventListMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
@@ -214,6 +213,7 @@ public class EventController {
             @RequestParam String status) {
 
         log.info("EventController - setStatus()");
+        authorizationService.checkIfLoggedUserHasAccessToEvent(eventId);
 
         if (authorizationService.getLoggedBasicUserId().equals(userId)) {
             eventService.setStatus(eventId, userId, status, eventType);
@@ -228,10 +228,9 @@ public class EventController {
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<List<EventSurveyDto>> getEventSurveysByEventId(@PathVariable Long eventId) {
         log.info("EventController - getEventSurveysByEventId");
+        authorizationService.checkIfLoggedUserHasAccessToEvent(eventId);
 
-        User user = authorizationService.getLoggedUser();
-
-        List<EventSurvey> surveys = eventService.getEventSurveysByEventId(eventId, user, eventType);
+        List<EventSurvey> surveys = eventService.getEventSurveysByEventId(eventId, eventType);
 
         List<EventSurveyDto> surveysDto = surveys
                 .stream()
@@ -240,7 +239,7 @@ public class EventController {
                             authorizationService.isLoggedUserEventOwner(eventId)) {
                         return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto);
                     } else {
-                        BasicUser basicUser = (BasicUser) user;
+                        BasicUser basicUser = (BasicUser) authorizationService.getLoggedUser();
                         return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto, basicUser);
                     }
                 })
@@ -252,14 +251,14 @@ public class EventController {
 
     @PutMapping("events/{eventId}/surveys")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<EventSurveyDto> createNewSurvey(@RequestBody EventSurveyRequestDto eventSurveyRequestDto){
+    public ResponseEntity<EventSurveyDto> createNewSurvey(@RequestBody EventSurveyRequestDto eventSurveyRequestDto, @PathVariable Long eventId){
         log.info("EventController - createNewSurvey");
 
-        EventSurvey eventSurvey = SurveyMapper.map();
+        EventSurvey eventSurvey = EventSurveyMapper.mapEventSurveyRequestDtoToEventSurvey(eventSurveyRequestDto);
 
-        EventSurvey newEventSurvey = eventService.createNewSurvey(eventSurvey);
+        EventSurvey newEventSurvey = eventService.createNewSurvey(eventSurvey, eventId);
 
-        EventSurveyDto newEventSurveyDto = SurveyMapper.map();
+        EventSurveyDto newEventSurveyDto = EventSurveyMapper.mapEventSurveyToEventSurveyDto(newEventSurvey);
 
 
         URI uri = ServletUriComponentsBuilder

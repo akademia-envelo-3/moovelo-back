@@ -7,12 +7,16 @@ import pl.envelo.moovelo.controller.AuthenticatedUser;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
+import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventOwner;
+import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.entity.groups.Group;
 import pl.envelo.moovelo.entity.groups.GroupOwner;
+import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 import pl.envelo.moovelo.service.actors.GroupOwnerService;
+import pl.envelo.moovelo.service.event.EventService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,6 +29,7 @@ public class AuthorizationService {
     EventOwnerService eventOwnerService;
     GroupOwnerService groupOwnerService;
     BasicUserService basicUserService;
+    EventService eventService;
 
     // TODO: 17.02.2023 - metoda potrzebna do mapowania Grupy na GroupListResponseDto (pole isUserMember)
     public boolean isLoggedUserGroupMember(Group group) {
@@ -92,5 +97,16 @@ public class AuthorizationService {
         log.info("AuthorizationService - authorizeGetByOwnerBasicUserId() " +
                 "- basicUserId = {} - return isLoggedUserIdEqualToBasicUserId = {}", basicUserId, isLoggedUserIdEqualToBasicUserId);
         return isLoggedUserIdEqualToBasicUserId;
+    }
+
+    public void checkIfLoggedUserHasAccessToEvent(Long eventId) {
+
+        User user = getLoggedUser();
+        Event event = eventService.getEventById(eventId, EventType.EVENT);
+
+        if (user.getRole().equals(Role.ROLE_USER) &&
+                !event.getUsersWithAccess().contains((BasicUser) user)) {
+            throw new UnauthorizedRequestException("User with id " + user.getId() + " does not have an access to event with id " + event.getId());
+        }
     }
 }
