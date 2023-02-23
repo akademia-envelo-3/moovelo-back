@@ -16,7 +16,6 @@ import pl.envelo.moovelo.controller.mapper.event.EventListMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
 import pl.envelo.moovelo.controller.mapper.event.manager.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.manager.EventMapperManager;
-import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.service.AuthorizationService;
@@ -36,7 +35,9 @@ public class InternalEventController {
     private AuthorizationService authorizationService;
 
     @Autowired
-    public InternalEventController(EventMapperManager eventMapperManager, InternalEventService<InternalEvent> internalEventService, AuthorizationService authorizationService) {
+    public InternalEventController(EventMapperManager eventMapperManager,
+                                   InternalEventService<InternalEvent> internalEventService,
+                                   AuthorizationService authorizationService) {
         this.eventMapperManager = eventMapperManager;
         this.internalEventService = internalEventService;
         this.authorizationService = authorizationService;

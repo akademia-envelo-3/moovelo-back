@@ -12,22 +12,20 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
-import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;
-import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
+import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
+import pl.envelo.moovelo.controller.mapper.event.EventListMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
-import pl.envelo.moovelo.controller.mapper.survey.EventSurveyMapper;
 import pl.envelo.moovelo.controller.mapper.event.manager.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.manager.EventMapperManager;
+import pl.envelo.moovelo.controller.mapper.survey.EventSurveyMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.User;
-import pl.envelo.moovelo.entity.events.*;
-import pl.envelo.moovelo.entity.surveys.Answer;
-import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventType;
+import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.AuthorizationService;
@@ -36,7 +34,6 @@ import pl.envelo.moovelo.service.event.EventService;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -231,13 +228,13 @@ public class EventController {
 
         User user = authorizationService.getLoggedUser();
 
-        List<EventSurvey> surveys = eventService.getEventSurveysByEventId(eventId, user);
+        List<EventSurvey> surveys = eventService.getEventSurveysByEventId(eventId, user, eventType);
 
         List<EventSurveyDto> surveysDto = surveys
                 .stream()
                 .map(surveyDto -> {
                     if (authorizationService.isLoggedUserAdmin() ||
-                        authorizationService.isLoggedUserEventOwner(eventId)) {
+                            authorizationService.isLoggedUserEventOwner(eventId)) {
                         return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto);
                     } else {
                         BasicUser basicUser = (BasicUser) user;
