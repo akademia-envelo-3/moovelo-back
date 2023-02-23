@@ -8,9 +8,9 @@ import javax.annotation.Generated;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "location",
-    "location_type",
-    "viewport"
+        "location",
+        "location_type",
+        "viewport"
 })
 @Generated("jsonschema2pojo")
 public class Geometry {

@@ -19,17 +19,17 @@ class EventServiceTest {
     @Autowired
     private EventService eventService;
 
-    /*@Test
-    void getAllEventsTest() {
-        // GIVEN
-
-        // WHEN
-        List<? extends Event> allEvents = eventService.getAllEvents();
-
-        // THEN
-        assertFalse(allEvents.isEmpty());
-        assertEquals(allEvents.get(0).getEventType(), EventType.EVENT);
-    }*/
+//    @Test
+//    void getAllEventsTest() {
+//        // GIVEN
+//
+//        // WHEN
+//        List<? extends Event> allEvents = eventService.getAllEvents();
+//
+//        // THEN
+//        assertFalse(allEvents.isEmpty());
+//        assertEquals(allEvents.get(0).getEventType(), EventType.EVENT);
+//    }
 
     /*@Test
     @Transactional
@@ -52,7 +52,7 @@ class EventServiceTest {
         long eventId = 1;
 
         // WHEN
-        eventService.removeEventById(eventId);
+        eventService.removeEventById(eventId, eventType);
 
         // THEN
         assertThrows(NoSuchElementException.class, () -> eventService.getEventById(eventId));
@@ -65,10 +65,10 @@ class EventServiceTest {
         long eventId = 1;
 
         // WHEN
-        eventService.removeEventById(eventId);
+        eventService.removeEventById(eventId, eventType);
 
         // THEN
-        assertThrows(NoContentException.class, () -> eventService.removeEventById(eventId));
+        assertThrows(NoContentException.class, () -> eventService.removeEventById(eventId, eventType));
     }
 
     void getAllEventsByEventOwnerBasicUserIdTest() {

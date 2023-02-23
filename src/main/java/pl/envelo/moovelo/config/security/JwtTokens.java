@@ -19,6 +19,7 @@ public class JwtTokens {
                 .withExpiresAt(new Date(System.currentTimeMillis() + Constants.ACCESS_TOKEN_DURATION_TIME))
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim("role", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+                .withClaim("userId", user.getId())
                 .sign(algorithm);
     }
 

@@ -30,7 +30,7 @@ public class Event {
     @OneToOne(orphanRemoval = true)
     protected EventInfo eventInfo;
 
-    protected int  limitedPlaces;
+    protected int limitedPlaces;
 
     private boolean isPrivate;
 

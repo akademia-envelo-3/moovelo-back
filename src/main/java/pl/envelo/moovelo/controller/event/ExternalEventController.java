@@ -9,10 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import pl.envelo.moovelo.Constants;
 import pl.envelo.moovelo.controller.AuthenticatedUser;
 import pl.envelo.moovelo.controller.dto.actor.VisitorDto;
-import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
-import pl.envelo.moovelo.controller.mapper.EventListResponseMapper;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.actors.Visitor;
+import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.exception.AvailablePlacesExceededException;
 import pl.envelo.moovelo.exception.EventDateException;
@@ -28,7 +27,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -37,23 +35,24 @@ import java.util.Map;
 @Slf4j
 public class ExternalEventController {
 
+    private static final EventType eventType = EventType.EXTERNAL_EVENT;
     private ExternalEventService externalEventService;
     private VisitorService visitorService;
     private AuthenticatedUser authenticatedUser;
     private BasicUserService basicUserService;
 
-    @GetMapping("/externalEvents")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<List<EventListResponseDto>> getAllExternalEvents() {
-        log.info("ExternalEventController - getAllExternalEvents()");
-        List<ExternalEvent> allExternalEvents = externalEventService.getAllExternalEvents();
-
-        List<EventListResponseDto> externalEventsDto = allExternalEvents.stream()
-                .map(EventListResponseMapper::mapExternalEventToEventListResponseDto).toList();
-
-        log.info("ExternalEventController - getAllExternalEvents() return {}", externalEventsDto);
-        return ResponseEntity.ok(externalEventsDto);
-    }
+//    @GetMapping("/externalEvents")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    public ResponseEntity<List<EventListResponseDto>> getAllExternalEvents() {
+//        log.info("ExternalEventController - getAllExternalEvents()");
+//        List<ExternalEvent> allExternalEvents = externalEventService.getAllExternalEvents();
+//
+//        List<EventListResponseDto> externalEventsDto = allExternalEvents.stream()
+//                .map(EventListResponseMapper::mapExternalEventToEventListResponseDto).toList();
+//
+//        log.info("ExternalEventController - getAllExternalEvents() return {}", externalEventsDto);
+//        return ResponseEntity.ok(externalEventsDto);
+//    }
 
     @PostMapping("/externalEvents/{id}/visitors")
     public ResponseEntity<?> sendConfirmationMailToVisitor(@RequestBody @Valid VisitorDto visitorDto, @PathVariable("id") Long externalEventId)

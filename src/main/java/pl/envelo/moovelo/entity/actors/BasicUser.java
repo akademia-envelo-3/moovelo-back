@@ -7,10 +7,8 @@ import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.categories.CategoryProposal;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.groups.Group;
-
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
+import pl.envelo.moovelo.entity.surveys.Answer;
+import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -27,8 +25,8 @@ public class BasicUser extends User {
     @OneToMany
     private List<Comment> comments;
 
-    @ManyToMany
-    private List<Group> groups;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH})
+    private Set<Group> groups;
 
     @ManyToMany(mappedBy = "acceptedStatusUsers")
     private List<Event> accessibleEvents;
@@ -41,6 +39,14 @@ public class BasicUser extends User {
 
     @ManyToMany(mappedBy = "rejectedStatusUsers")
     private Set<Event> rejectedEvents;
+
+    @ManyToMany
+    @JoinTable(
+            name = "basicUser_surveyAnswers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "answer_id")
+    )
+    private List<Answer> surveyAnswers;
 
     @Override
     public boolean equals(Object o) {
