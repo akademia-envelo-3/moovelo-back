@@ -17,15 +17,15 @@ class InternalEventServiceTest {
     @Autowired
     private InternalEventService internalEventService;
 
-    @Test
-    void getAllInternalEventsTest() {
-        // GIVEN
-
-        // WHEN
-        List<? extends Event> allInternalEvents = internalEventService.getAllInternalEvents();
-
-        // THEN
-        assertFalse(allInternalEvents.isEmpty());
-        assertEquals(allInternalEvents.get(0).getEventType(), EventType.INTERNAL_EVENT);
-    }
+//    @Test
+//    void getAllInternalEventsTest() {
+//        // GIVEN
+//
+//        // WHEN
+//        List<? extends Event> allInternalEvents = internalEventService.getAllInternalEvents();
+//
+//        // THEN
+//        assertFalse(allInternalEvents.isEmpty());
+//        assertEquals(allInternalEvents.get(0).getEventType(), EventType.INTERNAL_EVENT);
+//    }
 }

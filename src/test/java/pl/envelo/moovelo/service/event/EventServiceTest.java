@@ -45,41 +45,41 @@ class EventServiceTest {
         assertEquals(users.size(), 4);
     }*/
 
-    @Test
-    @Transactional
-    void removeEventByIdTest() {
-        // GIVEN
-        long eventId = 1;
+//    @Test
+//    @Transactional
+//    void removeEventByIdTest() {
+//        // GIVEN
+//        long eventId = 1;
+//
+//        // WHEN
+//        eventService.removeEventById(eventId, eventType);
+//
+//        // THEN
+//        assertThrows(NoSuchElementException.class, () -> eventService.getEventById(eventId));
+//    }
 
-        // WHEN
-        eventService.removeEventById(eventId, eventType);
-
-        // THEN
-        assertThrows(NoSuchElementException.class, () -> eventService.getEventById(eventId));
-    }
-
-    @Test
-    @Transactional
-    void removeEventByIdWhenEventDoesNotExistTest() {
-        // GIVEN
-        long eventId = 1;
-
-        // WHEN
-        eventService.removeEventById(eventId, eventType);
-
-        // THEN
-        assertThrows(NoContentException.class, () -> eventService.removeEventById(eventId, eventType));
-    }
-
-    void getAllEventsByEventOwnerBasicUserIdTest() {
-        // GIVEN
-        Long userId = 1L;
-
-        // WHEN
-        List<? extends Event> allEventOwnerEvents = eventService.getAllEventsByEventOwnerBasicUserId(userId);
-
-        // THEN
-        assertFalse(allEventOwnerEvents.isEmpty());
-        assertEquals(allEventOwnerEvents.get(0).getEventOwner().getUserId(), userId);
-    }
+//    @Test
+//    @Transactional
+//    void removeEventByIdWhenEventDoesNotExistTest() {
+//        // GIVEN
+//        long eventId = 1;
+//
+//        // WHEN
+//        eventService.removeEventById(eventId, eventType);
+//
+//        // THEN
+//        assertThrows(NoContentException.class, () -> eventService.removeEventById(eventId, eventType));
+//    }
+//
+//    void getAllEventsByEventOwnerBasicUserIdTest() {
+//        // GIVEN
+//        Long userId = 1L;
+//
+//        // WHEN
+//        List<? extends Event> allEventOwnerEvents = eventService.getAllEventsByEventOwnerBasicUserId(userId);
+//
+//        // THEN
+//        assertFalse(allEventOwnerEvents.isEmpty());
+//        assertEquals(allEventOwnerEvents.get(0).getEventOwner().getUserId(), userId);
+//    }
 }

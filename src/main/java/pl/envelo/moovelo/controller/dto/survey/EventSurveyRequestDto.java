@@ -10,5 +10,5 @@ import java.util.List;
 public class EventSurveyRequestDto {
     private String question;
     private boolean isMultipleChoice;
-    List<EventSurveyRequestAnswerDto> answers;
+    private List<EventSurveyRequestAnswerDto> answers;
 }

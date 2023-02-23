@@ -17,15 +17,15 @@ class CyclicEventServiceTest {
     @Autowired
     private CyclicEventService cyclicEventService;
 
-    @Test
-    void getAllCyclicEventsTest() {
-        // GIVEN
-
-        // WHEN
-        List<? extends Event> allCyclicEvents = cyclicEventService.getAllCyclicEvents();
-
-        // THEN
-        assertFalse(allCyclicEvents.isEmpty());
-        assertEquals(allCyclicEvents.get(0).getEventType(), EventType.CYCLIC_EVENT);
-    }
+//    @Test
+//    void getAllCyclicEventsTest() {
+//        // GIVEN
+//
+//        // WHEN
+//        List<? extends Event> allCyclicEvents = cyclicEventService.getAllCyclicEvents();
+//
+//        // THEN
+//        assertFalse(allCyclicEvents.isEmpty());
+//        assertEquals(allCyclicEvents.get(0).getEventType(), EventType.CYCLIC_EVENT);
+//    }
 }

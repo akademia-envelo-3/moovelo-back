@@ -22,6 +22,7 @@ import pl.envelo.moovelo.repository.event.EventRepositoryManager;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
+import pl.envelo.moovelo.service.survey.EventSurveyService;
 
 import javax.persistence.EntityExistsException;
 import java.util.List;
@@ -40,6 +41,8 @@ public class EventService<I extends Event> {
     protected final HashTagService hashTagService;
     protected final BasicUserService basicUserService;
     protected EventSearchSpecification eventSearchSpecification;
+
+    protected final EventSurveyService eventSurveyService;
 
     public I createNewEvent(I event, EventType eventType, Long userId) {
         log.info("EventService - createNewEvent()");
@@ -288,16 +291,11 @@ public class EventService<I extends Event> {
         return surveys;
     }
 
+    public EventSurvey createEventSurvey(EventSurvey eventSurvey, Long eventId) {
+        log.info("EventService - createEventSurvey()");
+        Event event = getEventById(eventId, EventType.EVENT);
 
-
-    public EventSurvey createNewSurvey(EventSurvey eventSurvey, Long eventId) {
-
-        if (checkIfEntityExist(eventSurvey)) {
-            throw new EntityExistsException("Survey already exists in database");
-        } else {
-
-
-
-
+        EventSurvey newEventSurvey = eventSurveyService.createNewSurvey(eventSurvey, event);
+        return newEventSurvey;
     }
 }

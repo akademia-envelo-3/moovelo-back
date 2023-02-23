@@ -249,26 +249,25 @@ public class EventController {
         return ResponseEntity.ok(surveysDto);
     }
 
-    @PutMapping("events/{eventId}/surveys")
+    @PostMapping("events/{eventId}/surveys")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<EventSurveyDto> createNewSurvey(@RequestBody EventSurveyRequestDto eventSurveyRequestDto, @PathVariable Long eventId){
+    public ResponseEntity<EventSurveyDto> createEventSurvey(@RequestBody EventSurveyRequestDto eventSurveyRequestDto, @PathVariable Long eventId) {
         log.info("EventController - createNewSurvey");
+        authorizationService.checkIfLoggedUserHasAccessToEvent(eventId);
 
         EventSurvey eventSurvey = EventSurveyMapper.mapEventSurveyRequestDtoToEventSurvey(eventSurveyRequestDto);
 
-        EventSurvey newEventSurvey = eventService.createNewSurvey(eventSurvey, eventId);
+        EventSurvey newEventSurvey = eventService.createEventSurvey(eventSurvey, eventId);
 
         EventSurveyDto newEventSurveyDto = EventSurveyMapper.mapEventSurveyToEventSurveyDto(newEventSurvey);
-
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(eventSurvey.getId())
+                .buildAndExpand(newEventSurvey.getId())
                 .toUri();
 
         log.info("EventController - () return createNewEventSurvey() - dto {}", newEventSurveyDto);
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(uri)
                 .body(newEventSurveyDto);

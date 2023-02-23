@@ -100,7 +100,7 @@ public class AuthorizationService {
     }
 
     public void checkIfLoggedUserHasAccessToEvent(Long eventId) {
-
+        log.info("AuthorizationService - checkIfLoggedUserHasAccessToEvent()");
         User user = getLoggedUser();
         Event event = eventService.getEventById(eventId, EventType.EVENT);
 

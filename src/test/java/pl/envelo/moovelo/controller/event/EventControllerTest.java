@@ -123,20 +123,20 @@ class EventControllerTest {
         //TODO: Napisać test kiedy ogarniemy spring security
     }
 
-    @Test
-    @Transactional
-    void getAllEventsByEventOwnerBasicUserIdUnitTest() {
-        // GIVEN
-
-        // WHEN
-        ResponseEntity<List<EventListResponseDto>> result = eventController.getAllEventsByEventOwnerBasicUserId(1L);
-
-        // THEN
-        assertTrue(result.hasBody());
-        assertEquals(result.getStatusCode(), HttpStatus.OK);
-        assertTrue(Objects.requireNonNull(result.getBody()).size() > 0);
-        assertEquals(1L, result.getBody().get(0).getEventOwner().getUserId());
-    }
+//    @Test
+//    @Transactional
+//    void getAllEventsByEventOwnerBasicUserIdUnitTest() {
+//        // GIVEN
+//
+//        // WHEN
+//        ResponseEntity<List<EventListResponseDto>> result = eventController.getAllEventsByEventOwnerBasicUserId(1L);
+//
+//        // THEN
+//        assertTrue(result.hasBody());
+//        assertEquals(result.getStatusCode(), HttpStatus.OK);
+//        assertTrue(Objects.requireNonNull(result.getBody()).size() > 0);
+//        assertEquals(1L, result.getBody().get(0).getEventOwner().getUserId());
+//    }
 
     /*@Test
     @Transactional

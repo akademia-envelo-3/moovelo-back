@@ -43,13 +43,10 @@ public class EventSurveyMapper {
         EventSurvey eventSurvey = new EventSurvey();
         eventSurvey.setQuestion(eventSurveyRequestDto.getQuestion());
         eventSurvey.setIsMultipleChoice(eventSurveyRequestDto.isMultipleChoice());
-
-        List<Answer> answers = eventSurveyRequestDto.getAnswers()
+        eventSurvey.setAnswers(eventSurveyRequestDto.getAnswers()
                 .stream()
                 .map(AnswerMapper::mapEventSurveyRequestAnswerDtoToAnswer)
-                .collect(Collectors.toList());
-        eventSurvey.setAnswers(answers);
-
+                .collect(Collectors.toList()));
         return eventSurvey;
     }
 }

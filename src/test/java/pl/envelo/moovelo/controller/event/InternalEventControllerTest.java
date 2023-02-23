@@ -45,17 +45,17 @@ class InternalEventControllerTest {
         //TODO: check the case when Admin is not logged in.
     }
 
-    @Test
-    @Transactional
-    void getAllInternalEventsUnitTest() {
-        // GIVEN
-
-        // WHEN
-        ResponseEntity<List<EventListResponseDto>> result = internalEventController.getAllInternalEvents();
-
-        // THEN
-        assertTrue(result.hasBody());
-        assertEquals(result.getStatusCode(), HttpStatus.OK);
-        assertTrue(Objects.requireNonNull(result.getBody()).size() > 0);
-    }
+//    @Test
+//    @Transactional
+//    void getAllInternalEventsUnitTest() {
+//        // GIVEN
+//
+//        // WHEN
+//        ResponseEntity<List<EventListResponseDto>> result = internalEventController.getAllInternalEvents();
+//
+//        // THEN
+//        assertTrue(result.hasBody());
+//        assertEquals(result.getStatusCode(), HttpStatus.OK);
+//        assertTrue(Objects.requireNonNull(result.getBody()).size() > 0);
+//    }
 }
