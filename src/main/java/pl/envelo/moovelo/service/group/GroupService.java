@@ -65,11 +65,19 @@ public class GroupService {
         }
     }
 
-    public void updateEventById(Group group, GroupInfo groupInfo) {
+    public void updateGroupById(Group group, GroupInfo groupInfo) {
+        log.info("GroupService - updateGroupById() - group = {} - newGroupInfo = {}", group.toString(), groupInfo.toString());
         String groupName = groupInfo.getName();
         Optional<Group> groupInfoOptional = groupRepository.findByGroupInfoName(groupName);
         if (groupInfoOptional.isPresent()) {
-            throw new IllegalArgumentException("Group with name: " + groupName + " already exists");
+            throw new IllegalArgumentException("Group name: " + groupName + " already exists. Choose another name!");
+        } else {
+            GroupInfo groupInfoInDb = group.getGroupInfo();
+            groupInfoInDb.setName(groupInfo.getName());
+            groupInfoInDb.setDescription(groupInfo.getDescription());
+            groupInfoService.updateGroupInfo(groupInfoInDb);
+            log.info("GroupService - updateGroupById() - updated - groupInfo.name = {} -  groupInfo.description = {} ",
+                    group.getGroupInfo().getName(), group.getGroupInfo().getDescription());
         }
     }
 }

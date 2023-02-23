@@ -13,4 +13,8 @@ public class GroupInfoService {
     public GroupInfo createGroupInfo(GroupInfo groupInfo) {
         return groupInfoRepository.save(groupInfo);
     }
+
+    public void updateGroupInfo(GroupInfo groupInfo) {
+        groupInfoRepository.save(groupInfo);
+    }
 }

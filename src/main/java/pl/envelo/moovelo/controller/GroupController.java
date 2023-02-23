@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import pl.envelo.moovelo.controller.dto.group.GroupInfoDto;
+import pl.envelo.moovelo.controller.dto.group.*;
 import pl.envelo.moovelo.controller.dto.group.GroupRequestDto;
 import pl.envelo.moovelo.controller.dto.group.GroupResponseDto;
 import pl.envelo.moovelo.controller.mapper.group.GroupInfoMapper;
@@ -83,19 +83,20 @@ public class GroupController {
 
     @PutMapping("/{groupId}")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<?> updateGroupById(@RequestBody GroupInfoDto groupInfoDto, @RequestParam Long groupId) {
+    public ResponseEntity<?> updateGroupById(@RequestBody GroupInfoDto groupInfoDto, @PathVariable Long groupId) {
         log.info("GroupController - () - updateGroupById() - groupId = {}", groupId);
         Group group = groupService.getGroupById(groupId);
         if (authorizationService.isLoggedUserAdmin() || authorizationService.isLoggedUserGroupOwner(group.getId())) {
             GroupInfo groupInfo = GroupInfoMapper.mapGroupInfoDtoToGroupInfo(groupInfoDto);
-            groupService.updateEventById(group, groupInfo);
+            groupService.updateGroupById(group, groupInfo);
 
             Map<String, String> body = new HashMap<>();
             body.put("message", "Group with id: " + groupId + " successfully updated");
+
             log.info("GroupController - () - updateGroupById() - groupId = {} updated", groupId);
             return ResponseEntity.ok(body);
         }
-        log.error("Unauthorized request Exception occured!");
-        throw new UnauthorizedRequestException("You must be the owner of the group or have administrative right to update it!");
+        log.error("Unauthorized request Exception occurred!");
+        throw new UnauthorizedRequestException("You must be the owner of the group or have administrative rights to update it!");
     }
 }
