@@ -1,8 +1,10 @@
 package pl.envelo.moovelo.controller.mapper.group;
 
-import pl.envelo.moovelo.controller.dto.group.*;
+import pl.envelo.moovelo.controller.dto.group.GroupListResponseDto;
+import pl.envelo.moovelo.controller.dto.group.GroupRequestDto;
+import pl.envelo.moovelo.controller.dto.group.GroupResponseDto;
+import pl.envelo.moovelo.controller.dto.group.GroupResponseDtoForEvent;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
-import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.controller.mapper.group.groupownership.GroupOwnerMapper;
 import pl.envelo.moovelo.entity.groups.Group;
 

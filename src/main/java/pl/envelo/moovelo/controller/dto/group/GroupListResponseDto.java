@@ -1,6 +1,9 @@
 package pl.envelo.moovelo.controller.dto.group;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import pl.envelo.moovelo.controller.dto.group.groupownership.GroupOwnerDto;
 
 @Getter

@@ -2,7 +2,7 @@ package pl.envelo.moovelo.controller.mapper.event;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import pl.envelo.moovelo.controller.dto.event.EventInfoDto;
+import pl.envelo.moovelo.controller.dto.event.eventInfo.EventInfoDto;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.categories.Category;
 import pl.envelo.moovelo.entity.events.EventInfo;

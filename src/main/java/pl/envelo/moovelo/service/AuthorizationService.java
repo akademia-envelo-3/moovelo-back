@@ -99,6 +99,14 @@ public class AuthorizationService {
         return isLoggedUserIdEqualToBasicUserId;
     }
 
+    public User getLoggedUser() {
+        log.info("AuthorizationService - getLoggedUser()");
+        User loggedUser = authenticatedUser.getAuthenticatedUser();
+
+        log.info("AuthorizationService - getLoggedUser() - return loggedUser = {}", loggedUser);
+        return loggedUser;
+    }
+
     public boolean isLoggedUserBasicUser() {
         return checkIfBasicUserExistsById(getLoggedUserId());
     }
