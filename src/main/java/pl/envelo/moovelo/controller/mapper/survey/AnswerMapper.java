@@ -1,6 +1,7 @@
 package pl.envelo.moovelo.controller.mapper.survey;
 
 import pl.envelo.moovelo.controller.dto.survey.AnswerResponseDto;
+import pl.envelo.moovelo.controller.dto.survey.EventSurveyRequestAnswerDto;
 import pl.envelo.moovelo.entity.surveys.Answer;
 
 public class AnswerMapper {
@@ -10,5 +11,11 @@ public class AnswerMapper {
                 .value(answer.getAnswerValue())
                 .voted(answer.getBasicUsers().size())
                 .build();
+    }
+
+    public static Answer mapEventSurveyRequestAnswerDtoToAnswer(EventSurveyRequestAnswerDto eventSurveyRequestAnswerDto) {
+        Answer answer = new Answer();
+        answer.setAnswerValue(eventSurveyRequestAnswerDto.getValue());
+        return answer;
     }
 }
