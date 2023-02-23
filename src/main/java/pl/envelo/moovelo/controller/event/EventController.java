@@ -227,6 +227,11 @@ public class EventController {
             SortingAndPagingCriteria sortingAndPagingCriteria
     ) {
         log.info("EventController - getAllEventsAvailableForUser");
+
+        if (!authorizationService.getLoggedBasicUserId().equals(userId)) {
+            throw new UnauthorizedRequestException("You do not have access to view this user's events");
+        }
+
         Page<? extends Event> eventsAvailableForUser = eventService.getEventsForUser(userId, filterCriteria, sortingAndPagingCriteria);
 
         Page<EventListResponseDto> eventAvailableForUserDto = eventsAvailableForUser.map(event ->

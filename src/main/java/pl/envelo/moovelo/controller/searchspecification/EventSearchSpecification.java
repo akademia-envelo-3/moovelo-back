@@ -113,6 +113,22 @@ public class EventSearchSpecification {
         }
     }
 
+    public Sort.Order createSortOrderForUserSpecification(String sortBy, Sort.Direction sortDirection) {
+        log.info("EventSearchSpecification - createSortOrderForUserSpecification(sortBy = '{}', sortDirection = '{}')", sortBy, sortDirection);
+        String sortOrderParameter = switch (sortBy.toLowerCase()) {
+            case "name" -> "eventInfo_name";
+            case "date" -> "eventInfo_startDate";
+            case "participants" -> "numOfAcceptedStatusUsers";
+            case "location" -> "eventInfo_location_city";
+            default -> "id";
+        };
+
+        Sort.Order order = new Sort.Order(sortDirection, sortOrderParameter);
+        log.info("EventSearchSpecification - createSortOrderForUserSpecification(sortBy = '{}', sortDirection = '{}') - return order = '{}'",
+                sortBy, sortDirection, order);
+        return order;
+    }
+
     public Specification<Event> getEventsAvailableForUserSpecification(Long userId, EventsForUserCriteria filterCriteria) {
         log.info("EventSearchSpecification - getEventsAvailableForUserSpecification(userId = '{}', filterCriteria = '{}')",
                 userId, filterCriteria);

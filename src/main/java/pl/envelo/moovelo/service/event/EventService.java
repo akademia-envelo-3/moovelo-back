@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
@@ -199,7 +198,11 @@ public class EventService {
         Pageable pageable = PageRequest.of(
                 sortingAndPagingCriteria.getPageNumber(),
                 sortingAndPagingCriteria.getPageSize(),
-                Sort.by(new Sort.Order(sortingAndPagingCriteria.getSortDirection(), sortingAndPagingCriteria.getSortBy()))
+                Sort.by(eventSearchSpecification.createSortOrderForUserSpecification(
+                                sortingAndPagingCriteria.getSortBy(),
+                                sortingAndPagingCriteria.getSortDirection()
+                        )
+                )
         );
 
         Page<? extends Event> allEvents = eventRepository.findAll(
