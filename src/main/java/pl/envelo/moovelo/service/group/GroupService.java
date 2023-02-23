@@ -64,4 +64,12 @@ public class GroupService {
             throw new NoSuchElementException("No group with id: " + groupId);
         }
     }
+
+    public void updateEventById(Group group, GroupInfo groupInfo) {
+        String groupName = groupInfo.getName();
+        Optional<Group> groupInfoOptional = groupRepository.findByGroupInfoName(groupName);
+        if (groupInfoOptional.isPresent()) {
+            throw new IllegalArgumentException("Group with name: " + groupName + " already exists");
+        }
+    }
 }
