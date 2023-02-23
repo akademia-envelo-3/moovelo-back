@@ -1,4 +1,4 @@
-package pl.envelo.moovelo.controller.dto.event;
+package pl.envelo.moovelo.controller.dto.event.response;
 
 import java.util.Objects;
 

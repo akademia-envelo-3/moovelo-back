@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import pl.envelo.moovelo.controller.dto.event.EventListResponseDto;
+import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
 
 import javax.transaction.Transactional;
 import java.util.List;

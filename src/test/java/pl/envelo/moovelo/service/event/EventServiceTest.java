@@ -51,7 +51,7 @@ class EventServiceTest {
         long eventId = 1;
 
         // WHEN
-        eventService.removeEventById(eventId);
+        eventService.removeEventById(eventId, eventType);
 
         // THEN
         assertThrows(NoSuchElementException.class, () -> eventService.getEventById(eventId));
@@ -64,10 +64,10 @@ class EventServiceTest {
         long eventId = 1;
 
         // WHEN
-        eventService.removeEventById(eventId);
+        eventService.removeEventById(eventId, eventType);
 
         // THEN
-        assertThrows(NoContentException.class, () -> eventService.removeEventById(eventId));
+        assertThrows(NoContentException.class, () -> eventService.removeEventById(eventId, eventType));
     }
 
     void getAllEventsByEventOwnerBasicUserIdTest() {

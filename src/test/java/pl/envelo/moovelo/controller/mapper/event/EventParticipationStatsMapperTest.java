@@ -1,7 +1,7 @@
 package pl.envelo.moovelo.controller.mapper.event;
 
 import org.junit.jupiter.api.Test;
-import pl.envelo.moovelo.controller.dto.event.participation.EventParticipationStatsDto;
+import pl.envelo.moovelo.controller.dto.event.response.EventParticipationStatsDto;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.actor.VisitorMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;

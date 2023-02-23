@@ -11,6 +11,7 @@ import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventType;
 
 import java.util.List;
+import java.util.Optional;
 
 @Primary
 @Repository
@@ -18,9 +19,11 @@ public interface EventRepository<I extends Event> extends JpaRepository<I, Long>
 
     Page<I> findAll(Specification<I> eventSpecification, Pageable pageable);
 
+    Optional<I> findById(Long id);
+
     List<I> findAllByEventType(EventType eventType);
 
-    List<I> findByEventOwner_UserId(Long userId);
+    Page<I> findByEventOwner_UserId(Long userId, Pageable pageable);
 
     List<I> findAllByEventOwnerId(Long eventOwnerId);
 
