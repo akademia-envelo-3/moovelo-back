@@ -153,6 +153,26 @@ public class EventController {
         return ResponseEntity.ok(eventsDto);
     }
 
+    @GetMapping("/events/users/{userId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<Page<?>> getAllEventsAvailableForUser(
+            @PathVariable Long userId,
+            EventsForUserCriteria filterCriteria,
+            SortingAndPagingCriteria sortingAndPagingCriteria
+    ) {
+        log.info("EventController - getAllEventsAvailableForUser");
+
+        if (!authorizationService.getLoggedBasicUserId().equals(userId)) {
+            throw new UnauthorizedRequestException("You do not have access to view this user's events");
+        }
+
+        Page<? extends Event> eventsAvailableForUser = eventService.getEventsForUser(userId, filterCriteria, sortingAndPagingCriteria, eventType);
+
+        Page<EventListResponseDto> eventAvailableForUserDto = eventMapperManager.mapEventToEventListResponseDto(eventsAvailableForUser, eventMapperInterface);
+
+        return ResponseEntity.ok(eventAvailableForUserDto);
+    }
+
     @GetMapping("/events/{eventId}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<EventResponseDto> getEventById(@PathVariable Long eventId) {
@@ -247,36 +267,5 @@ public class EventController {
 
         log.info("EventController - getEventSurveysByEventId() return {}", surveysDto);
         return ResponseEntity.ok(surveysDto);
-    }
-
-    @GetMapping("/events/users/{userId}")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Page<?>> getAllEventsAvailableForUser(
-            @PathVariable Long userId,
-            EventsForUserCriteria filterCriteria,
-            SortingAndPagingCriteria sortingAndPagingCriteria
-    ) {
-        log.info("EventController - getAllEventsAvailableForUser");
-
-        if (!authorizationService.getLoggedBasicUserId().equals(userId)) {
-            throw new UnauthorizedRequestException("You do not have access to view this user's events");
-        }
-
-        Page<? extends Event> eventsAvailableForUser = eventService.getEventsForUser(userId, filterCriteria, sortingAndPagingCriteria);
-
-        Page<EventListResponseDto> eventAvailableForUserDto = eventsAvailableForUser.map(event ->
-            switch (event.getEventType()) {
-                case EVENT ->
-                        EventListResponseMapper.mapBasicEventToEventListResponseDto(event);
-                case INTERNAL_EVENT ->
-                        EventListResponseMapper.mapInternalEventToEventListResponseDto((InternalEvent) event);
-                case CYCLIC_EVENT ->
-                        EventListResponseMapper.mapCyclicEventToEventListResponseDto((CyclicEvent) event);
-                case EXTERNAL_EVENT ->
-                        EventListResponseMapper.mapExternalEventToEventListResponseDto((ExternalEvent) event);
-            }
-        );
-
-        return ResponseEntity.ok(eventAvailableForUserDto);
     }
 }

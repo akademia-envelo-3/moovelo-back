@@ -15,10 +15,9 @@ import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.exception.StatusNotExistsException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
-import pl.envelo.moovelo.repository.event.EventRepositoryManager;
 import pl.envelo.moovelo.model.EventsForUserCriteria;
 import pl.envelo.moovelo.model.SortingAndPagingCriteria;
-import pl.envelo.moovelo.repository.event.EventRepository;
+import pl.envelo.moovelo.repository.event.EventRepositoryManager;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
@@ -122,6 +121,41 @@ public class EventService<I extends Event> {
                 .findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat, groupId), pageable);
 
         log.info("EventService - getAllEvents() return {}", allEvents.toString());
+
+        return allEvents;
+    }
+
+    public Page<? extends Event> getEventsForUser(
+            Long userId,
+            EventsForUserCriteria filterCriteria,
+            SortingAndPagingCriteria sortingAndPagingCriteria,
+            EventType eventType
+    ) {
+        log.info("EventService - getEventsForUser(userId = '{}', filterCriteria = '{}', sortingAndPagingCriteria = '{}')",
+                userId, filterCriteria, sortingAndPagingCriteria);
+
+        Pageable pageable = PageRequest.of(
+                sortingAndPagingCriteria.getPageNumber(),
+                sortingAndPagingCriteria.getPageSize(),
+                Sort.by(eventSearchSpecification.createSortOrderForUserSpecification(
+                                sortingAndPagingCriteria.getSortBy(),
+                                sortingAndPagingCriteria.getSortDirection()
+                        )
+                )
+        );
+
+        Page<? extends Event> allEvents = eventRepositoryManager
+                .getRepositoryForSpecificEvent(eventType)
+                .findAll(
+                        eventSearchSpecification.getEventsAvailableForUserSpecification(
+                                userId,
+                                filterCriteria
+                        ),
+                        pageable
+                );
+
+        log.info("EventService - getEventsForUser(userId = '{}', filterCriteria = '{}', sortingAndPagingCriteria = '{}') return '{}'",
+                userId, filterCriteria, sortingAndPagingCriteria, allEvents);
 
         return allEvents;
     }
@@ -299,37 +333,5 @@ public class EventService<I extends Event> {
         if (!event.getUsersWithAccess().contains(user)) {
             throw new UnauthorizedRequestException("User with id " + user.getId() + " does not have an access to event with id " + event.getId());
         }
-    }
-
-    public Page<? extends Event> getEventsForUser(
-            Long userId,
-            EventsForUserCriteria filterCriteria,
-            SortingAndPagingCriteria sortingAndPagingCriteria
-    ) {
-        log.info("EventService - getEventsForUser(userId = '{}', filterCriteria = '{}', sortingAndPagingCriteria = '{}')",
-                userId, filterCriteria, sortingAndPagingCriteria);
-
-        Pageable pageable = PageRequest.of(
-                sortingAndPagingCriteria.getPageNumber(),
-                sortingAndPagingCriteria.getPageSize(),
-                Sort.by(eventSearchSpecification.createSortOrderForUserSpecification(
-                                sortingAndPagingCriteria.getSortBy(),
-                                sortingAndPagingCriteria.getSortDirection()
-                        )
-                )
-        );
-
-        Page<? extends Event> allEvents = eventRepository.findAll(
-                eventSearchSpecification.getEventsAvailableForUserSpecification(
-                        userId,
-                        filterCriteria
-                ),
-                pageable
-        );
-
-        log.info("EventService - getEventsForUser(userId = '{}', filterCriteria = '{}', sortingAndPagingCriteria = '{}') return '{}'",
-                userId, filterCriteria, sortingAndPagingCriteria, allEvents);
-
-        return allEvents;
     }
 }
