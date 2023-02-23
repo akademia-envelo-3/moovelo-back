@@ -68,6 +68,25 @@ public class GroupController {
         return new ResponseEntity<>(groupListResponseDtoPage, HttpStatus.OK);
     }
 
+    @DeleteMapping("{groupId}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    public ResponseEntity<?> removeGroupById(@PathVariable Long groupId) {
+        log.info("GroupController - removeGroupById(groupId = '{}')", groupId);
+
+        if (!authorizationService.isLoggedUserAdmin() && !authorizationService.isLoggedUserGroupOwner(groupId)) {
+            throw new UnauthorizedRequestException("You must be the owner of the group to delete it!");
+        }
+
+        groupService.removeGroup(groupId);
+
+        log.info("GroupController - removeGroupById(groupId = '{}') removed", groupId);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("message", "Successfully removed the group");
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(body);
+    }
+
     @GetMapping("/{groupId}")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<GroupResponseDto> getGroupById(@PathVariable Long groupId) {
