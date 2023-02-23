@@ -14,9 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.util.List;
 
@@ -30,14 +27,14 @@ public class WebSecurityConfig {
     private AuthenticationConfiguration authenticationConfiguration;
 
     private static final String[] AUTH_WHITELIST = {
-        "/api/login/**",
-        "/api/refreshToken/**",
-        "/v2/api-docs",
-        "/v3/api-docs",
-        "/swagger-resources/**",
-        "/swagger-ui/**",
-        "/h2/**",
-        "/api/v1/externalEvents/**"
+            "/api/login/**",
+            "/api/refreshToken/**",
+            "/v2/api-docs",
+            "/v3/api-docs",
+            "/swagger-resources/**",
+            "/swagger-ui/**",
+            "/h2/**",
+            "/api/v1/externalEvents/**"
     };
 
     @Bean

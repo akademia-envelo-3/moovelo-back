@@ -1,6 +1,6 @@
 package pl.envelo.moovelo.controller.mapper;
 
-import pl.envelo.moovelo.controller.dto.event.EventInfoListResponseDto;
+import pl.envelo.moovelo.controller.dto.event.eventInfo.EventInfoListResponseDto;
 import pl.envelo.moovelo.entity.events.EventInfo;
 
 public class EventInfoListResponseMapper {

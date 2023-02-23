@@ -1,8 +1,9 @@
-package pl.envelo.moovelo.controller.dto.event;
+package pl.envelo.moovelo.controller.dto.event.ownership;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
+import pl.envelo.moovelo.controller.dto.event.response.EventIdDto;
 
 import java.util.List;
 import java.util.Objects;

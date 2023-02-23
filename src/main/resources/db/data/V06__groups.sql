@@ -1,4 +1,3 @@
 INSERT INTO API_GROUP(GROUP_OWNER_ID, GROUP_INFO_ID)
-VALUES
-( 1, 1 ),
-( 2, 2 );
+VALUES (1, 1),
+       (2, 2);

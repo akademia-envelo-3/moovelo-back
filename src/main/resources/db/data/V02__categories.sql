@@ -1,3 +1,3 @@
-INSERT INTO CATEGORY(NAME, VISIBLE) VALUES
-('Sport', true),
-('Java', true);
+INSERT INTO CATEGORY(NAME, VISIBLE)
+VALUES ('Sport', true),
+       ('Java', true);
