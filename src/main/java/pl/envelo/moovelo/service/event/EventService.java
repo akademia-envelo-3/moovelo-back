@@ -2,7 +2,10 @@ package pl.envelo.moovelo.service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.controller.searchutils.EventSearchSpecification;
@@ -21,6 +24,7 @@ import pl.envelo.moovelo.repository.event.EventRepositoryManager;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
+
 import javax.persistence.EntityExistsException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -39,7 +43,7 @@ public class EventService<I extends Event> {
     protected final BasicUserService basicUserService;
     protected EventSearchSpecification eventSearchSpecification;
 
-    public I createNewEvent(I event, EventType eventType, Long userId) {
+    public I createNewEvent(I event, EventType eventType, Long userId, Long groupId) {
         log.info("EventService - createNewEvent()");
         if (checkIfEventExistsById(event.getId(), eventType)) {
             throw new EntityExistsException(EVENT_EXIST_MESSAGE);
@@ -51,11 +55,20 @@ public class EventService<I extends Event> {
             eventAfterFieldValidation.setHashtags(hashtagsToAssign);
             eventAfterFieldValidation.setEventInfo(validatedEventInfo);
 
+            // TODO: 23.02.2023 Rzeźba z grupą
+            if ((eventType.equals(EventType.INTERNAL_EVENT) || eventType.equals(EventType.CYCLIC_EVENT))
+                    && (groupId != null)) {
+                setGroupToEventIfEventIsInternal(eventAfterFieldValidation, groupId);
+            }
+
             log.info("EventService - createNewEvent() return {}", eventAfterFieldValidation);
             return (I) eventRepositoryManager
                     .getRepositoryForSpecificEvent(eventType)
                     .save(eventAfterFieldValidation);
         }
+    }
+
+    protected void setGroupToEventIfEventIsInternal(I eventAfterFieldValidation, Long groupId) {
     }
 
     public void updateEventById(Long eventId, I eventFromDto, EventType eventType, Long userId) {
@@ -182,7 +195,6 @@ public class EventService<I extends Event> {
         I event = getEventById(eventId, eventType);
         eventOwnerService.createEventOwner(newEventOwner);
         event.setEventOwner(newEventOwner);
-        // TODO: 22.02.2023 repository manager
         eventOwnerService.removeEventOwnerWithNoEvents(getEventOwnerByUserId(currentEventOwnerUserId));
         eventRepositoryManager
                 .getRepositoryForSpecificEvent(eventType)

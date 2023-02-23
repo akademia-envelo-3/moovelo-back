@@ -37,10 +37,12 @@ public class InternalEventController {
     @Autowired
     public InternalEventController(EventMapperManager eventMapperManager,
                                    InternalEventService<InternalEvent> internalEventService,
-                                   AuthorizationService authorizationService) {
+                                   AuthorizationService authorizationService
+                                   ) {
         this.eventMapperManager = eventMapperManager;
         this.internalEventService = internalEventService;
         this.authorizationService = authorizationService;
+
     }
 
     @PostMapping("/internalEvents")
@@ -49,9 +51,10 @@ public class InternalEventController {
         log.info("InternalEventController - createNewEvent()");
         eventMapperInterface = new EventMapper();
         Long basicUserId = authorizationService.getLoggedBasicUserId();
+        Long groupId = eventRequestDto.getGroupId();
 
         InternalEvent mappedInternalEventFromRequest = eventMapperManager.mapEventRequestDtoToEventByEventType(eventRequestDto, eventType);
-        InternalEvent createdInternalEvent = internalEventService.createNewEvent(mappedInternalEventFromRequest, eventType, basicUserId);
+        InternalEvent createdInternalEvent = internalEventService.createNewEvent(mappedInternalEventFromRequest, eventType, basicUserId, groupId);
         EventResponseDto eventResponseDto = eventMapperManager.getMappedResponseForSpecificEvent(eventMapperInterface, createdInternalEvent);
 
         URI uri = ServletUriComponentsBuilder

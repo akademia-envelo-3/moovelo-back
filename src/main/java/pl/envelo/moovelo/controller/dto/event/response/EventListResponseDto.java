@@ -3,7 +3,7 @@ package pl.envelo.moovelo.controller.dto.event.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-import pl.envelo.moovelo.controller.dto.HashtagListResponseDto;
+import pl.envelo.moovelo.controller.dto.hashtag.HashtagListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.eventInfo.EventInfoListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerListResponseDto;
 

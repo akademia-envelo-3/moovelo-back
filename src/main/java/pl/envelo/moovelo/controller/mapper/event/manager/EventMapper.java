@@ -3,14 +3,14 @@ package pl.envelo.moovelo.controller.mapper.event.manager;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventIdDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
-import pl.envelo.moovelo.controller.mapper.EventOwnerListResponseMapper;
-import pl.envelo.moovelo.controller.mapper.HashtagListResponseMapper;
+import pl.envelo.moovelo.controller.mapper.HashtagMapper;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventInfoMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
+import pl.envelo.moovelo.controller.mapper.event.EventOwnerMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventParticipationStatsMapper;
+import pl.envelo.moovelo.controller.mapper.group.GroupMapper;
 import pl.envelo.moovelo.entity.events.*;
-import pl.envelo.moovelo.entity.groups.Group;
 
 import java.util.stream.Collectors;
 
@@ -32,7 +32,7 @@ public class EventMapper implements EventMapperInterface {
 //        event.setRejectedStatusUsers(new HashSet<>());
 //        event.setPendingStatusUsers(new HashSet<>());
         event.setHashtags(eventRequestDto.getHashtags().stream()
-                .map(HashtagListResponseMapper::mapHashTagDtoToHashtag)
+                .map(HashtagMapper::mapHashTagDtoToHashtag)
                 .collect(Collectors.toList())
         );
     }
@@ -41,7 +41,6 @@ public class EventMapper implements EventMapperInterface {
                                                                             T internalEvent) {
         mapEventRequestDtoToEvent(eventRequestDto, eventType, internalEvent);
         internalEvent.setPrivate(eventRequestDto.isPrivate());
-        internalEvent.setGroup(new Group());
     }
 
     static void mapEventRequestDtoToCyclicEvent(EventRequestDto eventRequestDto, EventType eventType, CyclicEvent cyclicEvent) {
@@ -53,30 +52,24 @@ public class EventMapper implements EventMapperInterface {
     public EventResponseDto mapEventToEventResponseDto(Event event) {
         EventResponseDto eventResponseDto = new EventResponseDto();
         eventResponseDto.setId(event.getId());
-        eventResponseDto.setEventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()));
+        eventResponseDto.setEventOwner(EventOwnerMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()));
         eventResponseDto.setEventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(event.getEventInfo()));
         eventResponseDto.setLimitedPlaces(event.getLimitedPlaces());
         eventResponseDto.setUsersWithAccess(event.getUsersWithAccess().stream().map(BasicUserMapper::map).collect(Collectors.toList()));
         eventResponseDto.setEventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(event));
         eventResponseDto.setPrivate(false);
         eventResponseDto.setCyclic(false);
-        eventResponseDto.setHashtags(event.getHashtags().stream().map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
+        eventResponseDto.setHashtags(event.getHashtags().stream().map(HashtagMapper::mapHashtagToHashtagListResponseDto)
                 .collect(Collectors.toList()));
         return eventResponseDto;
     }
 
     public EventResponseDto mapInternalEventToEventResponseDto(InternalEvent internalEvent) {
         EventResponseDto eventResponseDto = mapEventToEventResponseDto(internalEvent);
-        // TODO: 16.02.2023 Na ten moment nie mamy grup 
-//        displayEventResponseDto.setGroup(GroupResponseMapper.mapGroupToGroupResponseMapper(internalEvent.getGroup()));
+        eventResponseDto.setGroup(GroupMapper.mapGroupToGroupResponseDtoForEvent(internalEvent.getGroup()));
         eventResponseDto.setPrivate(internalEvent.isPrivate());
         return eventResponseDto;
     }
-
-    // TODO: 16.02.2023 Czemu tutaj?
-//    private static GroupResponseDto getGroupResponseDto(Group group) {
-//        return group != null ? GroupResponseMapper.mapGroupToGroupResponseMapper(group) : null;
-//    }
 
     public EventResponseDto mapCyclicEventToEventResponseDto(CyclicEvent cyclicEvent) {
         EventResponseDto eventResponseDto = mapInternalEventToEventResponseDto(cyclicEvent);

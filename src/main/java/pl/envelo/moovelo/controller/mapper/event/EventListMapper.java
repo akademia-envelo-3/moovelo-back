@@ -2,9 +2,7 @@ package pl.envelo.moovelo.controller.mapper.event;
 
 import org.springframework.util.ObjectUtils;
 import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
-import pl.envelo.moovelo.controller.mapper.EventInfoListResponseMapper;
-import pl.envelo.moovelo.controller.mapper.EventOwnerListResponseMapper;
-import pl.envelo.moovelo.controller.mapper.HashtagListResponseMapper;
+import pl.envelo.moovelo.controller.mapper.HashtagMapper;
 import pl.envelo.moovelo.entity.events.CyclicEvent;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
@@ -42,10 +40,10 @@ public class EventListMapper implements EventMapperInterface {
     private EventListResponseDto mapBasicEventToEventListResponseDto(Event event) {
         EventListResponseDto eventListResponseDto = new EventListResponseDto();
         eventListResponseDto.setId(event.getId());
-        eventListResponseDto.setEventOwner(EventOwnerListResponseMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()));
-        eventListResponseDto.setEventInfo(EventInfoListResponseMapper.mapEventInfoToEventInfoListResponseDto(event.getEventInfo()));
+        eventListResponseDto.setEventOwner(EventOwnerMapper.mapEventOwnerToEventOwnerListResponseDto(event.getEventOwner()));
+        eventListResponseDto.setEventInfo(EventInfoMapper.mapEventInfoToEventInfoListResponseDto(event.getEventInfo()));
         eventListResponseDto.setHashtags(event.getHashtags().stream()
-                .map(HashtagListResponseMapper::mapHashtagToHashtagListResponseDto)
+                .map(HashtagMapper::mapHashtagToHashtagListResponseDto)
                 .toList());
         eventListResponseDto.setStartDate(event.getEventInfo().getStartDate().toString());
         eventListResponseDto.setConfirmationRequired(event.getEventInfo().getIsConfirmationRequired());
