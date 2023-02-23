@@ -24,7 +24,7 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.PERSIST})
     private GroupOwner groupOwner;
 
     @ManyToMany
@@ -38,7 +38,7 @@ public class Group {
     @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private GroupInfo groupInfo;
 
-    @OneToMany(mappedBy = "group")
+    @OneToMany(mappedBy = "group", cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.DETACH})
     private List<InternalEvent> events;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")

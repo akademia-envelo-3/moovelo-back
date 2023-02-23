@@ -44,6 +44,14 @@ public class GroupService {
         return newGroup;
     }
 
+    public void removeGroup(Long groupId) {
+        log.info("GroupService - removeGroup(groupId = '{}')", groupId);
+        GroupOwner groupOwner = groupOwnerService.getGroupOwnerByGroupId(groupId);
+        groupRepository.deleteById(groupId);
+        groupOwnerService.removeGroupOwnerOwnerWithNoGroups(groupOwner);
+        log.info("GroupService - removeGroup(groupId = '{}') - group removed", groupId);
+    }
+
     public Group getGroupById(Long groupId) {
         log.info("GroupService - getGroupById() - groupId = {}", groupId);
         Optional<Group> groupOptional = groupRepository.findById(groupId);
