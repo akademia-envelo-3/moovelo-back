@@ -26,7 +26,6 @@ public class AuthorizationService {
     GroupOwnerService groupOwnerService;
     BasicUserService basicUserService;
 
-    // TODO: 17.02.2023 - metoda potrzebna do mapowania Grupy na GroupListResponseDto (pole isUserMember)
     public boolean isLoggedUserGroupMember(Group group) {
         log.info("AuthorizationService - isLoggedUserGroupMember() - group = {}", group);
         User user = authenticatedUser.getAuthenticatedUser();
@@ -38,6 +37,10 @@ public class AuthorizationService {
 
     public boolean isLoggedUserGroupOwner(Long groupId) {
         log.info("AuthorizationService - isLoggedUserGroupOwner() - groupId = {}", groupId);
+        if (isLoggedUserAdmin()) {
+            log.info("AuthorizationService - isLoggedUserGroupOwner() - return FALSE for admin");
+            return false;
+        }
         User loggedInUser = authenticatedUser.getAuthenticatedUser();
         GroupOwner groupOwnerByGroupId = groupOwnerService.getGroupOwnerByGroupId(groupId);
         boolean isUserGroupOwner = basicUserService.isBasicUserOwner(loggedInUser, groupOwnerByGroupId.getUserId());
@@ -62,6 +65,16 @@ public class AuthorizationService {
         return authenticatedUser.getAuthenticatedUser().getId();
     }
 
+    public BasicUser getLoggedBasicUser() {
+        Long id = authenticatedUser.getAuthenticatedUser().getId();
+        boolean basicUserExists = checkIfBasicUserExistsById(id);
+        if (basicUserExists) {
+            return (BasicUser) authenticatedUser.getAuthenticatedUser();
+        } else {
+            throw new NoSuchElementException("No Basic User with id: " + id);
+        }
+    }
+
     public boolean checkIfBasicUserExistsById(Long userId) {
         return basicUserService.checkIfBasicUserExistsById(userId);
     }
@@ -77,6 +90,15 @@ public class AuthorizationService {
         }
     }
 
+    public boolean isLoggedUserIdEqualToBasicUserIdParam(Long basicUserId) {
+        log.info("AuthorizationService - authorizeGetByOwnerBasicUserId() - basicUserId = {}", basicUserId);
+        User user = authenticatedUser.getAuthenticatedUser();
+        boolean isLoggedUserIdEqualToBasicUserId = user.getRole().equals(Role.ROLE_USER) && user.getId().equals(basicUserId);
+        log.info("AuthorizationService - authorizeGetByOwnerBasicUserId() " +
+                "- basicUserId = {} - return isLoggedUserIdEqualToBasicUserId = {}", basicUserId, isLoggedUserIdEqualToBasicUserId);
+        return isLoggedUserIdEqualToBasicUserId;
+    }
+
     public User getLoggedUser() {
         log.info("AuthorizationService - getLoggedUser()");
         User loggedUser = authenticatedUser.getAuthenticatedUser();
@@ -85,12 +107,7 @@ public class AuthorizationService {
         return loggedUser;
     }
 
-    public boolean authorizeGetByOwnerBasicUserId(Long basicUserId) {
-        log.info("AuthorizationService - authorizeGetByOwnerBasicUserId() - basicUserId = {}", basicUserId);
-        User user = authenticatedUser.getAuthenticatedUser();
-        boolean isLoggedUserIdEqualToBasicUserId = user.getRole().equals(Role.ROLE_USER) && user.getId().equals(basicUserId);
-        log.info("AuthorizationService - authorizeGetByOwnerBasicUserId() " +
-                "- basicUserId = {} - return isLoggedUserIdEqualToBasicUserId = {}", basicUserId, isLoggedUserIdEqualToBasicUserId);
-        return isLoggedUserIdEqualToBasicUserId;
+    public boolean isLoggedUserBasicUser() {
+        return checkIfBasicUserExistsById(getLoggedUserId());
     }
 }

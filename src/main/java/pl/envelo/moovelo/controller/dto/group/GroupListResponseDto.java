@@ -12,7 +12,7 @@ import pl.envelo.moovelo.controller.dto.group.groupownership.GroupOwnerDto;
 @Builder
 public class GroupListResponseDto {
     private Long id;
-    private GroupOwnerDto groupOwnerDto;
+    private GroupOwnerDto groupOwner;
     private boolean isUserMember;
     private String name;
     private String description;
