@@ -3,7 +3,6 @@ package pl.envelo.moovelo.controller.dto.group;
 import lombok.Builder;
 import lombok.Getter;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
-import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.group.groupownership.GroupOwnerDto;
 
 import java.util.List;
@@ -17,7 +16,6 @@ public class GroupResponseDto {
     private String description;
     private GroupOwnerDto groupOwner;
     private List<BasicUserDto> groupMembers;
-    private List<DisplayEventResponseDto> events;
 
     @Override
     public boolean equals(Object o) {

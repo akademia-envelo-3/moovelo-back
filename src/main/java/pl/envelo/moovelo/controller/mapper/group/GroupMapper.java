@@ -1,14 +1,18 @@
 package pl.envelo.moovelo.controller.mapper.group;
 
-import pl.envelo.moovelo.controller.dto.group.*;
+import pl.envelo.moovelo.controller.dto.group.GroupListResponseDto;
+import pl.envelo.moovelo.controller.dto.group.GroupRequestDto;
+import pl.envelo.moovelo.controller.dto.group.GroupResponseDto;
+import pl.envelo.moovelo.controller.dto.group.GroupResponseDtoForEvent;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
-import pl.envelo.moovelo.controller.mapper.event.EventMapper;
 import pl.envelo.moovelo.controller.mapper.group.groupownership.GroupOwnerMapper;
 import pl.envelo.moovelo.entity.groups.Group;
 
 import java.util.stream.Collectors;
 
 public class GroupMapper {
+    private static final int FIRST_THREE_GROUP_MEMBERS = 3;
+
     public static GroupResponseDto mapGroupToGroupResponseDto(Group group) {
         return GroupResponseDto
                 .builder()
@@ -19,10 +23,7 @@ public class GroupMapper {
                 .groupMembers(group.getMembers()
                         .stream()
                         .map(BasicUserMapper::map)
-                        .collect(Collectors.toList()))
-                .events(group.getEvents()
-                        .stream()
-                        .map(EventMapper::mapInternalEventToEventResponseDto)
+                        .limit(FIRST_THREE_GROUP_MEMBERS)
                         .collect(Collectors.toList()))
                 .build();
 

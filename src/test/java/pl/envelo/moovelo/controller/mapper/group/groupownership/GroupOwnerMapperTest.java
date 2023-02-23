@@ -2,7 +2,6 @@ package pl.envelo.moovelo.controller.mapper.group.groupownership;
 
 import org.junit.jupiter.api.Test;
 import pl.envelo.moovelo.controller.dto.group.groupownership.GroupOwnerDto;
-import pl.envelo.moovelo.controller.dto.group.groupownership.GroupOwnershipRequestDto;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.groups.GroupOwner;
 

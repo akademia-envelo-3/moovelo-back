@@ -3,7 +3,6 @@ package pl.envelo.moovelo.model;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Getter
 @Setter

@@ -12,6 +12,8 @@ import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventInfo;
 import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.exception.NoContentException;
+import pl.envelo.moovelo.exception.StatusNotExistsException;
+import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.model.EventsForUserCriteria;
 import pl.envelo.moovelo.model.SortingAndPagingCriteria;
 import pl.envelo.moovelo.repository.event.EventRepository;
@@ -20,9 +22,11 @@ import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 
 import javax.persistence.EntityExistsException;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 @AllArgsConstructor
 @Service
@@ -36,13 +40,13 @@ public class EventService {
     private final BasicUserService basicUserService;
     private EventSearchSpecification eventSearchSpecification;
 
-    public Page<? extends Event> getAllEvents(String privacy, String group, String cat, String sort, String sortOrder, int page) {
+    public Page<? extends Event> getAllEvents(String privacy, String group, String cat, Long groupId, String sort, String sortOrder, int page) {
         log.info("EventService - getAllEvents()");
 
         int sizeOfPage = 10;
 
         Pageable pageable = PageRequest.of(page, sizeOfPage, Sort.by(eventSearchSpecification.createSortOrder(sort, sortOrder)));
-        Page<? extends Event> allEvents = eventRepository.findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat), pageable);
+        Page<? extends Event> allEvents = eventRepository.findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat, groupId), pageable);
 
         log.info("EventService - getAllEvents() return {}", allEvents.toString());
         return allEvents;
@@ -182,9 +186,71 @@ public class EventService {
 
     public static <T> Page<T> listToPage(final Pageable pageable, List<T> list) {
         int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());
-        ;
         int last = Math.min(first + pageable.getPageSize(), list.size());
         return new PageImpl<>(list.subList(first, last), pageable, list.size());
+    }
+
+    @Transactional
+    public void setStatus(Long eventId, Long userId, String status) {
+        log.info("EventService - setStatus()");
+
+        Event event = getEventById(eventId);
+        BasicUser user = basicUserService.getBasicUserById(userId);
+
+        if (!event.getUsersWithAccess().contains(user)) {
+            throw new UnauthorizedRequestException("User with id " + userId + " does not have an access to event with id " + eventId);
+        }
+
+        Set<BasicUser> setOfAccepted = event.getAcceptedStatusUsers();
+        Set<BasicUser> setOfPending = event.getPendingStatusUsers();
+        Set<BasicUser> setOfRejected = event.getRejectedStatusUsers();
+
+        switch (status.toLowerCase()) {
+            case "accepted" -> setAcceptedStatus(user, setOfAccepted, setOfPending, setOfRejected);
+            case "pending" -> setPendingStatus(user, setOfAccepted, setOfPending, setOfRejected);
+            case "rejected" -> setRejectedStatus(user, setOfAccepted, setOfPending, setOfRejected);
+            default -> throw new StatusNotExistsException("Status " + status + " does not exist");
+        }
+
+        event.setAcceptedStatusUsers(setOfAccepted);
+        event.setPendingStatusUsers(setOfPending);
+        event.setRejectedStatusUsers(setOfRejected);
+    }
+
+    private void setAcceptedStatus(BasicUser user,
+                                   Set<BasicUser> setOfAccepted,
+                                   Set<BasicUser> setOfPending,
+                                   Set<BasicUser> setOfRejected) {
+
+        if (!setOfAccepted.contains(user)) {
+            setOfAccepted.add(user);
+            setOfPending.remove(user);
+            setOfRejected.remove(user);
+        }
+    }
+
+    private void setPendingStatus(BasicUser user,
+                                  Set<BasicUser> setOfAccepted,
+                                  Set<BasicUser> setOfPending,
+                                  Set<BasicUser> setOfRejected) {
+
+        if (!setOfPending.contains(user)) {
+            setOfPending.add(user);
+            setOfAccepted.remove(user);
+            setOfRejected.remove(user);
+        }
+    }
+
+    private void setRejectedStatus(BasicUser user,
+                                   Set<BasicUser> setOfAccepted,
+                                   Set<BasicUser> setOfPending,
+                                   Set<BasicUser> setOfRejected) {
+
+        if (!setOfRejected.contains(user)) {
+            setOfRejected.add(user);
+            setOfPending.remove(user);
+            setOfAccepted.remove(user);
+        }
     }
 
     public Page<? extends Event> getEventsForUser(
@@ -219,5 +285,3 @@ public class EventService {
         return allEvents;
     }
 }
-
-

@@ -3,7 +3,6 @@ package pl.envelo.moovelo.controller.mapper.event;
 import pl.envelo.moovelo.controller.dto.event.DisplayEventResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventIdDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
-import pl.envelo.moovelo.controller.dto.group.GroupListResponseDto;
 import pl.envelo.moovelo.controller.dto.group.GroupResponseDtoForEvent;
 import pl.envelo.moovelo.controller.mapper.EventOwnerListResponseMapper;
 import pl.envelo.moovelo.controller.mapper.HashtagListResponseMapper;
@@ -56,7 +55,6 @@ public class EventMapper implements EventMapperInterface {
                 .eventInfo(EventInfoMapper.mapEventInfoToEventInfoDto(event.getEventInfo()))
                 .limitedPlaces(event.getLimitedPlaces())
                 .usersWithAccess(event.getUsersWithAccess().stream().map(BasicUserMapper::map).collect(Collectors.toList()))
-                //TODO Wysypuje blad
                 .eventParticipationStats(EventParticipationStatsMapper.mapEventToEventParticipationStatsDto(event))
                 .isPrivate(false)
                 .isCyclic(false)

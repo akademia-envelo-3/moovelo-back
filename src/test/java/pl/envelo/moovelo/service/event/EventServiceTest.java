@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.envelo.moovelo.entity.events.Event;
-import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.exception.NoContentException;
 
 import javax.transaction.Transactional;
@@ -19,17 +18,17 @@ class EventServiceTest {
     @Autowired
     private EventService eventService;
 
-    /*@Test
-    void getAllEventsTest() {
-        // GIVEN
-
-        // WHEN
-        List<? extends Event> allEvents = eventService.getAllEvents();
-
-        // THEN
-        assertFalse(allEvents.isEmpty());
-        assertEquals(allEvents.get(0).getEventType(), EventType.EVENT);
-    }*/
+//    @Test
+//    void getAllEventsTest() {
+//        // GIVEN
+//
+//        // WHEN
+//        List<? extends Event> allEvents = eventService.getAllEvents();
+//
+//        // THEN
+//        assertFalse(allEvents.isEmpty());
+//        assertEquals(allEvents.get(0).getEventType(), EventType.EVENT);
+//    }
 
     /*@Test
     @Transactional
