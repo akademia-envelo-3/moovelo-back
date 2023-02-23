@@ -11,6 +11,7 @@ import pl.envelo.moovelo.entity.events.InternalEvent;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -33,7 +34,7 @@ public class Group {
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "basic_user_id")
     )
-    private List<BasicUser> members;
+    private Set<BasicUser> members;
 
     @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private GroupInfo groupInfo;
@@ -46,8 +47,4 @@ public class Group {
 
     @Column(name = "group_size")
     private int groupSize;
-
-    public int getGroupSize() {
-        return members.size();
-    }
 }

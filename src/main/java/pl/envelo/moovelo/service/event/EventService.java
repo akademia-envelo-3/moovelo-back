@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.envelo.moovelo.controller.searchUtils.EventSearchSpecification;
-import pl.envelo.moovelo.controller.searchUtils.PagingUtils;
+import pl.envelo.moovelo.controller.searchutils.EventSearchSpecification;
+import pl.envelo.moovelo.controller.searchutils.PagingUtils;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.actors.BasicUser;
@@ -18,7 +18,6 @@ import pl.envelo.moovelo.exception.StatusNotExistsException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.repository.event.EventRepository;
 import pl.envelo.moovelo.service.HashTagService;
-import pl.envelo.moovelo.service.LocationService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 import javax.persistence.EntityExistsException;
@@ -71,7 +70,6 @@ public class EventService {
     public List<? extends Event> getAllEventsByEventOwnerBasicUserId(Long basicUserId) {
         log.info("EventService - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
         List<? extends Event> events = eventRepository.findByEventOwner_UserId(basicUserId);
-
         log.info("EventService - getAllEventsByEventOwnerBasicUserId() return {}", events);
         return events;
     }
@@ -182,8 +180,6 @@ public class EventService {
         log.info("EventService - getUsersWithAccess() return {}", usersWithAccess);
         return usersWithAccess;
     }
-
-
 
     @Transactional
     public void setStatus(Long eventId, Long userId, String status) {

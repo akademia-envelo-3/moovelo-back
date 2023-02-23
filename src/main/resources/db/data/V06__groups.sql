@@ -1,7 +1,3 @@
 INSERT INTO API_GROUP(GROUP_OWNER_ID, GROUP_INFO_ID, GROUP_SIZE )
 VALUES
-( 1, 1, 10 ),
-( 1, 2, 15 ),
-( 1, 3, 100 ),
-( 1, 4, 50 ),
-( 1, 5, 120 );
+( 1, 3, 0 );

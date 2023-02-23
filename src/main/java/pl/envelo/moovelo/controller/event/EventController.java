@@ -85,7 +85,7 @@ public class EventController {
     public ResponseEntity<List<EventListResponseDto>> getAllEventsByEventOwnerBasicUserId(@PathVariable("userId") Long basicUserId) {
         log.info("EventController - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
 
-        if (!authorizationService.authorizeGetByOwnerBasicUserId(basicUserId) && !authorizationService.isLoggedUserAdmin()) {
+        if (!authorizationService.isLoggedUserIdEqualToBasicUserIdParam(basicUserId) && !authorizationService.isLoggedUserAdmin()) {
             throw new UnauthorizedRequestException("Access denied");
         }
         List<? extends Event> allEvents = eventService.getAllEventsByEventOwnerBasicUserId(basicUserId);

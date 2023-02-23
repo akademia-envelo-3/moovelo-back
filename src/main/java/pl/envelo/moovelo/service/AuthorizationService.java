@@ -26,7 +26,6 @@ public class AuthorizationService {
     GroupOwnerService groupOwnerService;
     BasicUserService basicUserService;
 
-    // TODO: 17.02.2023 - metoda potrzebna do mapowania Grupy na GroupListResponseDto (pole isUserMember)
     public boolean isLoggedUserGroupMember(Group group) {
         log.info("AuthorizationService - isLoggedUserGroupMember() - group = {}", group);
         User user = authenticatedUser.getAuthenticatedUser();
@@ -91,7 +90,7 @@ public class AuthorizationService {
         }
     }
 
-    public boolean authorizeGetByOwnerBasicUserId(Long basicUserId) {
+    public boolean isLoggedUserIdEqualToBasicUserIdParam(Long basicUserId) {
         log.info("AuthorizationService - authorizeGetByOwnerBasicUserId() - basicUserId = {}", basicUserId);
         User user = authenticatedUser.getAuthenticatedUser();
         boolean isLoggedUserIdEqualToBasicUserId = user.getRole().equals(Role.ROLE_USER) && user.getId().equals(basicUserId);

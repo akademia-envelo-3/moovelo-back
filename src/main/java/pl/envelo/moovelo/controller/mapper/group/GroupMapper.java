@@ -9,7 +9,7 @@ import pl.envelo.moovelo.entity.groups.Group;
 import java.util.stream.Collectors;
 
 public class GroupMapper {
-    private final static int FIRST_THREE_GROUP_MEMBERS = 3;
+    private static final int FIRST_THREE_GROUP_MEMBERS = 3;
 
     public static GroupResponseDto mapGroupToGroupResponseDto(Group group) {
         return GroupResponseDto
@@ -34,7 +34,7 @@ public class GroupMapper {
                 .isUserMember(isGroupMember)
                 .name(group.getGroupInfo().getName())
                 .description(group.getGroupInfo().getDescription())
-                .numberOfMembers(group.getMembers().size())
+                .numberOfMembers(group.getGroupSize())
                 .build();
     }
 

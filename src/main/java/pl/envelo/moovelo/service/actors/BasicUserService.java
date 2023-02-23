@@ -9,10 +9,9 @@ import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.groups.Group;
 import pl.envelo.moovelo.repository.actors.BasicUserRepository;
+import pl.envelo.moovelo.service.group.GroupService;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @AllArgsConstructor
 @Service
@@ -45,9 +44,16 @@ public class BasicUserService {
         return basicUserOptional.get();
     }
 
-    public List<Group> getAllBasicUserGroups(Long basicUserId) {
+    public Set<Group> getAllBasicUserGroups(Long basicUserId) {
+        log.info("BasicUserService - getAllBasicUserGroups()");
         BasicUser basicUserById = getBasicUserById(basicUserId);
-        return basicUserById.getGroups();
+        Set<Group> basicUserGroups = basicUserById.getGroups();
+        log.info("BasicUserService - getAllBasicUserGroups() - return basicUserGroups = {}", basicUserGroups);
+        return basicUserGroups;
+    }
+
+    public BasicUser updateBasicUser(BasicUser basicUser) {
+        return basicUserRepository.save(basicUser);
     }
 }
 

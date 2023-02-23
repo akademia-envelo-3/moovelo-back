@@ -12,12 +12,15 @@ import pl.envelo.moovelo.controller.dto.group.GroupListResponseDto;
 import pl.envelo.moovelo.controller.dto.group.GroupRequestDto;
 import pl.envelo.moovelo.controller.dto.group.GroupResponseDto;
 import pl.envelo.moovelo.controller.mapper.group.GroupMapper;
-import pl.envelo.moovelo.controller.searchUtils.GroupPage;
+import pl.envelo.moovelo.controller.searchutils.GroupPage;
 import pl.envelo.moovelo.entity.groups.Group;
+import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.AuthorizationService;
 import pl.envelo.moovelo.service.group.GroupService;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 @AllArgsConstructor
 @RestController
@@ -61,6 +64,7 @@ public class GroupController {
         }
         Page<GroupListResponseDto> groupListResponseDtoPage =
                 groups.map(group -> GroupMapper.mapGroupToGroupListResponseDto(group, authorizationService.isLoggedUserGroupMember(group)));
+        log.info("GroupController - getAllGroups() - return groupListResponseDtoPage = {}", groupListResponseDtoPage);
         return new ResponseEntity<>(groupListResponseDtoPage, HttpStatus.OK);
     }
 
@@ -72,5 +76,19 @@ public class GroupController {
         GroupResponseDto groupResponseDto = GroupMapper.mapGroupToGroupResponseDto(group);
         log.info("GroupController - () - getGroupById() - groupId = {} - return = {}", groupId, groupResponseDto);
         return ResponseEntity.ok(groupResponseDto);
+    }
+
+    @PostMapping("/{groupId}/users/{userId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> joinGroup(@PathVariable Long userId, @PathVariable Long groupId) {
+        Group group = groupService.getGroupById(groupId);
+        if (!authorizationService.isLoggedUserIdEqualToBasicUserIdParam(userId)
+                || authorizationService.isLoggedUserGroupMember(group)) {
+            throw new UnauthorizedRequestException("Access denied");
+        }
+        groupService.joinGroup(userId, group);
+        Map<String, String> body = new HashMap<>();
+        body.put("message", "User with id: " + userId + " successfully added the group with id: " + groupId);
+        return ResponseEntity.ok().body(body);
     }
 }

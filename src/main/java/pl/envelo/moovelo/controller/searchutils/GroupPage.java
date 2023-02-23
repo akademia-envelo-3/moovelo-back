@@ -1,4 +1,4 @@
-package pl.envelo.moovelo.controller.searchUtils;
+package pl.envelo.moovelo.controller.searchutils;
 
 import lombok.Getter;
 import lombok.Setter;

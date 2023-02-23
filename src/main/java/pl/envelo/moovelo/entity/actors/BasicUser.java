@@ -28,7 +28,7 @@ public class BasicUser extends User {
     private List<Comment> comments;
 
     @ManyToMany
-    private List<Group> groups;
+    private Set<Group> groups;
 
     @ManyToMany(mappedBy = "acceptedStatusUsers")
     private List<Event> accessibleEvents;

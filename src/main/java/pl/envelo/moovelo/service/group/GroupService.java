@@ -7,8 +7,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import pl.envelo.moovelo.controller.searchUtils.GroupPage;
-import pl.envelo.moovelo.controller.searchUtils.PagingUtils;
+import pl.envelo.moovelo.controller.searchutils.GroupPage;
+import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.groups.Group;
 import pl.envelo.moovelo.entity.groups.GroupInfo;
 import pl.envelo.moovelo.entity.groups.GroupOwner;
@@ -18,10 +18,7 @@ import pl.envelo.moovelo.service.actors.GroupOwnerService;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.List;
+import java.util.*;
 
 @AllArgsConstructor
 @Service
@@ -48,7 +45,7 @@ public class GroupService {
         newGroup.setGroupInfo(groupInfo);
         newGroup.setGroupOwner(groupOwner);
         newGroup.setCreationDate(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
-        newGroup.setMembers(new ArrayList<>());
+        newGroup.setMembers(new HashSet<>());
         newGroup.setEvents(new ArrayList<>());
         return newGroup;
     }
@@ -70,18 +67,25 @@ public class GroupService {
         log.info("GroupService - getAllGroupsForBasicUser()  - params - basicUser = {}, membership = {}, groupPage = {}",
                 basicUserId, membership, groupPage);
         Pageable pageable = getPageable(groupPage);
-        List<Group> allBasicUserGroups = basicUserService.getAllBasicUserGroups(basicUserId);
-        List<Group> allNotBasicUserGroups = getNonBasicUserGroups(allBasicUserGroups);
-        List<Group> allGroups = membership ?  allBasicUserGroups : allNotBasicUserGroups;
-        log.info("GroupService - getAllGroupsForBasicUser() - return {}", allGroups.toString());
-        return PagingUtils.listToPage(pageable, allGroups);
+        BasicUser basicUser = basicUserService.getBasicUserById(basicUserId);
+        Page<Group> basicUserGroups = groupRepository.findAllGroupsWhereUserIsMember(basicUser, pageable);
+        Page<Group> notBasicUserGroups = groupRepository.findAllGroupsWhereUserIsNotMember(basicUser, pageable);
+        Page<Group> resultPage = membership ? basicUserGroups : notBasicUserGroups;
+        log.info("GroupService - getAllGroupsForBasicUser() - return {}", resultPage.toString());
+        return resultPage;
     }
 
-    private List<Group> getNonBasicUserGroups(List<Group> allBasicUserGroups) {
-        List <Group> allNotBasicUserGroups= groupRepository.findAll()
-                .stream()
-                .filter(group -> !allBasicUserGroups.contains(group)).toList();
-        return allNotBasicUserGroups;
+    public void joinGroup(Long userId, Group group) {
+        BasicUser basicUser = basicUserService.getBasicUserById(userId);
+        Set<Group> userGroups = basicUser.getGroups();
+        if (userGroups == null) {
+            userGroups = new HashSet<>();
+        }
+        userGroups.add(group);
+        group.getMembers().add(basicUser);
+        group.setGroupSize(group.getGroupSize() + 1);
+        groupRepository.save(group);
+        basicUserService.updateBasicUser(basicUser);
     }
 
     public Page<Group> getAllGroupsWithoutFiltering(GroupPage groupPage) {
@@ -90,7 +94,11 @@ public class GroupService {
     }
 
     private Pageable getPageable(GroupPage groupPage) {
-        Sort sort = Sort.by(groupPage.getSortOrder(), groupPage.getSort());
+        String sortFromParam = groupPage.getSort();
+        if (sortFromParam.equals("name")) {
+            sortFromParam = "groupInfo.name";
+        }
+        Sort sort = Sort.by(groupPage.getSortOrder(), sortFromParam);
         return PageRequest.of(groupPage.getPageNumber(), groupPage.getPageSize(), sort);
     }
 }
