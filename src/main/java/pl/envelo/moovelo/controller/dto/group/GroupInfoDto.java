@@ -2,7 +2,6 @@ package pl.envelo.moovelo.controller.dto.group;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Builder
 @Getter

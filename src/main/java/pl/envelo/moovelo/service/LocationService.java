@@ -27,6 +27,18 @@ public class LocationService {
         return locationComparedWithDb.orElseGet(() -> locationRepository.save(locationAfterGeocodingApiRequest));
     }
 
+    /**
+     * Method check if location is assigned to any EventInfo. If list of EventInfos is empty,
+     * then location entity is remove from database.
+     */
+    public void removeLocationWithNoEvents(Location location) {
+        log.info("LocationService - removeLocationWithNoEvents() - location = {}", location);
+        if (location.getEventsInfos().isEmpty()) {
+            locationRepository.delete(location);
+            log.info("LocationService - removeLocationWithNoEvents() - location removed");
+        }
+    }
+
     private Location getLocationAfterGeocodingApiRequest(Location location) {
         GeocodingApiDto geocodingApiResponse = sendGeolocationApiRequest(location);
         LocationDto locationDtoAfterGeolocationApiRequest = GeocodingApiDtoToGeolocationDtoMapper.map(geocodingApiResponse);
@@ -41,17 +53,5 @@ public class LocationService {
 
     private GeocodingApiDto sendGeolocationApiRequest(Location locationBeforeApiRequest) {
         return geocodingApiClient.getGeolocationInfoForAddress(locationBeforeApiRequest);
-    }
-
-    /**
-     * Method check if location is assigned to any EventInfo. If list of EventInfos is empty,
-     * then location entity is remove from database.
-     */
-    public void removeLocationWithNoEvents(Location location) {
-        log.info("LocationService - removeLocationWithNoEvents() - location = {}", location);
-        if (location.getEventsInfos().isEmpty()) {
-            locationRepository.delete(location);
-            log.info("LocationService - removeLocationWithNoEvents() - location removed");
-        }
     }
 }

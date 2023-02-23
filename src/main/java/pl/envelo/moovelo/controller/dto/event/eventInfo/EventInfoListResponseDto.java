@@ -1,4 +1,4 @@
-package pl.envelo.moovelo.controller.dto.event;
+package pl.envelo.moovelo.controller.dto.event.eventInfo;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package pl.envelo.moovelo.controller.dto.event;
+package pl.envelo.moovelo.controller.dto.event.eventInfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -13,7 +13,6 @@ import java.util.List;
 @Getter
 public class EventInfoDto {
     private Long id;
-    private long eventId;
     private String name;
     private String description;
     private CategoryListResponseDto category;
