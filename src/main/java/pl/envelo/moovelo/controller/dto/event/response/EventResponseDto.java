@@ -1,31 +1,30 @@
-package pl.envelo.moovelo.controller.dto.event;
+package pl.envelo.moovelo.controller.dto.event.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import pl.envelo.moovelo.controller.dto.HashtagListResponseDto;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
+import pl.envelo.moovelo.controller.dto.event.eventInfo.EventInfoDto;
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerListResponseDto;
-import pl.envelo.moovelo.controller.dto.event.participation.EventParticipationStatsDto;
-import pl.envelo.moovelo.controller.dto.group.GroupListResponseDto;
 import pl.envelo.moovelo.controller.dto.group.GroupResponseDtoForEvent;
 
 import java.util.List;
 
-@Builder
+@Setter
 @Getter
-public class DisplayEventResponseDto {
+public class EventResponseDto {
     @JsonProperty("eventId")
     private long id;
     private EventOwnerListResponseDto eventOwner;
     private EventInfoDto eventInfo;
     private int limitedPlaces;
-    private boolean isCyclic;
     private boolean isPrivate;
     private GroupResponseDtoForEvent group;
     private List<HashtagListResponseDto> hashtags;
     private List<BasicUserDto> usersWithAccess;
     private EventParticipationStatsDto eventParticipationStats;
+    private boolean isCyclic;
     private int frequencyInDays;
     private int numberOfRepeats;
 

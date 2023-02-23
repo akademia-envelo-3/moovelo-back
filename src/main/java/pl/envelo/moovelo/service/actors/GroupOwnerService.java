@@ -1,10 +1,8 @@
 package pl.envelo.moovelo.service.actors;
 
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.envelo.moovelo.entity.events.EventOwner;
 import pl.envelo.moovelo.entity.groups.GroupOwner;
 import pl.envelo.moovelo.repository.group.GroupOwnerRepository;
 

@@ -30,12 +30,11 @@ public class GeocodingApiClient {
     }
 
     private String createAddressFromLocationFields(Location location) {
-        StringBuilder addressBuilder = new StringBuilder();
-        addressBuilder.append(location.getStreet())
-                .append(ADDRESS_SEPARATOR)
-                .append(location.getStreetNumber())
-                .append(ADDRESS_SEPARATOR)
-                .append(location.getCity());
-        return addressBuilder.toString();
+        String addressBuilder = location.getStreet() +
+                ADDRESS_SEPARATOR +
+                location.getStreetNumber() +
+                ADDRESS_SEPARATOR +
+                location.getCity();
+        return addressBuilder;
     }
 }
