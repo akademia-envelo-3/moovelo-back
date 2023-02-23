@@ -38,4 +38,12 @@ public class GroupOwnerService {
         groupOwner.setUserId(userId);
         return groupOwnerRepository.save(groupOwner);
     }
+
+    public void removeGroupOwnerOwnerWithNoGroups(GroupOwner groupOwner) {
+        log.info("GroupOwnerService - removeGroupOwnerWithNoGroups() - groupOwner = '{}'", groupOwner);
+        if (groupOwner.getGroups().isEmpty()) {
+            groupOwnerRepository.delete(groupOwner);
+            log.info("GroupOwnerService - removeGroupOwnerWithNoGroups() - groupOwner removed");
+        }
+    }
 }
