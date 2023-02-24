@@ -213,6 +213,8 @@ public class EventController {
             @RequestParam String status) {
 
         log.info("EventController - setStatus()");
+
+        //TODO: 24.02.2023 zmiana na metodę authorizationService.isLoggedUserIdEqualToBasicUserIdParam()
         authorizationService.checkIfLoggedUserHasAccessToEvent(eventId, eventType);
 
         if (authorizationService.getLoggedBasicUserId().equals(userId)) {
@@ -239,6 +241,7 @@ public class EventController {
                             authorizationService.isLoggedUserEventOwner(eventId)) {
                         return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto);
                     } else {
+                        //TODO: 24.02.2023 zmiana na metodę authorizationService.getLoggedBasicUser()
                         BasicUser basicUser = (BasicUser) authorizationService.getLoggedUser();
                         return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto, basicUser);
                     }
