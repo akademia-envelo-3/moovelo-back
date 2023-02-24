@@ -8,6 +8,7 @@ import pl.envelo.moovelo.repository.event.EventRepositoryManager;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
+import pl.envelo.moovelo.service.survey.EventSurveyService;
 
 @Service
 @Slf4j
@@ -16,9 +17,9 @@ public class InternalEventService<C extends InternalEvent> extends EventService<
     public InternalEventService(EventRepositoryManager eventRepositoryManager, EventInfoService eventInfoService,
                                 EventOwnerService eventOwnerService,
                                 HashTagService hashTagService, BasicUserService basicUserService,
-                                EventSearchSpecification eventSearchSpecification) {
+                                EventSearchSpecification eventSearchSpecification, EventSurveyService eventSurveyService) {
         super(eventRepositoryManager, eventInfoService, eventOwnerService, hashTagService,
-                basicUserService, eventSearchSpecification);
+                basicUserService, eventSearchSpecification, eventSurveyService);
     }
 
     @Override
