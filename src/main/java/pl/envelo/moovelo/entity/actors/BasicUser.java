@@ -50,20 +50,11 @@ public class BasicUser extends User {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        BasicUser basicUser = (BasicUser) o;
-        return Objects.equals(categoryProposals, basicUser.categoryProposals)
-                && Objects.equals(comments, basicUser.comments) && Objects.equals(groups, basicUser.groups)
-                && Objects.equals(acceptedEvents, basicUser.acceptedEvents);
+        return super.equals(o);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(categoryProposals, comments, groups, acceptedEvents);
+        return super.hashCode();
     }
 }
