@@ -3,7 +3,7 @@ package pl.envelo.moovelo.controller.dto.event.eventInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
-import pl.envelo.moovelo.controller.dto.AttachmentDto;
+import pl.envelo.moovelo.controller.dto.attachment.AttachmentDto;
 import pl.envelo.moovelo.controller.dto.category.CategoryListResponseDto;
 import pl.envelo.moovelo.controller.dto.location.LocationDto;
 

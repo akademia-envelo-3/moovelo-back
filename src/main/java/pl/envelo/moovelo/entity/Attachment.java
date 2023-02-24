@@ -21,6 +21,8 @@ public class Attachment {
 
     private String fileType;
 
+    private long fileSize;
+
     @Lob
     private byte[] data;
 

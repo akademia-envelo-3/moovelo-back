@@ -1,10 +1,8 @@
 package pl.envelo.moovelo.service;
 
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.expression.ExpressionException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import pl.envelo.moovelo.entity.Attachment;
 import pl.envelo.moovelo.repository.AttachmentRepository;
 
@@ -16,11 +14,7 @@ public class AttachmentService {
 
     private AttachmentRepository attachmentRepository;
 
-    public Attachment saveAttachment(MultipartFile file) throws IOException {
-        Attachment attachment = new Attachment();
-        attachment.setFileName(file.getOriginalFilename());
-        attachment.setFileType(file.getContentType());
-        attachment.setData(file.getBytes());
+    public Attachment saveAttachment(Attachment attachment) throws IOException {
         return attachmentRepository.save(attachment);
     }
 
