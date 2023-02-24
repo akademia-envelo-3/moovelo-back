@@ -8,12 +8,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import pl.envelo.moovelo.controller.dto.group.GroupInfoDto;
 import pl.envelo.moovelo.controller.dto.group.GroupListResponseDto;
 import pl.envelo.moovelo.controller.dto.group.GroupRequestDto;
 import pl.envelo.moovelo.controller.dto.group.GroupResponseDto;
+import pl.envelo.moovelo.controller.mapper.group.GroupInfoMapper;
 import pl.envelo.moovelo.controller.mapper.group.GroupMapper;
 import pl.envelo.moovelo.controller.searchutils.GroupPage;
 import pl.envelo.moovelo.entity.groups.Group;
+import pl.envelo.moovelo.entity.groups.GroupInfo;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.AuthorizationService;
 import pl.envelo.moovelo.service.group.GroupService;
@@ -94,6 +97,25 @@ public class GroupController {
         GroupResponseDto groupResponseDto = GroupMapper.mapGroupToGroupResponseDto(group);
         log.info("GroupController - () - getGroupById() - groupId = {} - return = {}", groupId, groupResponseDto);
         return ResponseEntity.ok(groupResponseDto);
+    }
+
+    @PutMapping("/{groupId}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    public ResponseEntity<?> updateGroupById(@RequestBody GroupInfoDto groupInfoDto, @PathVariable Long groupId) {
+        log.info("GroupController - () - updateGroupById() - groupId = {}", groupId);
+        Group group = groupService.getGroupById(groupId);
+        if (authorizationService.isLoggedUserAdmin() || authorizationService.isLoggedUserGroupOwner(group.getId())) {
+            GroupInfo groupInfo = GroupInfoMapper.mapGroupInfoDtoToGroupInfo(groupInfoDto);
+            groupService.updateGroupById(group, groupInfo);
+
+            Map<String, String> body = new HashMap<>();
+            body.put("message", "Group with id: " + groupId + " successfully updated");
+
+            log.info("GroupController - () - updateGroupById() - groupId = {} updated", groupId);
+            return ResponseEntity.ok(body);
+        }
+        log.error("Unauthorized request Exception occurred!");
+        throw new UnauthorizedRequestException("You must be the owner of the group or have administrative rights to update it!");
     }
 
     @PostMapping("/{groupId}/users/{userId}")
