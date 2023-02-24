@@ -99,10 +99,10 @@ public class AuthorizationService {
         return isLoggedUserIdEqualToBasicUserId;
     }
 
-    public void checkIfLoggedUserHasAccessToEvent(Long eventId) {
+    public void checkIfLoggedUserHasAccessToEvent(Long eventId, EventType eventType) {
         log.info("AuthorizationService - checkIfLoggedUserHasAccessToEvent()");
         User user = getLoggedUser();
-        Event event = eventService.getEventById(eventId, EventType.EVENT);
+        Event event = eventService.getEventById(eventId, eventType);
 
         if (user.getRole().equals(Role.ROLE_USER) &&
                 !event.getUsersWithAccess().contains((BasicUser) user)) {

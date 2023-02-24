@@ -213,7 +213,7 @@ public class EventController {
             @RequestParam String status) {
 
         log.info("EventController - setStatus()");
-        authorizationService.checkIfLoggedUserHasAccessToEvent(eventId);
+        authorizationService.checkIfLoggedUserHasAccessToEvent(eventId, eventType);
 
         if (authorizationService.getLoggedBasicUserId().equals(userId)) {
             eventService.setStatus(eventId, userId, status, eventType);
@@ -228,7 +228,7 @@ public class EventController {
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<List<EventSurveyDto>> getEventSurveysByEventId(@PathVariable Long eventId) {
         log.info("EventController - getEventSurveysByEventId");
-        authorizationService.checkIfLoggedUserHasAccessToEvent(eventId);
+        authorizationService.checkIfLoggedUserHasAccessToEvent(eventId, eventType);
 
         List<EventSurvey> surveys = eventService.getEventSurveysByEventId(eventId, eventType);
 
