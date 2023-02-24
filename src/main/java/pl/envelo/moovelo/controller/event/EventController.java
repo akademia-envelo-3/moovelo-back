@@ -253,12 +253,12 @@ public class EventController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<EventSurveyDto> createEventSurvey(@RequestBody EventSurveyRequestDto eventSurveyRequestDto, @PathVariable Long eventId) {
         log.info("EventController - createNewSurvey");
-        authorizationService.checkIfLoggedUserHasAccessToEvent(eventId);
+        if (!authorizationService.isLoggedUserEventOwner(eventId)) {
+            throw new UnauthorizedRequestException("Logged in user is not authorized to create a survey in event with id " + eventId);
+        }
 
         EventSurvey eventSurvey = EventSurveyMapper.mapEventSurveyRequestDtoToEventSurvey(eventSurveyRequestDto);
-
         EventSurvey newEventSurvey = eventService.createEventSurvey(eventSurvey, eventId);
-
         EventSurveyDto newEventSurveyDto = EventSurveyMapper.mapEventSurveyToEventSurveyDto(newEventSurvey);
 
         URI uri = ServletUriComponentsBuilder

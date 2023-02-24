@@ -18,7 +18,6 @@ public class EventSurveyService {
     private final EventSurveyRepository eventSurveyRepository;
 
     public EventSurvey createNewSurvey(EventSurvey eventSurvey, Event event) {
-        //EventSurvey createdEventSurvey = new EventSurvey();
 
         eventSurvey.setSurveyees(new ArrayList<>());
         eventSurvey.setEvent(event);
