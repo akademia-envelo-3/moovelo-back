@@ -29,4 +29,11 @@ public class CyclicEventService extends InternalEventService<CyclicEvent> {
         eventWithFieldsAfterValidation.setNumberOfRepeats(event.getNumberOfRepeats());
         eventWithFieldsAfterValidation.setFrequencyInDays(event.getFrequencyInDays());
     }
+
+    @Override
+    protected void validateFieldsForExtendedEvents(CyclicEvent eventInDb, CyclicEvent eventFromDto) {
+        super.validateFieldsForExtendedEvents(eventInDb, eventFromDto);
+        eventInDb.setFrequencyInDays(eventFromDto.getFrequencyInDays());
+        eventInDb.setNumberOfRepeats(eventFromDto.getNumberOfRepeats());
+    }
 }

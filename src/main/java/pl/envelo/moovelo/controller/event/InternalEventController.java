@@ -38,7 +38,7 @@ public class InternalEventController {
     public InternalEventController(EventMapperManager eventMapperManager,
                                    InternalEventService<InternalEvent> internalEventService,
                                    AuthorizationService authorizationService
-                                   ) {
+    ) {
         this.eventMapperManager = eventMapperManager;
         this.internalEventService = internalEventService;
         this.authorizationService = authorizationService;
@@ -68,6 +68,26 @@ public class InternalEventController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(uri)
                 .body(eventResponseDto);
+    }
+
+    @PutMapping("/internalEvents/{eventId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<String> updateInternalEventById(@PathVariable Long eventId, @RequestBody EventRequestDto eventRequestDto) {
+        log.info("InternalEventController - updateInternalEventById() - eventId = {}", eventId);
+        eventMapperInterface = new EventMapper();
+
+        if (internalEventService.checkIfEventExistsById(eventId, eventType)) {
+            if (authorizationService.isLoggedUserEventOwner(eventId)) {
+                InternalEvent mappedEventFromRequest = eventMapperManager.mapEventRequestDtoToEventByEventType(eventRequestDto, eventType);
+                internalEventService.updateEventById(eventId, mappedEventFromRequest, eventType, authorizationService.getLoggedUserId());
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Logged in user is not authorized to update the  with id: " + eventId);
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event with id " + eventId + " does not exist");
+        }
+        log.info("EventController - updateEventById() - event with eventId = {} updated", eventId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/internalEvents")

@@ -41,11 +41,8 @@ public class InternalEventService<C extends InternalEvent> extends EventService<
         eventAfterFieldValidation.setGroup(groupById);
     }
 
-//    public List<? extends Event> getAllInternalEvents() {
-//        log.info("InternalEventService - getAllInternalEvents()");
-//        List<? extends Event> allInternalEvents = internalEventRepository.findAll();
-//
-//        log.info("InternalEventService - getAllInternalEvents() return {}", allInternalEvents.toString());
-//        return allInternalEvents;
-//    }
+    @Override
+    protected void validateFieldsForExtendedEvents(C eventInDb, C eventFromDto) {
+        super.validateFieldsForExtendedEvents(eventInDb, eventFromDto);
+    }
 }

@@ -70,8 +70,7 @@ public class EventService<I extends Event> {
         }
     }
 
-    protected void setGroupToEventIfEventIsInternal(I eventAfterFieldValidation, Long groupId) {
-    }
+
 
     public void updateEventById(Long eventId, I eventFromDto, EventType eventType, Long userId) {
         log.info("EventService - updateEventById() - eventId = {}", eventId);
@@ -83,11 +82,19 @@ public class EventService<I extends Event> {
         setValidatedEntitiesForUpdateEvent(eventInDb, eventFromDto, userId);
         eventInDb.setHashtags(hashtagsToAssign);
         eventInDb.setEventInfo(validatedEventInfo);
+        if (eventType.equals(EventType.CYCLIC_EVENT)) {
+            validateFieldsForExtendedEvents(eventInDb, eventFromDto);
+        }
         eventRepositoryManager
                 .getRepositoryForSpecificEvent(eventType)
                 .save(eventInDb);
         eventInfoService.removeLocationWithNoEvents(formerLocation);
         log.info("EventService - updateEventById() - eventId = {} updated", eventId);
+    }
+
+    protected void validateFieldsForExtendedEvents(I eventInDb, I eventFromDto) {
+    }
+    protected  void setGroupToEventIfEventIsInternal(I eventAfterFieldValidation, Long groupId) {
     }
 
     public I getEventById(Long id, EventType eventType) {
