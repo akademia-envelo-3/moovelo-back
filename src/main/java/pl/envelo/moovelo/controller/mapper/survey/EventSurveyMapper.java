@@ -1,10 +1,12 @@
 package pl.envelo.moovelo.controller.mapper.survey;
 
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;
+import pl.envelo.moovelo.controller.dto.survey.EventSurveyRequestDto;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.surveys.Answer;
 import pl.envelo.moovelo.entity.surveys.EventSurvey;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class EventSurveyMapper {
@@ -35,5 +37,16 @@ public class EventSurveyMapper {
                         .map(AnswerMapper::mapAnswerToAnswerResponseDto)
                         .collect(Collectors.toList()))
                 .build();
+    }
+
+    public static EventSurvey mapEventSurveyRequestDtoToEventSurvey(EventSurveyRequestDto eventSurveyRequestDto) {
+        EventSurvey eventSurvey = new EventSurvey();
+        eventSurvey.setQuestion(eventSurveyRequestDto.getQuestion());
+        eventSurvey.setIsMultipleChoice(eventSurveyRequestDto.isMultipleChoice());
+        eventSurvey.setAnswers(eventSurveyRequestDto.getAnswers()
+                .stream()
+                .map(AnswerMapper::mapEventSurveyRequestAnswerDtoToAnswer)
+                .collect(Collectors.toList()));
+        return eventSurvey;
     }
 }

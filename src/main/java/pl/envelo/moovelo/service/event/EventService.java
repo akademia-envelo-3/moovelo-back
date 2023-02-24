@@ -2,7 +2,10 @@ package pl.envelo.moovelo.service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.controller.searchutils.EventSearchSpecification;
@@ -14,13 +17,19 @@ import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.*;
 import pl.envelo.moovelo.entity.surveys.EventSurvey;
+import pl.envelo.moovelo.entity.surveys.Answer;
+import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.exception.StatusNotExistsException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
+import pl.envelo.moovelo.model.EventsForUserCriteria;
+import pl.envelo.moovelo.model.SortingAndPagingCriteria;
 import pl.envelo.moovelo.repository.event.EventRepositoryManager;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
+import pl.envelo.moovelo.service.survey.EventSurveyService;
+
 import javax.persistence.EntityExistsException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -38,6 +47,8 @@ public class EventService<I extends Event> {
     protected final HashTagService hashTagService;
     protected final BasicUserService basicUserService;
     protected EventSearchSpecification eventSearchSpecification;
+
+    protected final EventSurveyService eventSurveyService;
 
     public I createNewEvent(I event, EventType eventType, Long userId) {
         log.info("EventService - createNewEvent()");
@@ -119,6 +130,41 @@ public class EventService<I extends Event> {
                 .findAll(eventSearchSpecification.getEventsSpecification(privacy, group, cat, groupId), pageable);
 
         log.info("EventService - getAllEvents() return {}", allEvents.toString());
+
+        return allEvents;
+    }
+
+    public Page<? extends Event> getEventsForUser(
+            Long userId,
+            EventsForUserCriteria filterCriteria,
+            SortingAndPagingCriteria sortingAndPagingCriteria,
+            EventType eventType
+    ) {
+        log.info("EventService - getEventsForUser(userId = '{}', filterCriteria = '{}', sortingAndPagingCriteria = '{}')",
+                userId, filterCriteria, sortingAndPagingCriteria);
+
+        Pageable pageable = PageRequest.of(
+                sortingAndPagingCriteria.getPageNumber(),
+                sortingAndPagingCriteria.getPageSize(),
+                Sort.by(eventSearchSpecification.createSortOrderForUserSpecification(
+                                sortingAndPagingCriteria.getSortBy(),
+                                sortingAndPagingCriteria.getSortDirection()
+                        )
+                )
+        );
+
+        Page<? extends Event> allEvents = eventRepositoryManager
+                .getRepositoryForSpecificEvent(eventType)
+                .findAll(
+                        eventSearchSpecification.getEventsAvailableForUserSpecification(
+                                userId,
+                                filterCriteria
+                        ),
+                        pageable
+                );
+
+        log.info("EventService - getEventsForUser(userId = '{}', filterCriteria = '{}', sortingAndPagingCriteria = '{}') return '{}'",
+                userId, filterCriteria, sortingAndPagingCriteria, allEvents);
 
         return allEvents;
     }
@@ -218,8 +264,6 @@ public class EventService<I extends Event> {
         I event = getEventById(eventId, eventType);
         BasicUser user = basicUserService.getBasicUserById(userId);
 
-        checkIfUserHasAccessToEvent(event, user);
-
         Set<BasicUser> setOfAccepted = event.getAcceptedStatusUsers();
         Set<BasicUser> setOfPending = event.getPendingStatusUsers();
         Set<BasicUser> setOfRejected = event.getRejectedStatusUsers();
@@ -272,13 +316,9 @@ public class EventService<I extends Event> {
         }
     }
 
-    public List<EventSurvey> getEventSurveysByEventId(Long eventId, User user, EventType eventType) {
+    public List<EventSurvey> getEventSurveysByEventId(Long eventId, EventType eventType) {
         log.info("EventService - getEventSurveysByEventId()");
         I event = getEventById(eventId, eventType);
-
-        if (user.getRole().equals(Role.ROLE_USER)) {
-            checkIfUserHasAccessToEvent(event, (BasicUser) user);
-        }
 
         List<EventSurvey> surveys = event.getEventSurveys();
 
@@ -286,9 +326,11 @@ public class EventService<I extends Event> {
         return surveys;
     }
 
-    private void checkIfUserHasAccessToEvent(Event event, BasicUser user) {
-        if (!event.getUsersWithAccess().contains(user)) {
-            throw new UnauthorizedRequestException("User with id " + user.getId() + " does not have an access to event with id " + event.getId());
-        }
+    public EventSurvey createEventSurvey(EventSurvey eventSurvey, Long eventId) {
+        log.info("EventService - createEventSurvey()");
+        Event event = getEventById(eventId, EventType.EVENT);
+
+        EventSurvey newEventSurvey = eventSurveyService.createNewSurvey(eventSurvey, event);
+        return newEventSurvey;
     }
 }
