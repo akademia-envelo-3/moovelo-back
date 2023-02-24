@@ -71,6 +71,22 @@ public class GroupService {
         }
     }
 
+    public void updateGroupById(Group group, GroupInfo groupInfo) {
+        log.info("GroupService - updateGroupById() - group = {} - newGroupInfo = {}", group.toString(), groupInfo.toString());
+        String groupName = groupInfo.getName();
+        Optional<Group> groupInfoOptional = groupRepository.findByGroupInfoName(groupName);
+        if (groupInfoOptional.isPresent()) {
+            throw new IllegalArgumentException("Group name: " + groupName + " already exists. Choose another name!");
+        } else {
+            GroupInfo groupInfoInDb = group.getGroupInfo();
+            groupInfoInDb.setName(groupInfo.getName());
+            groupInfoInDb.setDescription(groupInfo.getDescription());
+            groupInfoService.updateGroupInfo(groupInfoInDb);
+            log.info("GroupService - updateGroupById() - updated - groupInfo.name = {} -  groupInfo.description = {} ",
+                    group.getGroupInfo().getName(), group.getGroupInfo().getDescription());
+        }
+    }
+
     public Page<Group> getAllGroupsForBasicUser(Long basicUserId, Boolean membership, GroupPage groupPage) {
         log.info("GroupService - getAllGroupsForBasicUser()  - params - basicUser = {}, membership = {}, groupPage = {}",
                 basicUserId, membership, groupPage);
