@@ -1,6 +1,6 @@
 INSERT INTO EVENTS_X_BASIC_USERS_ACCESS(EVENT_ID, USER_ID)
 VALUES (1, 1), (1, 2), (1, 3),
-                       (2, 3),
+       (2, 1),         (2, 3),
        (3, 1), (3, 2), (3, 3),
        (4, 1), (4, 2), (4, 3),
        (5, 1), (5, 2), (5, 3),

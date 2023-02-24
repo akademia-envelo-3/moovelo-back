@@ -165,28 +165,32 @@ public class EventSearchSpecification {
             CriteriaBuilder criteriaBuilder,
             List<Predicate> predicates
     ) {
+        predicates.add(
+                criteriaBuilder.in(
+                        eventRoot.join("usersWithAccess").get("id")
+                ).value(userId)
+        );
+
         if (filterCriteria.isAcceptedEvents()) {
             predicates.add(
                     criteriaBuilder.in(
                             eventRoot.join("acceptedStatusUsers").get("id")
                     ).value(userId)
             );
-        } else if (filterCriteria.isPendingEvents()) {
+        }
+
+        if (filterCriteria.isPendingEvents()) {
             predicates.add(
                     criteriaBuilder.in(
                             eventRoot.join("pendingStatusUsers").get("id")
                     ).value(userId)
             );
-        } else if (filterCriteria.isRejectedEvents()) {
+        }
+
+        if (filterCriteria.isRejectedEvents()) {
             predicates.add(
                     criteriaBuilder.in(
                             eventRoot.join("rejectedStatusUsers").get("id")
-                    ).value(userId)
-            );
-        } else {
-            predicates.add(
-                    criteriaBuilder.in(
-                            eventRoot.join("usersWithAccess").get("id")
                     ).value(userId)
             );
         }
