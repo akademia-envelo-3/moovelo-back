@@ -28,6 +28,8 @@ import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
+import pl.envelo.moovelo.model.EventsForUserCriteria;
+import pl.envelo.moovelo.model.SortingAndPagingCriteria;
 import pl.envelo.moovelo.service.AuthorizationService;
 import pl.envelo.moovelo.service.event.EventService;
 
@@ -149,6 +151,30 @@ public class EventController {
 
         log.info("EventController - getAllEvents() return {}", eventsDto);
         return ResponseEntity.ok(eventsDto);
+    }
+
+    @GetMapping("/events/users/{userId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<Page<?>> getAllEventsAvailableForUser(
+            @PathVariable Long userId,
+            EventsForUserCriteria filterCriteria,
+            SortingAndPagingCriteria sortingAndPagingCriteria
+    ) {
+        log.info("EventController - getAllEventsAvailableForUser - userId = '{}', filterCriteria = '{}', sortingAndPagingCriteria = '{}'",
+                userId, filterCriteria, sortingAndPagingCriteria);
+        eventMapperInterface = new EventListMapper();
+
+        if (!authorizationService.isLoggedUserIdEqualToBasicUserIdParam(userId)) {
+            throw new UnauthorizedRequestException("You do not have access to view this user's events");
+        }
+
+        Page<? extends Event> eventsAvailableForUser = eventService.getEventsForUser(userId, filterCriteria, sortingAndPagingCriteria, eventType);
+
+        Page<EventListResponseDto> eventsAvailableForUserDto = eventMapperManager.mapEventToEventListResponseDto(eventsAvailableForUser, eventMapperInterface);
+
+        log.info("EventController - getAllEventsAvailableForUser - userId = '{}', filterCriteria = '{}', sortingAndPagingCriteria = '{}' - return = '{}'",
+                userId, filterCriteria, sortingAndPagingCriteria, eventsAvailableForUserDto);
+        return ResponseEntity.ok(eventsAvailableForUserDto);
     }
 
     @GetMapping("/events/{eventId}")
