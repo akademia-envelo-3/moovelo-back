@@ -2,10 +2,14 @@ package pl.envelo.moovelo.service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
+import pl.envelo.moovelo.controller.searchutils.EventSearchSpecification;
+import pl.envelo.moovelo.controller.searchutils.PagingUtils;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.actors.BasicUser;
@@ -18,6 +22,8 @@ import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.exception.StatusNotExistsException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
+import pl.envelo.moovelo.model.EventsForUserCriteria;
+import pl.envelo.moovelo.model.SortingAndPagingCriteria;
 import pl.envelo.moovelo.repository.event.EventRepositoryManager;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
@@ -128,6 +134,41 @@ public class EventService<I extends Event> {
         return allEvents;
     }
 
+    public Page<? extends Event> getEventsForUser(
+            Long userId,
+            EventsForUserCriteria filterCriteria,
+            SortingAndPagingCriteria sortingAndPagingCriteria,
+            EventType eventType
+    ) {
+        log.info("EventService - getEventsForUser(userId = '{}', filterCriteria = '{}', sortingAndPagingCriteria = '{}')",
+                userId, filterCriteria, sortingAndPagingCriteria);
+
+        Pageable pageable = PageRequest.of(
+                sortingAndPagingCriteria.getPageNumber(),
+                sortingAndPagingCriteria.getPageSize(),
+                Sort.by(eventSearchSpecification.createSortOrderForUserSpecification(
+                                sortingAndPagingCriteria.getSortBy(),
+                                sortingAndPagingCriteria.getSortDirection()
+                        )
+                )
+        );
+
+        Page<? extends Event> allEvents = eventRepositoryManager
+                .getRepositoryForSpecificEvent(eventType)
+                .findAll(
+                        eventSearchSpecification.getEventsAvailableForUserSpecification(
+                                userId,
+                                filterCriteria
+                        ),
+                        pageable
+                );
+
+        log.info("EventService - getEventsForUser(userId = '{}', filterCriteria = '{}', sortingAndPagingCriteria = '{}') return '{}'",
+                userId, filterCriteria, sortingAndPagingCriteria, allEvents);
+
+        return allEvents;
+    }
+
     // TODO: 21.02.2023 Z List dziala, Page trzeba powalczyc
 //    public Page<I> getAllEventsByEventOwnerBasicUserId(Long basicUserId, EventType eventType) {
 //        log.info("EventService - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
@@ -211,15 +252,9 @@ public class EventService<I extends Event> {
         List<BasicUser> usersWithAccessList = event.getUsersWithAccess();
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<BasicUser> usersWithAccess = listToPage(pageable, usersWithAccessList);
+        Page<BasicUser> usersWithAccess = PagingUtils.listToPage(pageable, usersWithAccessList);
         log.info("EventService - getUsersWithAccess() return {}", usersWithAccess);
         return usersWithAccess;
-    }
-
-    public static <T> Page<T> listToPage(final Pageable pageable, List<T> list) {
-        int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());
-        int last = Math.min(first + pageable.getPageSize(), list.size());
-        return new PageImpl<>(list.subList(first, last), pageable, list.size());
     }
 
     @Transactional

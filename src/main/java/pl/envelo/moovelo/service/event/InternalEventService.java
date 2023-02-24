@@ -2,7 +2,7 @@ package pl.envelo.moovelo.service.event;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
+import pl.envelo.moovelo.controller.searchutils.EventSearchSpecification;
 import pl.envelo.moovelo.entity.events.InternalEvent;
 import pl.envelo.moovelo.repository.event.EventRepositoryManager;
 import pl.envelo.moovelo.service.HashTagService;
