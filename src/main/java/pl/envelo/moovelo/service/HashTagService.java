@@ -19,6 +19,7 @@ public class HashTagService {
     public List<Hashtag> getHashtagsToAssign(List<Hashtag> hashtags) {
         List<Hashtag> hashtagsToAssign = new ArrayList<>();
         hashtags.forEach(hashtag -> {
+            // TODO: 24.02.2023 - sprawdzić widoczność hashtagu -> jeśli są niewidoczne, to nie dodajemy ich do wydarzenia
             if (checkIfHashtagExistByHashTagValue(hashtag)) {
                 Hashtag incrementedHashtag = incrementHashTagOccurrence(hashtag);
                 hashtagsToAssign.add(incrementedHashtag);
