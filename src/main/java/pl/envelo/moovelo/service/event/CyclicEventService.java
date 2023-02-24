@@ -9,6 +9,7 @@ import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 import pl.envelo.moovelo.service.group.GroupService;
+import pl.envelo.moovelo.service.survey.EventSurveyService;
 
 @Service
 @Slf4j
@@ -19,8 +20,10 @@ public class CyclicEventService extends InternalEventService<CyclicEvent> {
                               HashTagService hashTagService,
                               BasicUserService basicUserService,
                               EventSearchSpecification eventSearchSpecification,
-                              GroupService groupService) {
-        super(eventRepositoryManager, eventInfoService, eventOwnerService, hashTagService, basicUserService, eventSearchSpecification, groupService);
+                              GroupService groupService,
+                              EventSurveyService eventSurveyService) {
+        super(eventRepositoryManager, eventInfoService, eventOwnerService, hashTagService,
+                basicUserService, eventSearchSpecification, groupService, eventSurveyService);
     }
 
     @Override

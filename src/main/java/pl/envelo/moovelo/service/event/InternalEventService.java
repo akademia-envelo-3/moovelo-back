@@ -10,6 +10,7 @@ import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 import pl.envelo.moovelo.service.group.GroupService;
+import pl.envelo.moovelo.service.survey.EventSurveyService;
 
 @Service
 @Slf4j
@@ -23,9 +24,10 @@ public class InternalEventService<C extends InternalEvent> extends EventService<
                                 HashTagService hashTagService,
                                 BasicUserService basicUserService,
                                 EventSearchSpecification eventSearchSpecification,
-                                GroupService groupService) {
+                                GroupService groupService,
+                                EventSurveyService eventSurveyService) {
         super(eventRepositoryManager, eventInfoService, eventOwnerService, hashTagService,
-                basicUserService, eventSearchSpecification);
+                basicUserService, eventSearchSpecification, eventSurveyService);
         this.groupService = groupService;
     }
 
