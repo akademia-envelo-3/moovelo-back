@@ -125,4 +125,15 @@ public class GroupService {
         Sort sort = Sort.by(groupPage.getSortOrder(), sortFromParam);
         return PageRequest.of(groupPage.getPageNumber(), groupPage.getPageSize(), sort);
     }
+
+    public void updateGroupOwnershipById(Long groupId, Long newOwnerUserId) {
+        log.info("GroupService - updateGroupOwnershipById() - groupId = {}", groupId);
+        Group group = getGroupById(groupId);
+        GroupOwner newGroupOwner = groupOwnerService.getGroupOwnerByUserId(newOwnerUserId);
+        GroupOwner currentGroupOwner = groupOwnerService.getGroupOwnerByGroupId(groupId);
+        group.setGroupOwner(newGroupOwner);
+        groupRepository.save(group);
+        groupOwnerService.removeGroupOwnerOwnerWithNoGroups(currentGroupOwner);
+        log.info("GroupService - updateGroupOwnershipById() - groupId = {} updated", groupId);
+    }
 }

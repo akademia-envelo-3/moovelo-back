@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import pl.envelo.moovelo.controller.dto.OwnershipRequestDto;
 import pl.envelo.moovelo.controller.dto.group.GroupInfoDto;
 import pl.envelo.moovelo.controller.dto.group.GroupListResponseDto;
 import pl.envelo.moovelo.controller.dto.group.GroupRequestDto;
@@ -132,4 +133,31 @@ public class GroupController {
         body.put("message", "User with id: " + userId + " successfully added the group with id: " + groupId);
         return ResponseEntity.ok().body(body);
     }
+
+    @PatchMapping("/{groupId}/ownership")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    public ResponseEntity<?> updateGroupOwnershipById(
+            @RequestBody OwnershipRequestDto ownershipRequestDto, @PathVariable Long groupId) {
+        log.info("GroupController - updateGroupOwnershipById(), - groupId = {}", groupId);
+        if (authorizationService.isLoggedUserGroupOwner(groupId) || authorizationService.isLoggedUserAdmin()) {
+            Long newOwnerUserId = ownershipRequestDto.getNewOwnerUserId();
+            if (authorizationService.checkIfBasicUserExistsById(newOwnerUserId)) {
+                groupService.updateGroupOwnershipById(groupId, newOwnerUserId);
+            } else {
+                log.error("GroupController - updateGroupOwnershipById()", new UnauthorizedRequestException("Unauthorized request"));
+                throw new UnauthorizedRequestException("The id of the new group owner does not belong to any basic user account");
+            }
+        } else {
+            log.error("EventController - updateEventOwnershipById()", new UnauthorizedRequestException("Unauthorized request"));
+            throw new UnauthorizedRequestException("Logged in user is not authorized to change the group owner of the event with id: " + groupId);
+        }
+        // TODO: 24.02.2023 - change to getBody()
+        Map<String, String> body = new HashMap<>();
+        body.put("message", "Group with id: "  + groupId + " has a new owner!");
+
+        log.info("GroupController - updateGroupOwnershipById(), - groupId = {} - ownership updated", groupId);
+        return ResponseEntity.ok().body(body);
+    }
+
+
 }
