@@ -2,9 +2,14 @@ package pl.envelo.moovelo.service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import pl.envelo.moovelo.controller.searchspecification.EventSearchSpecification;
+import org.springframework.transaction.annotation.Transactional;
+import pl.envelo.moovelo.controller.searchutils.EventSearchSpecification;
+import pl.envelo.moovelo.controller.searchutils.PagingUtils;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.actors.BasicUser;
@@ -23,7 +28,6 @@ import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 
 import javax.persistence.EntityExistsException;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -243,15 +247,9 @@ public class EventService<I extends Event> {
         List<BasicUser> usersWithAccessList = event.getUsersWithAccess();
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<BasicUser> usersWithAccess = listToPage(pageable, usersWithAccessList);
+        Page<BasicUser> usersWithAccess = PagingUtils.listToPage(pageable, usersWithAccessList);
         log.info("EventService - getUsersWithAccess() return {}", usersWithAccess);
         return usersWithAccess;
-    }
-
-    public static <T> Page<T> listToPage(final Pageable pageable, List<T> list) {
-        int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), list.size());
-        int last = Math.min(first + pageable.getPageSize(), list.size());
-        return new PageImpl<>(list.subList(first, last), pageable, list.size());
     }
 
     @Transactional

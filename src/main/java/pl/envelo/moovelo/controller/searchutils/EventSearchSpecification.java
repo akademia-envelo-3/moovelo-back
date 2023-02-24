@@ -1,4 +1,4 @@
-package pl.envelo.moovelo.controller.searchspecification;
+package pl.envelo.moovelo.controller.searchutils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
