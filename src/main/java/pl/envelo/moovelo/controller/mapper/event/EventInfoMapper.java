@@ -1,7 +1,7 @@
 package pl.envelo.moovelo.controller.mapper.event;
 
 import pl.envelo.moovelo.controller.dto.event.eventInfo.EventInfoDto;
-import pl.envelo.moovelo.controller.mapper.CategoryListResponseMapper;
+import pl.envelo.moovelo.controller.dto.event.eventInfo.EventInfoListResponseDto;
 import pl.envelo.moovelo.controller.mapper.LocationMapper;
 import pl.envelo.moovelo.controller.mapper.category.CategoryMapper;
 import pl.envelo.moovelo.entity.events.EventInfo;
@@ -17,18 +17,23 @@ public class EventInfoMapper {
                 .id(eventInfo.getId())
                 .name(eventInfo.getName())
                 .description(eventInfo.getDescription())
-                .category(CategoryListResponseMapper.mapCategoryToCategoryListResponseDto(eventInfo.getCategory()))
+                .category(CategoryMapper.mapCategoryToCategoryListResponseDto(eventInfo.getCategory()))
                 .startDate(eventInfo.getStartDate().format(DATE_FORMAT))
                 .isConfirmationRequired(eventInfo.getIsConfirmationRequired())
                 .location(LocationMapper.mapFromLocationEntityToLocationDto(eventInfo.getLocation()))
                 // TODO
 //                .attachments()
                 .build();
+    }
 
+    public static EventInfoListResponseDto mapEventInfoToEventInfoListResponseDto(EventInfo eventInfo) {
+        return EventInfoListResponseDto.builder()
+                .name(eventInfo.getName())
+                .category(CategoryMapper.mapCategoryToCategoryListResponseDto(eventInfo.getCategory()))
+                .build();
     }
 
     public static EventInfo mapEventInfoDtoToEventInfo(EventInfoDto eventInfoDto) {
-//        TODO zakomentowane pola nie dzialaja przy create Event
         EventInfo eventInfo = new EventInfo();
         eventInfo.setId(eventInfoDto.getId());
         eventInfo.setName(eventInfoDto.getName());
@@ -37,7 +42,7 @@ public class EventInfoMapper {
         eventInfo.setLocation(LocationMapper.mapFromLocationDtoToLocationEntity(
                 eventInfoDto.getLocation().getId(), eventInfoDto.getLocation()));
         eventInfo.setIsConfirmationRequired(eventInfoDto.isConfirmationRequired());
-        eventInfo.setCategory(CategoryMapper.mapCategoryResponseDtoToCategory(eventInfoDto.getCategory()));
+        eventInfo.setCategory(CategoryMapper.mapCategoryListDtoToCategory(eventInfoDto.getCategory()));
         /// TODO: 26.01.2023
         //    eventInfo.setFiles(eventInfoDto.getAttachments().stream().map(attachmentDto -> AttachmentMapper.mapAttachmentDtoToAttachment(attachmentDto)));
         return eventInfo;

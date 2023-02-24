@@ -1,6 +1,7 @@
 package pl.envelo.moovelo.controller.mapper.event;
 
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerDto;
+import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnerListResponseDto;
 import pl.envelo.moovelo.controller.mapper.event.manager.EventMapper;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.EventOwner;
@@ -8,6 +9,12 @@ import pl.envelo.moovelo.entity.events.EventOwner;
 import java.util.stream.Collectors;
 
 public class EventOwnerMapper {
+
+    public static EventOwner mapEventOwnerDtoToEventOwner(EventOwnerDto eventOwnerDto) {
+        EventOwner eventOwner = new EventOwner();
+        eventOwner.setUserId(eventOwnerDto.getUserId());
+        return eventOwner;
+    }
 
     public static EventOwnerDto mapEventOwnerToEventOwnerDto(EventOwner eventOwner, BasicUser basicUser) {
         return EventOwnerDto.builder()
@@ -19,9 +26,9 @@ public class EventOwnerMapper {
                 .build();
     }
 
-    public static EventOwner mapEventOwnerDtoToEventOwner(EventOwnerDto eventOwnerDto) {
-        EventOwner eventOwner = new EventOwner();
-        eventOwner.setUserId(eventOwnerDto.getUserId());
-        return eventOwner;
+    public static EventOwnerListResponseDto mapEventOwnerToEventOwnerListResponseDto(EventOwner eventOwner) {
+        return EventOwnerListResponseDto.builder()
+                .userId(eventOwner.getUserId())
+                .build();
     }
 }

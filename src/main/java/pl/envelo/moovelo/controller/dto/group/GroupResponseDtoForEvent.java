@@ -1,11 +1,12 @@
 package pl.envelo.moovelo.controller.dto.group;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class GroupResponseDtoForEvent {
+
     private Long id;
     private String name;
 }

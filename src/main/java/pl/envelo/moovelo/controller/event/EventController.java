@@ -63,9 +63,10 @@ public class EventController {
         log.info("EventController - createNewEvent()");
         eventMapperInterface = new EventMapper();
         Long basicUserId = authorizationService.getLoggedBasicUserId();
+        Long groupId = eventRequestDto.getGroupId();
 
         Event mappedEventFromRequest = eventMapperManager.mapEventRequestDtoToEventByEventType(eventRequestDto, eventType);
-        Event createdEvent = eventService.createNewEvent(mappedEventFromRequest, eventType, basicUserId);
+        Event createdEvent = eventService.createNewEvent(mappedEventFromRequest, eventType, basicUserId, groupId);
         EventResponseDto eventResponseDto = eventMapperManager.getMappedResponseForSpecificEvent(eventMapperInterface, createdEvent);
 
         URI uri = ServletUriComponentsBuilder
@@ -115,7 +116,7 @@ public class EventController {
 
     @DeleteMapping("/events/{eventId}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> removeEventById(@PathVariable long eventId) throws IllegalAccessException {
+    public ResponseEntity<?> removeEventById(@PathVariable long eventId){
         log.info("EventController - removeEventById() - eventId = {}", eventId);
 
         Event event = eventService.getEventById(eventId, eventType);

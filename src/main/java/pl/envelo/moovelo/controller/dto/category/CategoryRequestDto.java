@@ -5,7 +5,6 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class CategoryListResponseDto {
-    private Long id;
+public class CategoryRequestDto {
     private String name;
 }

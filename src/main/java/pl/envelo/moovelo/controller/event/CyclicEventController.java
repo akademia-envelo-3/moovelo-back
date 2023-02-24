@@ -47,9 +47,10 @@ public class CyclicEventController {
         log.info("CyclicEventController - createNewEvent()");
         eventMapperInterface = new EventMapper();
         Long basicUserId = authorizationService.getLoggedBasicUserId();
+        Long groupId = eventRequestDto.getGroupId();
 
         CyclicEvent event = eventMapperManager.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.CYCLIC_EVENT);
-        CyclicEvent createdCyclicEvent = cyclicEventService.createNewEvent(event, eventType, basicUserId);
+        CyclicEvent createdCyclicEvent = cyclicEventService.createNewEvent(event, eventType, basicUserId, groupId);
         EventResponseDto eventResponseDto = eventMapperManager.getMappedResponseForSpecificEvent(eventMapperInterface, createdCyclicEvent);
 
         URI uri = ServletUriComponentsBuilder
