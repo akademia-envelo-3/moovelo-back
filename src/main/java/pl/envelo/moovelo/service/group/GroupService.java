@@ -19,6 +19,7 @@ import pl.envelo.moovelo.service.actors.GroupOwnerService;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.BiFunction;
 
 @AllArgsConstructor
 @Service
@@ -100,14 +101,32 @@ public class GroupService {
     }
 
     public void joinGroup(Long userId, Group group) {
+        log.info("GroupService - joinGroup() - basicUserId = {}, group = {}", userId, group);
         BasicUser basicUser = basicUserService.getBasicUserById(userId);
         Set<Group> userGroups = basicUser.getGroups();
         if (userGroups == null) {
             userGroups = new HashSet<>();
         }
         userGroups.add(group);
-        group.getMembers().add(basicUser);
-        group.setGroupSize(group.getGroupSize() + 1);
+        updateGroupAndBasicUser(group, basicUser, Set::add);
+        log.info("GroupService - joinGroup() - basicUserId = {}, group = {} - group joined by user", userId, group);
+    }
+
+    public void leaveGroup(Long userId, Group group) {
+        log.info("GroupService - leaveGroup() - basicUserId = {}, group = {}", userId, group);
+        BasicUser basicUser = basicUserService.getBasicUserById(userId);
+        Set<Group> userGroups = basicUser.getGroups();
+        userGroups.remove(group);
+        updateGroupAndBasicUser(group, basicUser, Set::remove);
+        log.info("GroupService - leaveGroup() - basicUserId = {}, group = {} - group left by user", userId, group);
+    }
+
+    private void updateGroupAndBasicUser(Group group,
+                                         BasicUser basicUser,
+                                         BiFunction<Set<BasicUser>, BasicUser, Boolean> membersInteraction) {
+        Set<BasicUser> members = group.getMembers();
+        membersInteraction.apply(members, basicUser);
+        group.setGroupSize(members.size());
         groupRepository.save(group);
         basicUserService.updateBasicUser(basicUser);
     }
