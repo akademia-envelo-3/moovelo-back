@@ -37,10 +37,12 @@ public class InternalEventController {
     @Autowired
     public InternalEventController(EventMapperManager eventMapperManager,
                                    InternalEventService<InternalEvent> internalEventService,
-                                   AuthorizationService authorizationService) {
+                                   AuthorizationService authorizationService
+    ) {
         this.eventMapperManager = eventMapperManager;
         this.internalEventService = internalEventService;
         this.authorizationService = authorizationService;
+
     }
 
     @PostMapping("/internalEvents")
@@ -49,9 +51,10 @@ public class InternalEventController {
         log.info("InternalEventController - createNewEvent()");
         eventMapperInterface = new EventMapper();
         Long basicUserId = authorizationService.getLoggedBasicUserId();
+        Long groupId = eventRequestDto.getGroupId();
 
         InternalEvent mappedInternalEventFromRequest = eventMapperManager.mapEventRequestDtoToEventByEventType(eventRequestDto, eventType);
-        InternalEvent createdInternalEvent = internalEventService.createNewEvent(mappedInternalEventFromRequest, eventType, basicUserId);
+        InternalEvent createdInternalEvent = internalEventService.createNewEvent(mappedInternalEventFromRequest, eventType, basicUserId, groupId);
         EventResponseDto eventResponseDto = eventMapperManager.getMappedResponseForSpecificEvent(eventMapperInterface, createdInternalEvent);
 
         URI uri = ServletUriComponentsBuilder
@@ -65,6 +68,26 @@ public class InternalEventController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(uri)
                 .body(eventResponseDto);
+    }
+
+    @PutMapping("/internalEvents/{eventId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<String> updateInternalEventById(@PathVariable Long eventId, @RequestBody EventRequestDto eventRequestDto) {
+        log.info("InternalEventController - updateInternalEventById() - eventId = {}", eventId);
+        eventMapperInterface = new EventMapper();
+
+        if (internalEventService.checkIfEventExistsById(eventId, eventType)) {
+            if (authorizationService.isLoggedUserEventOwner(eventId)) {
+                InternalEvent mappedEventFromRequest = eventMapperManager.mapEventRequestDtoToEventByEventType(eventRequestDto, eventType);
+                internalEventService.updateEventById(eventId, mappedEventFromRequest, eventType, authorizationService.getLoggedUserId());
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Logged in user is not authorized to update the  with id: " + eventId);
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event with id " + eventId + " does not exist");
+        }
+        log.info("EventController - updateEventById() - event with eventId = {} updated", eventId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/internalEvents")

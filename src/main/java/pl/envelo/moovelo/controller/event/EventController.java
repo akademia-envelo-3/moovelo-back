@@ -14,7 +14,7 @@ import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.attachment.AttachmentResponseDto;
 import pl.envelo.moovelo.controller.dto.comment.CommentResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
-import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
+import pl.envelo.moovelo.controller.dto.OwnershipRequestDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;
@@ -30,10 +30,8 @@ import pl.envelo.moovelo.controller.mapper.survey.EventSurveyMapper;
 import pl.envelo.moovelo.entity.Attachment;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.actors.BasicUser;
-import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventType;
-import pl.envelo.moovelo.entity.surveys.Answer;
 import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
@@ -74,7 +72,7 @@ public class EventController {
         Long basicUserId = authorizationService.getLoggedBasicUserId();
 
         Event mappedEventFromRequest = eventMapperManager.mapEventRequestDtoToEventByEventType(eventRequestDto, eventType);
-        Event createdEvent = eventService.createNewEvent(mappedEventFromRequest, eventType, basicUserId);
+        Event createdEvent = eventService.createNewEvent(mappedEventFromRequest, eventType, basicUserId, null);
         EventResponseDto eventResponseDto = eventMapperManager.getMappedResponseForSpecificEvent(eventMapperInterface, createdEvent);
 
         URI uri = ServletUriComponentsBuilder
@@ -94,6 +92,7 @@ public class EventController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<String> updateEventById(@PathVariable Long eventId, @RequestBody EventRequestDto eventRequestDto) {
         log.info("EventController - updateEventById() - eventId = {}", eventId);
+        eventMapperInterface = new EventMapper();
 
         if (eventService.checkIfEventExistsById(eventId, eventType)) {
             if (authorizationService.isLoggedUserEventOwner(eventId)) {
@@ -124,7 +123,7 @@ public class EventController {
 
     @DeleteMapping("/events/{eventId}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> removeEventById(@PathVariable long eventId) throws IllegalAccessException {
+    public ResponseEntity<?> removeEventById(@PathVariable long eventId) {
         log.info("EventController - removeEventById() - eventId = {}", eventId);
 
         Event event = eventService.getEventById(eventId, eventType);
@@ -220,11 +219,11 @@ public class EventController {
 
     @PatchMapping("/events/{eventId}/ownership")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<String> updateEventOwnershipById(@RequestBody EventOwnershipRequestDto eventOwnershipRequestDto,
+    public ResponseEntity<String> updateEventOwnershipById(@RequestBody OwnershipRequestDto ownershipRequestDto,
                                                            @PathVariable Long eventId) {
         log.info("EventController - updateEventOwnershipById(), - eventId = {}", eventId);
         if (authorizationService.isLoggedUserEventOwner(eventId) || authorizationService.isLoggedUserAdmin()) {
-            Long newOwnerUserId = eventOwnershipRequestDto.getNewOwnerUserId();
+            Long newOwnerUserId = ownershipRequestDto.getNewOwnerUserId();
             if (authorizationService.checkIfBasicUserExistsById(newOwnerUserId)) {
                 eventService.updateEventOwnershipByEventId(eventId, newOwnerUserId, eventType);
             } else {

@@ -28,7 +28,7 @@ public class Group {
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.PERSIST})
     private GroupOwner groupOwner;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH})
     @JoinTable(
             name = "groups_members",
             joinColumns = @JoinColumn(name = "group_id"),

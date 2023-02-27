@@ -9,17 +9,23 @@ import pl.envelo.moovelo.service.AttachmentService;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
+import pl.envelo.moovelo.service.group.GroupService;
 import pl.envelo.moovelo.service.survey.EventSurveyService;
 
 @Service
 @Slf4j
 public class CyclicEventService extends InternalEventService<CyclicEvent> {
-    public CyclicEventService(EventRepositoryManager eventRepositoryManager, EventInfoService eventInfoService,
-                              EventOwnerService eventOwnerService, HashTagService hashTagService,
-                              BasicUserService basicUserService, EventSearchSpecification eventSearchSpecification, EventSurveyService eventSurveyService,
+    public CyclicEventService(EventRepositoryManager eventRepositoryManager,
+                              EventInfoService eventInfoService,
+                              EventOwnerService eventOwnerService,
+                              HashTagService hashTagService,
+                              BasicUserService basicUserService,
+                              EventSearchSpecification eventSearchSpecification,
+                              GroupService groupService,
+                              EventSurveyService eventSurveyService,
                               AttachmentService attachmentService) {
-        super(eventRepositoryManager, eventInfoService, eventOwnerService, hashTagService, basicUserService,
-                eventSearchSpecification, eventSurveyService, attachmentService);
+        super(eventRepositoryManager, eventInfoService, eventOwnerService, hashTagService,
+                basicUserService, eventSearchSpecification, groupService, eventSurveyService, attachmentService);
     }
 
     @Override
@@ -27,5 +33,12 @@ public class CyclicEventService extends InternalEventService<CyclicEvent> {
         super.setValidatedBasicEventFields(event, userId, eventWithFieldsAfterValidation);
         eventWithFieldsAfterValidation.setNumberOfRepeats(event.getNumberOfRepeats());
         eventWithFieldsAfterValidation.setFrequencyInDays(event.getFrequencyInDays());
+    }
+
+    @Override
+    protected void validateFieldsForExtendedEvents(CyclicEvent eventInDb, CyclicEvent eventFromDto) {
+        super.validateFieldsForExtendedEvents(eventInDb, eventFromDto);
+        eventInDb.setFrequencyInDays(eventFromDto.getFrequencyInDays());
+        eventInDb.setNumberOfRepeats(eventFromDto.getNumberOfRepeats());
     }
 }

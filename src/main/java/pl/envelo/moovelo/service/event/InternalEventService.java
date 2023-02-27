@@ -4,23 +4,33 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.controller.searchutils.EventSearchSpecification;
 import pl.envelo.moovelo.entity.events.InternalEvent;
+import pl.envelo.moovelo.entity.groups.Group;
 import pl.envelo.moovelo.repository.event.EventRepositoryManager;
 import pl.envelo.moovelo.service.AttachmentService;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
+import pl.envelo.moovelo.service.group.GroupService;
 import pl.envelo.moovelo.service.survey.EventSurveyService;
 
 @Service
 @Slf4j
 public class InternalEventService<C extends InternalEvent> extends EventService<C> {
 
-    public InternalEventService(EventRepositoryManager eventRepositoryManager, EventInfoService eventInfoService,
+    private final GroupService groupService;
+
+    public InternalEventService(EventRepositoryManager eventRepositoryManager,
+                                EventInfoService eventInfoService,
                                 EventOwnerService eventOwnerService,
-                                HashTagService hashTagService, BasicUserService basicUserService,
-                                EventSearchSpecification eventSearchSpecification, EventSurveyService eventSurveyService, AttachmentService attachmentService) {
+                                HashTagService hashTagService,
+                                BasicUserService basicUserService,
+                                EventSearchSpecification eventSearchSpecification,
+                                GroupService groupService,
+                                EventSurveyService eventSurveyService,
+                                AttachmentService attachmentService) {
         super(eventRepositoryManager, eventInfoService, eventOwnerService, hashTagService,
                 basicUserService, eventSearchSpecification, eventSurveyService, attachmentService);
+        this.groupService = groupService;
     }
 
     @Override
@@ -29,30 +39,14 @@ public class InternalEventService<C extends InternalEvent> extends EventService<
         eventWithFieldsAfterValidation.setPrivate(event.isPrivate());
     }
 
-    //    public C createNewEvent(C event, Long userId) {
-//        log.info("EventService - createNewEvent()");
-//        if (checkIfEntityExist(event)) {
-//            throw new EntityExistsException(EVENT_EXIST_MESSAGE);
-//        } else {
-//            List<Hashtag> hashtagsToAssign = hashTagService.getHashtagsToAssign(event.getHashtags());
-//            EventInfo validatedEventInfo = eventInfoService.validateEventInfoForCreateEvent(event.getEventInfo());
-//
-//            InternalEvent eventAfterFieldValidation = validateAggregatedEntitiesForCreateEvent(event, userId);
-//            eventAfterFieldValidation.setHashtags(hashtagsToAssign);
-//            eventAfterFieldValidation.setEventInfo(validatedEventInfo);
-//            eventAfterFieldValidation.setPrivate(event.isPrivate());
-//
-//            log.info("EventService - createNewEvent() return {}", eventAfterFieldValidation);
-//
-//            return (C) repositoryManager.getRepositoryForSpecificEvent(EventType.INTERNAL_EVENT).save(eventAfterFieldValidation);
-//        }
-//    }
+    @Override
+    protected void setGroupToEventIfEventIsInternal(C eventAfterFieldValidation, Long groupId) {
+        Group groupById = groupService.getGroupById(groupId);
+        eventAfterFieldValidation.setGroup(groupById);
+    }
 
-//    public List<? extends Event> getAllInternalEvents() {
-//        log.info("InternalEventService - getAllInternalEvents()");
-//        List<? extends Event> allInternalEvents = internalEventRepository.findAll();
-//
-//        log.info("InternalEventService - getAllInternalEvents() return {}", allInternalEvents.toString());
-//        return allInternalEvents;
-//    }
+    @Override
+    protected void validateFieldsForExtendedEvents(C eventInDb, C eventFromDto) {
+        super.validateFieldsForExtendedEvents(eventInDb, eventFromDto);
+    }
 }
