@@ -20,4 +20,6 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 
     @Query("SELECT g FROM Group g WHERE :user NOT MEMBER OF g.members")
     Page<Group> findAllGroupsWhereUserIsNotMember(@Param("user") BasicUser user, Pageable pageable);
+
+    Page<Group> findAllByGroupOwnerUserId(Long ownerUserId, Pageable pageable);
 }

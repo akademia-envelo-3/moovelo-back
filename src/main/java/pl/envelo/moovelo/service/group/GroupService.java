@@ -100,6 +100,20 @@ public class GroupService {
         return resultPage;
     }
 
+    public Page<Group> getAllGroupsByGroupOwnerUserId(Long ownerUserId, GroupPage groupPage) {
+        log.info("GroupService - getAllGroupsByGroupOwnerUserId()  - params, ownerUserId = {}", ownerUserId);
+        if (groupOwnerService.isBasicUserGroupOwner(ownerUserId)) {
+            Pageable pageable = getPageable(groupPage);
+            Page<Group> allByGroupOwnerUserId = groupRepository.findAllByGroupOwnerUserId(ownerUserId, pageable);
+            log.info("GroupService - getAllGroupsByGroupOwnerUserId() " +
+                    "- params - ownerUserId = {} - return {}", ownerUserId, allByGroupOwnerUserId.toString());
+            return allByGroupOwnerUserId;
+        } else {
+            log.info("GroupService - getAllGroupsByGroupOwnerUserId() - return - empty Page");
+            return Page.empty();
+        }
+    }
+
     public void joinGroup(Long userId, Group group) {
         log.info("GroupService - joinGroup() - basicUserId = {}, group = {}", userId, group);
         BasicUser basicUser = basicUserService.getBasicUserById(userId);
