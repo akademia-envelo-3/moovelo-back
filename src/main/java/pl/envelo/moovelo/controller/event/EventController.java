@@ -15,6 +15,7 @@ import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto
 import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;
+import pl.envelo.moovelo.controller.dto.survey.EventSurveyRequestDto;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventListMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
@@ -25,9 +26,12 @@ import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventType;
+import pl.envelo.moovelo.entity.surveys.Answer;
 import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.IllegalEventException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
+import pl.envelo.moovelo.model.EventsForUserCriteria;
+import pl.envelo.moovelo.model.SortingAndPagingCriteria;
 import pl.envelo.moovelo.service.AuthorizationService;
 import pl.envelo.moovelo.service.event.EventService;
 
@@ -151,6 +155,30 @@ public class EventController {
         return ResponseEntity.ok(eventsDto);
     }
 
+    @GetMapping("/events/users/{userId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<Page<?>> getAllEventsAvailableForUser(
+            @PathVariable Long userId,
+            EventsForUserCriteria filterCriteria,
+            SortingAndPagingCriteria sortingAndPagingCriteria
+    ) {
+        log.info("EventController - getAllEventsAvailableForUser - userId = '{}', filterCriteria = '{}', sortingAndPagingCriteria = '{}'",
+                userId, filterCriteria, sortingAndPagingCriteria);
+        eventMapperInterface = new EventListMapper();
+
+        if (!authorizationService.isLoggedUserIdEqualToBasicUserIdParam(userId)) {
+            throw new UnauthorizedRequestException("You do not have access to view this user's events");
+        }
+
+        Page<? extends Event> eventsAvailableForUser = eventService.getEventsForUser(userId, filterCriteria, sortingAndPagingCriteria, eventType);
+
+        Page<EventListResponseDto> eventsAvailableForUserDto = eventMapperManager.mapEventToEventListResponseDto(eventsAvailableForUser, eventMapperInterface);
+
+        log.info("EventController - getAllEventsAvailableForUser - userId = '{}', filterCriteria = '{}', sortingAndPagingCriteria = '{}' - return = '{}'",
+                userId, filterCriteria, sortingAndPagingCriteria, eventsAvailableForUserDto);
+        return ResponseEntity.ok(eventsAvailableForUserDto);
+    }
+
     @GetMapping("/events/{eventId}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<EventResponseDto> getEventById(@PathVariable Long eventId) {
@@ -212,6 +240,9 @@ public class EventController {
 
         log.info("EventController - setStatus()");
 
+        //TODO: 24.02.2023 zmiana na metodę authorizationService.isLoggedUserIdEqualToBasicUserIdParam()
+        authorizationService.checkIfLoggedUserHasAccessToEvent(eventId, eventType);
+
         if (authorizationService.getLoggedBasicUserId().equals(userId)) {
             eventService.setStatus(eventId, userId, status, eventType);
         } else {
@@ -225,10 +256,9 @@ public class EventController {
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<List<EventSurveyDto>> getEventSurveysByEventId(@PathVariable Long eventId) {
         log.info("EventController - getEventSurveysByEventId");
+        authorizationService.checkIfLoggedUserHasAccessToEvent(eventId, eventType);
 
-        User user = authorizationService.getLoggedUser();
-
-        List<EventSurvey> surveys = eventService.getEventSurveysByEventId(eventId, user, eventType);
+        List<EventSurvey> surveys = eventService.getEventSurveysByEventId(eventId, eventType);
 
         List<EventSurveyDto> surveysDto = surveys
                 .stream()
@@ -237,7 +267,8 @@ public class EventController {
                             authorizationService.isLoggedUserEventOwner(eventId)) {
                         return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto);
                     } else {
-                        BasicUser basicUser = (BasicUser) user;
+                        //TODO: 24.02.2023 zmiana na metodę authorizationService.getLoggedBasicUser()
+                        BasicUser basicUser = (BasicUser) authorizationService.getLoggedUser();
                         return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto, basicUser);
                     }
                 })
@@ -245,5 +276,29 @@ public class EventController {
 
         log.info("EventController - getEventSurveysByEventId() return {}", surveysDto);
         return ResponseEntity.ok(surveysDto);
+    }
+
+    @PostMapping("events/{eventId}/surveys")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<EventSurveyDto> createEventSurvey(@RequestBody EventSurveyRequestDto eventSurveyRequestDto, @PathVariable Long eventId) {
+        log.info("EventController - createNewSurvey");
+        if (!authorizationService.isLoggedUserEventOwner(eventId)) {
+            throw new UnauthorizedRequestException("Logged in user is not authorized to create a survey in event with id " + eventId);
+        }
+
+        EventSurvey eventSurvey = EventSurveyMapper.mapEventSurveyRequestDtoToEventSurvey(eventSurveyRequestDto);
+        EventSurvey newEventSurvey = eventService.createEventSurvey(eventSurvey, eventId);
+        EventSurveyDto newEventSurveyDto = EventSurveyMapper.mapEventSurveyToEventSurveyDto(newEventSurvey);
+
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(newEventSurvey.getId())
+                .toUri();
+
+        log.info("EventController - () return createNewEventSurvey() - dto {}", newEventSurveyDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .location(uri)
+                .body(newEventSurveyDto);
     }
 }

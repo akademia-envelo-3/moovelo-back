@@ -7,12 +7,16 @@ import pl.envelo.moovelo.controller.AuthenticatedUser;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.Role;
 import pl.envelo.moovelo.entity.actors.User;
+import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventOwner;
+import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.entity.groups.Group;
 import pl.envelo.moovelo.entity.groups.GroupOwner;
+import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
 import pl.envelo.moovelo.service.actors.GroupOwnerService;
+import pl.envelo.moovelo.service.event.EventService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,6 +29,7 @@ public class AuthorizationService {
     EventOwnerService eventOwnerService;
     GroupOwnerService groupOwnerService;
     BasicUserService basicUserService;
+    EventService eventService;
 
     public boolean isLoggedUserGroupMember(Group group) {
         log.info("AuthorizationService - isLoggedUserGroupMember() - group = {}", group);
@@ -109,5 +114,16 @@ public class AuthorizationService {
 
     public boolean isLoggedUserBasicUser() {
         return checkIfBasicUserExistsById(getLoggedUserId());
+    }
+
+    public void checkIfLoggedUserHasAccessToEvent(Long eventId, EventType eventType) {
+        log.info("AuthorizationService - checkIfLoggedUserHasAccessToEvent()");
+        User user = getLoggedUser();
+        Event event = eventService.getEventById(eventId, eventType);
+
+        if (user.getRole().equals(Role.ROLE_USER) &&
+                !event.getUsersWithAccess().contains((BasicUser) user)) {
+            throw new UnauthorizedRequestException("User with id " + user.getId() + " does not have an access to event with id " + event.getId());
+        }
     }
 }
