@@ -60,8 +60,7 @@ public class GroupController {
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<Page<GroupListResponseDto>> getAllGroups(Long ownerUserId, Boolean membership, GroupPage groupPage) {
         log.info("GroupController - getAllGroups()");
-        Page<Group> groups;
-        groups = getGroupsWithFiltering(ownerUserId, membership, groupPage);
+        Page<Group> groups = getGroupsWithFiltering(ownerUserId, membership, groupPage);
         Page<GroupListResponseDto> groupListResponseDtoPage =
                 groups.map(group -> GroupMapper.mapGroupToGroupListResponseDto(group, authorizationService.isLoggedUserGroupMember(group)));
         log.info("GroupController - getAllGroups() - return groupListResponseDtoPage = {}", groupListResponseDtoPage);

@@ -100,13 +100,13 @@ public class GroupService {
         return resultPage;
     }
 
-    public Page<Group> getAllGroupsByGroupOwnerUserId(Long ownership, GroupPage groupPage) {
-        log.info("GroupService - getAllGroupsByGroupOwnerUserId()  - params, ownership = {}", ownership);
-        if (groupOwnerService.isBasicUserGroupOwner(ownership)) {
+    public Page<Group> getAllGroupsByGroupOwnerUserId(Long ownerUserId, GroupPage groupPage) {
+        log.info("GroupService - getAllGroupsByGroupOwnerUserId()  - params, ownerUserId = {}", ownerUserId);
+        if (groupOwnerService.isBasicUserGroupOwner(ownerUserId)) {
             Pageable pageable = getPageable(groupPage);
-            Page<Group> allByGroupOwnerUserId = groupRepository.findAllByGroupOwnerUserId(ownership, pageable);
+            Page<Group> allByGroupOwnerUserId = groupRepository.findAllByGroupOwnerUserId(ownerUserId, pageable);
             log.info("GroupService - getAllGroupsByGroupOwnerUserId() " +
-                    "- params - ownership = {} - return {}", ownership, allByGroupOwnerUserId.toString());
+                    "- params - ownerUserId = {} - return {}", ownerUserId, allByGroupOwnerUserId.toString());
             return allByGroupOwnerUserId;
         } else {
             log.info("GroupService - getAllGroupsByGroupOwnerUserId() - return - empty Page");
