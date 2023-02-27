@@ -8,8 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
+import pl.envelo.moovelo.controller.dto.attachment.AttachmentResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
@@ -17,11 +19,13 @@ import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyRequestDto;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
+import pl.envelo.moovelo.controller.mapper.attachment.AttachmentMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventListMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
 import pl.envelo.moovelo.controller.mapper.event.manager.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.manager.EventMapperManager;
 import pl.envelo.moovelo.controller.mapper.survey.EventSurveyMapper;
+import pl.envelo.moovelo.entity.Attachment;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.Event;
@@ -300,5 +304,42 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(uri)
                 .body(newEventSurveyDto);
+    }
+
+    @GetMapping("events/{eventId}/files")
+    public ResponseEntity<List<AttachmentResponseDto>> getEventAttachments(
+            @PathVariable Long eventId
+    ) {
+        log.info("EventController - getEventAttachments(eventId = '{}')", eventId);
+        List<Attachment> attachments = eventService.getEventAttachments(eventId);
+        List<AttachmentResponseDto> attachmentResponseDtos = attachments
+                .stream()
+                .map(AttachmentMapper::mapAttachmentToAttachmentResponseDto)
+                .toList();
+
+        attachmentResponseDtos.forEach(attachmentResponseDto -> attachmentResponseDto.setDownloadLink(
+                ServletUriComponentsBuilder
+                        .fromCurrentContextPath()
+                        .path("/api/v1/files/{id}")
+                        .buildAndExpand(attachmentResponseDto.getId())
+                        .toUri()
+                        .toString()
+        ));
+
+        log.info("\"EventController - getEventAttachments(eventId = '{}') - return attachmentResponseDtos = '{}'",
+                eventId, attachmentResponseDtos);
+        return ResponseEntity.ok(attachmentResponseDtos);
+    }
+
+    @PostMapping("events/{eventId}/files")
+    public ResponseEntity<AttachmentResponseDto> addAttachmentToEvent(
+            @PathVariable Long eventId,
+            @RequestParam MultipartFile file
+    ) {
+        log.info("EventController - addAttachmentToEvent(eventId = '{}', file = '{}'", eventId, file.getName());
+        Attachment attachment = AttachmentMapper.mapMultipartFileToAttachment(file);
+        attachment = eventService.addAttachmentToEvent(eventId, attachment);
+        AttachmentResponseDto attachmentResponseDto = AttachmentMapper.mapAttachmentToAttachmentResponseDto(attachment);
+        return ResponseEntity.ok(attachmentResponseDto);
     }
 }

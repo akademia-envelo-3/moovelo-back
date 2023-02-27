@@ -29,7 +29,6 @@ public class AttachmentController {
 
     private AttachmentService attachmentService;
 
-    // TODO: 23.02.2023 Dodaj logi do serwisów oraz mapperów.
     @PostMapping
     public ResponseEntity<AttachmentResponseDto> uploadFile(@RequestParam MultipartFile file) {
         log.info("AttachmentController - uploadFile() - file name = '{}'", file.getName());

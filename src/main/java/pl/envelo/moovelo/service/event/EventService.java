@@ -10,21 +10,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.controller.searchutils.EventSearchSpecification;
 import pl.envelo.moovelo.controller.searchutils.PagingUtils;
+import pl.envelo.moovelo.entity.Attachment;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.actors.BasicUser;
-import pl.envelo.moovelo.entity.actors.Role;
-import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.*;
-import pl.envelo.moovelo.entity.surveys.EventSurvey;
-import pl.envelo.moovelo.entity.surveys.Answer;
 import pl.envelo.moovelo.entity.surveys.EventSurvey;
 import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.exception.StatusNotExistsException;
-import pl.envelo.moovelo.exception.UnauthorizedRequestException;
 import pl.envelo.moovelo.model.EventsForUserCriteria;
 import pl.envelo.moovelo.model.SortingAndPagingCriteria;
 import pl.envelo.moovelo.repository.event.EventRepositoryManager;
+import pl.envelo.moovelo.service.AttachmentService;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
@@ -47,8 +44,8 @@ public class EventService<I extends Event> {
     protected final HashTagService hashTagService;
     protected final BasicUserService basicUserService;
     protected EventSearchSpecification eventSearchSpecification;
-
     protected final EventSurveyService eventSurveyService;
+    private AttachmentService attachmentService;
 
     public I createNewEvent(I event, EventType eventType, Long userId) {
         log.info("EventService - createNewEvent()");
@@ -332,5 +329,20 @@ public class EventService<I extends Event> {
 
         EventSurvey newEventSurvey = eventSurveyService.createNewSurvey(eventSurvey, event);
         return newEventSurvey;
+    }
+
+    public List<Attachment> getEventAttachments(Long eventId) {
+        log.info("EventService - getEventAttachments(eventId = '{}')", eventId);
+        Event event = getEventById(eventId, EventType.EVENT);
+        List<Attachment> files = event.getEventInfo().getFiles();
+        log.info("EventService - getEventAttachments(eventId = '{}') - return files = '{}'", eventId, files);
+        return files;
+    }
+
+    public Attachment addAttachmentToEvent(Long eventId, Attachment attachment) {
+        EventInfo eventInfo = getEventById(eventId, EventType.EVENT).getEventInfo();
+        attachment.setEventInfo(eventInfo);
+        Attachment savedAttachment = attachmentService.saveAttachment(attachment);
+        return savedAttachment;
     }
 }

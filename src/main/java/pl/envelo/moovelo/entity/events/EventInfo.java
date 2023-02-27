@@ -38,7 +38,7 @@ public class EventInfo {
     @ManyToOne
     private Category category;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "eventInfo")
     private List<Attachment> files;
 
     @Override
