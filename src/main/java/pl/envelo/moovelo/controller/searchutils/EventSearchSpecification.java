@@ -129,7 +129,7 @@ public class EventSearchSpecification {
             case "date" -> "eventInfo_startDate";
             case "participants" -> "numOfAcceptedStatusUsers";
             case "location" -> "eventInfo_location_city";
-            default -> "id";
+            default -> "eventInfo_startDate";
         };
 
         Sort.Order order = new Sort.Order(sortDirection, sortOrderParameter);

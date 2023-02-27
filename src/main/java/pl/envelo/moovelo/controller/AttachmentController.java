@@ -16,9 +16,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.envelo.moovelo.controller.dto.attachment.AttachmentResponseDto;
 import pl.envelo.moovelo.controller.mapper.attachment.AttachmentMapper;
 import pl.envelo.moovelo.entity.Attachment;
+import pl.envelo.moovelo.model.SortingAndPagingCriteria;
 import pl.envelo.moovelo.service.AttachmentService;
 
-import java.io.IOException;
 import java.net.URI;
 
 @Slf4j
@@ -31,8 +31,7 @@ public class AttachmentController {
 
     // TODO: 23.02.2023 Dodaj logi do serwisów oraz mapperów.
     @PostMapping
-    public ResponseEntity<AttachmentResponseDto> uploadFile(@RequestParam MultipartFile file)
-            throws IOException {
+    public ResponseEntity<AttachmentResponseDto> uploadFile(@RequestParam MultipartFile file) {
         log.info("AttachmentController - uploadFile() - file name = '{}'", file.getName());
         Attachment attachment = AttachmentMapper.mapMultipartFileToAttachment(file);
         attachment = attachmentService.saveAttachment(attachment);
@@ -68,8 +67,23 @@ public class AttachmentController {
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Page<AttachmentResponseDto>> getAttachmentsInfo(
+            SortingAndPagingCriteria sortingAndPagingCriteria
     ) {
-        log.info("AttachmentController - getAttachmentsInfo()");
-        return null;
+        log.info("AttachmentController - getAttachmentsInfo(sortingAndPagingCriteria = '{}')", sortingAndPagingCriteria);
+        Page<Attachment> attachments = attachmentService.getAttachments(sortingAndPagingCriteria);
+        Page<AttachmentResponseDto> attachmentResponsesDto = attachments.map(AttachmentMapper::mapAttachmentToAttachmentResponseDto);
+        attachmentResponsesDto.forEach(pageAttachments -> pageAttachments.setDownloadLink(
+                        ServletUriComponentsBuilder
+                                .fromCurrentRequest()
+                                .path("/{id}")
+                                .buildAndExpand(pageAttachments.getId())
+                                .toUri()
+                                .toString()
+                )
+        );
+
+        log.info("AttachmentController - getAttachmentsInfo(sortingAndPagingCriteria = '{}') - return attachmentResponsesDto = '{}'",
+                sortingAndPagingCriteria, attachmentResponsesDto);
+        return ResponseEntity.ok(attachmentResponsesDto);
     }
 }
