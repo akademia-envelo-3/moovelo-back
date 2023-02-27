@@ -41,7 +41,13 @@ public class GroupMapper {
     }
 
     public static GroupResponseDtoForEvent mapGroupToGroupResponseDtoForEvent(Group group) {
-        return new GroupResponseDtoForEvent(group.getId(), group.getGroupInfo().getName());
+        GroupResponseDtoForEvent groupResponseDtoForEvent;
+        if (group != null) {
+            groupResponseDtoForEvent = new GroupResponseDtoForEvent();
+            groupResponseDtoForEvent.setId(group.getId());
+            groupResponseDtoForEvent.setName(group.getGroupInfo().getName());
+        } else groupResponseDtoForEvent = null;
+        return groupResponseDtoForEvent;
     }
 
     public static Group mapGroupRequestDtoToGroup(GroupRequestDto groupRequestDto) {

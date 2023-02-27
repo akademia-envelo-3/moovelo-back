@@ -51,9 +51,12 @@ public class EventMapperManager {
     }
 
     private CyclicEvent returnMappedCyclicEvent(EventRequestDto eventRequestDto, EventType eventType) {
-        CyclicEvent cyclicEvent = new CyclicEvent();
-        EventMapper.mapEventRequestDtoToCyclicEvent(eventRequestDto, eventType, cyclicEvent);
-        return cyclicEvent;
+        if (eventRequestDto.getGroupId() != null) {
+            CyclicEvent cyclicEvent = new CyclicEvent();
+            EventMapper.mapEventRequestDtoToCyclicEvent(eventRequestDto, eventType, cyclicEvent);
+            return cyclicEvent;
+        } else
+            throw new IllegalArgumentException("Group Id cannot be null in Cyclic Event");
     }
 
     private ExternalEvent returnMappedExternalEvent(EventRequestDto eventRequestDto, EventType eventType) {

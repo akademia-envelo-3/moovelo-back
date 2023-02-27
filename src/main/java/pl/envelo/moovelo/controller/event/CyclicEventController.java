@@ -47,9 +47,10 @@ public class CyclicEventController {
         log.info("CyclicEventController - createNewEvent()");
         eventMapperInterface = new EventMapper();
         Long basicUserId = authorizationService.getLoggedBasicUserId();
+        Long groupId = eventRequestDto.getGroupId();
 
         CyclicEvent event = eventMapperManager.mapEventRequestDtoToEventByEventType(eventRequestDto, EventType.CYCLIC_EVENT);
-        CyclicEvent createdCyclicEvent = cyclicEventService.createNewEvent(event, eventType, basicUserId);
+        CyclicEvent createdCyclicEvent = cyclicEventService.createNewEvent(event, eventType, basicUserId, groupId);
         EventResponseDto eventResponseDto = eventMapperManager.getMappedResponseForSpecificEvent(eventMapperInterface, createdCyclicEvent);
 
         URI uri = ServletUriComponentsBuilder
@@ -65,18 +66,25 @@ public class CyclicEventController {
                 .body(eventResponseDto);
     }
 
-//    @GetMapping("/cyclicEvents")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
-//    public ResponseEntity<List<EventListResponseDto>> getAllCyclicEvents() {
-//        log.info("CyclicEventController - getAllCyclicEvents()");
-//        List<CyclicEvent> allCyclicEvents = cyclicEventService.getAllCyclicEvents();
-//
-//        List<EventListResponseDto> cyclicEventsDto = allCyclicEvents.stream()
-//                .map(EventListResponseMapper::mapCyclicEventToEventListResponseDto).toList();
-//
-//        log.info("CyclicEventController - getAllCyclicEvents() return {}", cyclicEventsDto);
-//        return ResponseEntity.ok(cyclicEventsDto);
-//    }
+    @PutMapping("/cyclicEvents/{eventId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<String> updateCyclicEventById(@PathVariable Long eventId, @RequestBody EventRequestDto eventRequestDto) {
+        log.info("ICyclicEventController - updateCyclicEventById() - eventId = {}", eventId);
+        eventMapperInterface = new EventMapper();
+
+        if (cyclicEventService.checkIfEventExistsById(eventId, eventType)) {
+            if (authorizationService.isLoggedUserEventOwner(eventId)) {
+                CyclicEvent mappedEventFromRequest = eventMapperManager.mapEventRequestDtoToEventByEventType(eventRequestDto, eventType);
+                cyclicEventService.updateEventById(eventId, mappedEventFromRequest, eventType, authorizationService.getLoggedUserId());
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Logged in user is not authorized to update the  with id: " + eventId);
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event with id " + eventId + " does not exist");
+        }
+        log.info("EventController - updateEventById() - event with eventId = {} updated", eventId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
     @GetMapping("/cyclicEvents")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
