@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -21,7 +23,7 @@ import java.net.URI;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/file")
+@RequestMapping("/api/v1/files")
 @AllArgsConstructor
 public class AttachmentController {
 
@@ -29,7 +31,8 @@ public class AttachmentController {
 
     // TODO: 23.02.2023 Dodaj logi do serwisów oraz mapperów.
     @PostMapping
-    public ResponseEntity<AttachmentResponseDto> uploadFile(@RequestParam MultipartFile file) throws IOException {
+    public ResponseEntity<AttachmentResponseDto> uploadFile(@RequestParam MultipartFile file)
+            throws IOException {
         log.info("AttachmentController - uploadFile() - file name = '{}'", file.getName());
         Attachment attachment = AttachmentMapper.mapMultipartFileToAttachment(file);
         attachment = attachmentService.saveAttachment(attachment);
@@ -60,5 +63,13 @@ public class AttachmentController {
                 .contentType(MediaType.parseMediaType(attachment.getFileType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + attachment.getFileName() + "\"")
                 .body(new ByteArrayResource(attachment.getData()));
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Page<AttachmentResponseDto>> getAttachmentsInfo(
+    ) {
+        log.info("AttachmentController - getAttachmentsInfo()");
+        return null;
     }
 }
