@@ -40,12 +40,7 @@ public class BasicUser extends User {
     @ManyToMany(mappedBy = "rejectedStatusUsers")
     private Set<Event> rejectedEvents;
 
-    @ManyToMany
-    @JoinTable(
-            name = "basicUser_surveyAnswers",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "answer_id")
-    )
+    @ManyToMany(mappedBy = "basicUsers")
     private List<Answer> surveyAnswers;
 
     @Override

@@ -11,12 +11,12 @@ VALUES ('Odpowiedź do pyt. 1 nr 1', 1),
        ('Odpowiedź do pyt. 2 nr 2', 2),
        ('Odpowiedź do pyt. 2 nr 3', 2);
 
-INSERT INTO BASIC_USER_SURVEY_ANSWERS(USER_ID, ANSWER_ID)
-VALUES (3, 1),
+INSERT INTO ANSWERS_BASIC_USERS(ANSWER_ID, USER_ID)
+VALUES (1, 3),
        (3, 3),
-       (3, 4),
+       (4, 3),
        (2, 2),
-       (2, 3),
-       (2, 5);
+       (3, 2),
+       (5, 2);
 
 

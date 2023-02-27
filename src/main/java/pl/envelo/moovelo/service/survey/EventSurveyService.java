@@ -10,12 +10,24 @@ import pl.envelo.moovelo.repository.survey.EventSurveyRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class EventSurveyService {
     private final EventSurveyRepository eventSurveyRepository;
+
+    public EventSurvey getSurveyById(Long id) {
+        log.info("EventSurvey - getSurveyById()");
+        Optional<EventSurvey> surveyOptional = eventSurveyRepository.findById(id);
+        if (surveyOptional.isEmpty()) {
+            throw new NoSuchElementException("No survey with id: " + id);
+        }
+        log.info("EventSurvey - getSurveyById() return {}", surveyOptional.get());
+        return surveyOptional.get();
+    }
 
     public EventSurvey createNewSurvey(EventSurvey eventSurvey, Event event) {
 

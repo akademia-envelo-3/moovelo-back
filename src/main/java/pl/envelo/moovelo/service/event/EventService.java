@@ -347,4 +347,12 @@ public class EventService<I extends Event> {
         EventSurvey newEventSurvey = eventSurveyService.createNewSurvey(eventSurvey, event);
         return newEventSurvey;
     }
+
+    public void voteInEventSurvey(List<Long> userAnswersIds, Long eventId,
+                             EventType eventType, Long surveyId) {
+
+        log.info("EventService - voteInEventSurvey()");
+
+
+    }
 }
