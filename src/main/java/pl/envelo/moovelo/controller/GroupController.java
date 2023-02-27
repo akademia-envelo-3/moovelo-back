@@ -109,8 +109,7 @@ public class GroupController {
             GroupInfo groupInfo = GroupInfoMapper.mapGroupInfoDtoToGroupInfo(groupInfoDto);
             groupService.updateGroupById(group, groupInfo);
 
-            Map<String, String> body = new HashMap<>();
-            body.put("message", "Group with id: " + groupId + " successfully updated");
+            Map<String, String> body = getBody(String.format("Group with id: %d successfully updated", groupId));
 
             log.info("GroupController - () - updateGroupById() - groupId = {} updated", groupId);
             return ResponseEntity.ok(body);
@@ -174,9 +173,7 @@ public class GroupController {
             log.error("EventController - updateEventOwnershipById()", new UnauthorizedRequestException("Unauthorized request"));
             throw new UnauthorizedRequestException("Logged in user is not authorized to change the group owner of the event with id: " + groupId);
         }
-        // TODO: 24.02.2023 - change to getBody()
-        Map<String, String> body = new HashMap<>();
-        body.put("message", "Group with id: "  + groupId + " has a new owner!");
+        Map<String, String> body = getBody(String.format("Group with id: %d has a new owner", groupId));
 
         log.info("GroupController - updateGroupOwnershipById(), - groupId = {} - ownership updated", groupId);
         return ResponseEntity.ok().body(body);
