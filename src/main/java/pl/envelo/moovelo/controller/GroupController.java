@@ -84,8 +84,7 @@ public class GroupController {
 
         log.info("GroupController - removeGroupById(groupId = '{}') removed", groupId);
 
-        Map<String, String> body = new HashMap<>();
-        body.put("message", "Successfully removed the group");
+        Map<String, String> body = getBody("Successfully removed the group");
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(body);
     }
@@ -122,14 +121,44 @@ public class GroupController {
     @PostMapping("/{groupId}/users/{userId}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> joinGroup(@PathVariable Long userId, @PathVariable Long groupId) {
+        log.info("GroupController - () - joinGroup() - groupId = {} - userId = {}", groupId, userId);
         Group group = groupService.getGroupById(groupId);
         if (!authorizationService.isLoggedUserIdEqualToBasicUserIdParam(userId)
                 || authorizationService.isLoggedUserGroupMember(group)) {
             throw new UnauthorizedRequestException("Access denied");
         }
         groupService.joinGroup(userId, group);
-        Map<String, String> body = new HashMap<>();
-        body.put("message", "User with id: " + userId + " successfully added the group with id: " + groupId);
+        Map<String, String> body = getBody(
+                String.format("User with id %d successfully added the group with id: %d", userId, groupId));
+        log.info("GroupController - () - joinGroup() - groupId = {} - userId = {} - group joined by user", groupId, userId);
         return ResponseEntity.ok().body(body);
+    }
+
+    @DeleteMapping("/{groupId}/users/{userId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> leaveGroup(@PathVariable Long userId, @PathVariable Long groupId) {
+        log.info("GroupController - () - leaveGroup() - groupId = {} - userId = {}", groupId, userId);
+
+        if (!authorizationService.isLoggedUserIdEqualToBasicUserIdParam(userId)) {
+            throw new UnauthorizedRequestException("The user id passed does not match logged in user id");
+        }
+        Group group = groupService.getGroupById(groupId);
+
+        if (!authorizationService.isLoggedUserGroupMember(group)) {
+            throw new UnauthorizedRequestException("You must be a member of the group to leave it!");
+        }
+        groupService.leaveGroup(userId, group);
+
+        Map<String, String> body = getBody(
+                String.format("User with id: %d successfully removed from the group with id: %d", userId, groupId));
+
+        log.info("GroupController - () - leaveGroup() - groupId = {} - userId = {} - group left by user", groupId, userId);
+        return ResponseEntity.ok().body(body);
+    }
+
+    private Map<String, String> getBody(String message) {
+        Map<String, String> body = new HashMap<>();
+        body.put("message", message);
+        return body;
     }
 }
