@@ -33,6 +33,10 @@ public class GroupOwnerService {
         return groupOwnerOptional.orElseGet(() -> createNewGroupOwner(userId));
     }
 
+    public boolean isBasicUserGroupOwner(Long userId) {
+        return groupOwnerRepository.findByUserId(userId).isPresent();
+    }
+
     private GroupOwner createNewGroupOwner(Long userId) {
         GroupOwner groupOwner = new GroupOwner();
         groupOwner.setUserId(userId);

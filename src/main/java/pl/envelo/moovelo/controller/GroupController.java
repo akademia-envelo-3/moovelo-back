@@ -57,18 +57,26 @@ public class GroupController {
 
     @GetMapping("")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<Page<GroupListResponseDto>> getAllGroups(Boolean membership, GroupPage groupPage) {
+    public ResponseEntity<Page<GroupListResponseDto>> getAllGroups(Long ownerUserId, Boolean membership, GroupPage groupPage) {
         log.info("GroupController - getAllGroups()");
         Page<Group> groups;
-        if (authorizationService.isLoggedUserBasicUser() && membership != null) {
-            groups = groupService.getAllGroupsForBasicUser(authorizationService.getLoggedBasicUserId(), membership, groupPage);
-        } else {
-            groups = groupService.getAllGroupsWithoutFiltering(groupPage);
-        }
+        groups = getGroupsWithFiltering(ownerUserId, membership, groupPage);
         Page<GroupListResponseDto> groupListResponseDtoPage =
                 groups.map(group -> GroupMapper.mapGroupToGroupListResponseDto(group, authorizationService.isLoggedUserGroupMember(group)));
         log.info("GroupController - getAllGroups() - return groupListResponseDtoPage = {}", groupListResponseDtoPage);
         return new ResponseEntity<>(groupListResponseDtoPage, HttpStatus.OK);
+    }
+
+    private Page<Group> getGroupsWithFiltering(Long ownerUserId, Boolean membership, GroupPage groupPage) {
+        Page<Group> groups;
+        if (authorizationService.isLoggedUserBasicUser() && membership != null) {
+            groups = groupService.getAllGroupsForBasicUser(authorizationService.getLoggedBasicUserId(), membership, groupPage);
+        } else if (authorizationService.isLoggedUserAdmin() && ownerUserId != null) {
+            groups = groupService.getAllGroupsByGroupOwnerUserId(ownerUserId, groupPage);
+        } else {
+            groups = groupService.getAllGroupsWithoutFiltering(groupPage);
+        }
+        return groups;
     }
 
     @DeleteMapping("{groupId}")

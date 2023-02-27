@@ -99,17 +99,18 @@ public class GroupService {
         return resultPage;
     }
 
-    public void joinGroup(Long userId, Group group) {
-        BasicUser basicUser = basicUserService.getBasicUserById(userId);
-        Set<Group> userGroups = basicUser.getGroups();
-        if (userGroups == null) {
-            userGroups = new HashSet<>();
+    public Page<Group> getAllGroupsByGroupOwnerUserId(Long ownership, GroupPage groupPage) {
+        log.info("GroupService - getAllGroupsByGroupOwnerUserId()  - params, ownership = {}", ownership);
+        if (groupOwnerService.isBasicUserGroupOwner(ownership)) {
+            Pageable pageable = getPageable(groupPage);
+            Page<Group> allByGroupOwnerUserId = groupRepository.findAllByGroupOwnerUserId(ownership, pageable);
+            log.info("GroupService - getAllGroupsByGroupOwnerUserId() " +
+                    "- params - ownership = {} - return {}", ownership, allByGroupOwnerUserId.toString());
+            return allByGroupOwnerUserId;
+        } else {
+            log.info("GroupService - getAllGroupsByGroupOwnerUserId() - return - empty Page");
+            return Page.empty();
         }
-        userGroups.add(group);
-        group.getMembers().add(basicUser);
-        group.setGroupSize(group.getGroupSize() + 1);
-        groupRepository.save(group);
-        basicUserService.updateBasicUser(basicUser);
     }
 
     public Page<Group> getAllGroupsWithoutFiltering(GroupPage groupPage) {
@@ -124,5 +125,18 @@ public class GroupService {
         }
         Sort sort = Sort.by(groupPage.getSortOrder(), sortFromParam);
         return PageRequest.of(groupPage.getPageNumber(), groupPage.getPageSize(), sort);
+    }
+
+    public void joinGroup(Long userId, Group group) {
+        BasicUser basicUser = basicUserService.getBasicUserById(userId);
+        Set<Group> userGroups = basicUser.getGroups();
+        if (userGroups == null) {
+            userGroups = new HashSet<>();
+        }
+        userGroups.add(group);
+        group.getMembers().add(basicUser);
+        group.setGroupSize(group.getGroupSize() + 1);
+        groupRepository.save(group);
+        basicUserService.updateBasicUser(basicUser);
     }
 }

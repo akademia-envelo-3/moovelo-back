@@ -53,6 +53,15 @@ public class AuthorizationService {
         return isUserGroupOwner;
     }
 
+    public boolean isLoggedUserGroupOwner() {
+        log.info("AuthorizationService - isLoggedUserGroupOwner()");
+        User loggedInUser = authenticatedUser.getAuthenticatedUser();
+        boolean isBasicUserGroupOwner = groupOwnerService.isBasicUserGroupOwner(loggedInUser.getId());
+        log.info("AuthorizationService - isLoggedUserGroupOwner() - return isBasicUserGroupOwner = {}", isBasicUserGroupOwner);
+        return isBasicUserGroupOwner;
+
+    }
+
     public boolean isLoggedUserEventOwner(Long eventId) {
         log.info("AuthorizationService - isLoggedUserEventOwner() - eventId = {}", eventId);
         User loggedInUser = authenticatedUser.getAuthenticatedUser();
