@@ -228,7 +228,6 @@ public class EventService<I extends Event> {
         I event = getEventById(eventId, eventType);
         eventOwnerService.createEventOwner(newEventOwner);
         event.setEventOwner(newEventOwner);
-        // TODO: 22.02.2023 repository manager
         eventOwnerService.removeEventOwnerWithNoEvents(getEventOwnerByUserId(currentEventOwnerUserId));
         eventRepositoryManager
                 .getRepositoryForSpecificEvent(eventType)
