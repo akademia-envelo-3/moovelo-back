@@ -9,6 +9,7 @@ import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import javax.mail.Multipart;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Data
@@ -20,5 +21,6 @@ public class CommentRequestDto {
     @NotEmpty(message = "You can't add comment without message")
     private String text;
 
+    @Size(max = 10)
     private List<MultipartFile> files;
 }

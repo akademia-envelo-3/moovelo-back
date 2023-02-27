@@ -12,12 +12,14 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.attachment.AttachmentResponseDto;
+import pl.envelo.moovelo.controller.dto.comment.CommentResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.dto.event.ownership.EventOwnershipRequestDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyRequestDto;
+import pl.envelo.moovelo.controller.mapper.CommentMapper;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.attachment.AttachmentMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventListMapper;
@@ -26,6 +28,7 @@ import pl.envelo.moovelo.controller.mapper.event.manager.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.manager.EventMapperManager;
 import pl.envelo.moovelo.controller.mapper.survey.EventSurveyMapper;
 import pl.envelo.moovelo.entity.Attachment;
+import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.events.Event;
@@ -340,6 +343,8 @@ public class EventController {
         Attachment attachment = AttachmentMapper.mapMultipartFileToAttachment(file);
         attachment = eventService.addAttachmentToEvent(eventId, attachment);
         AttachmentResponseDto attachmentResponseDto = AttachmentMapper.mapAttachmentToAttachmentResponseDto(attachment);
+        log.info("EventController - addAttachmentToEvent(eventId = '{}', file = '{}') - return attachmentResponseDto = '{}'",
+                eventId, file.getName(), attachmentResponseDto);
         return ResponseEntity.ok(attachmentResponseDto);
     }
 }

@@ -22,7 +22,7 @@ public class BasicUser extends User {
     @OneToMany(mappedBy = "basicUser")
     private List<CategoryProposal> categoryProposals;
 
-    @OneToMany
+    @OneToMany(mappedBy = "basicUser")
     private List<Comment> comments;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH})

@@ -2,10 +2,15 @@ package pl.envelo.moovelo.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventType;
+import pl.envelo.moovelo.model.SortingAndPagingCriteria;
 import pl.envelo.moovelo.repository.CommentRepository;
 import pl.envelo.moovelo.service.event.EventService;
 
@@ -25,5 +30,24 @@ public class CommentService {
         log.info("CommentService - addCommentToEvent(comment = '{}', eventId = '{}') - return savedComment = '{}'",
                 comment, event, savedComment);
         return comment;
+    }
+
+    public Page<Comment> getEventComments(Long eventId, SortingAndPagingCriteria sortingAndPagingCriteria) {
+        log.info("CommentService - getEventComments(eventId = '{}', sortingAndPagingCriteria = '{}')",
+                eventId, sortingAndPagingCriteria);
+
+        Pageable pageable = PageRequest.of(
+                sortingAndPagingCriteria.getPageNumber(),
+                sortingAndPagingCriteria.getPageSize(),
+                Sort.by(new Sort.Order(
+                        sortingAndPagingCriteria.getSortDirection(),
+                        sortingAndPagingCriteria.getSortBy()
+                ))
+        );
+
+        Page<Comment> comments = commentRepository.findAllByEvent_Id(eventId, pageable);
+        log.info("CommentService - getEventComments(eventId = '{}', sortingAndPagingCriteria = '{}') - return comments = '{}'",
+                eventId, sortingAndPagingCriteria, comments);
+        return comments;
     }
 }
