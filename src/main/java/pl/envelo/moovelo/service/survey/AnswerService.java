@@ -8,6 +8,7 @@ import pl.envelo.moovelo.entity.surveys.Answer;
 import pl.envelo.moovelo.repository.survey.AnswerRepository;
 import pl.envelo.moovelo.repository.survey.EventSurveyRepository;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -27,5 +28,4 @@ public class AnswerService {
         log.info("AnswerService - getAnswerById() return {}", answerOptional.get());
         return answerOptional.get();
     }
-    public void voteForAnswer(){}
 }

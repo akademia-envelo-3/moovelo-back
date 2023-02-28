@@ -23,11 +23,6 @@ public class Answer {
 
     private String answerValue;
 
-    @ManyToMany
-    @JoinTable(
-            name = "answers_basic_users",
-            joinColumns = @JoinColumn(name = "answer_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
+    @ManyToMany(mappedBy = "surveyAnswers")
     private List<BasicUser> basicUsers;
 }

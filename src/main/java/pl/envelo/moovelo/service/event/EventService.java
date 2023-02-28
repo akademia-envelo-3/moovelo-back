@@ -348,11 +348,8 @@ public class EventService<I extends Event> {
         return newEventSurvey;
     }
 
-    public void voteInEventSurvey(List<Long> userAnswersIds, Long eventId,
-                             EventType eventType, Long surveyId) {
-
+    public void voteInEventSurvey(List<Long> userAnswersIds, Long surveyId, Long basicUserId) {
         log.info("EventService - voteInEventSurvey()");
-
-
+        eventSurveyService.voteInSurvey(userAnswersIds, surveyId, basicUserId);
     }
 }

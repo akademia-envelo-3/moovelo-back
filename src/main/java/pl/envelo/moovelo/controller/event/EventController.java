@@ -267,8 +267,7 @@ public class EventController {
                             authorizationService.isLoggedUserEventOwner(eventId)) {
                         return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto);
                     } else {
-                        //TODO: 24.02.2023 zmiana na metodę authorizationService.getLoggedBasicUser()
-                        BasicUser basicUser = (BasicUser) authorizationService.getLoggedUser();
+                        BasicUser basicUser = authorizationService.getLoggedBasicUser();
                         return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto, basicUser);
                     }
                 })
@@ -302,7 +301,7 @@ public class EventController {
                 .body(newEventSurveyDto);
     }
 
-    @PutMapping("events/{evenId}/surveys/{surveyId}")
+    @PutMapping("events/{eventId}/surveys/{surveyId}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<String> voteInEventSurvey(@RequestBody AnswerRequestDto answerRequestDto,
                                                     @PathVariable Long eventId,
@@ -312,8 +311,10 @@ public class EventController {
 
         authorizationService.checkIfLoggedUserHasAccessToEvent(eventId, eventType);
 
+        Long basicUserId = authorizationService.getLoggedBasicUserId();
+
         List<Long> userAnswersIds = answerRequestDto.getUserAnswersIds();
-        eventService.voteInEventSurvey(userAnswersIds, eventId, eventType, surveyId);
+        eventService.voteInEventSurvey(userAnswersIds, surveyId, basicUserId);
 
         return ResponseEntity.ok().build();
     }
