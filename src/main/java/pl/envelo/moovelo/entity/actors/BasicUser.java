@@ -42,7 +42,7 @@ public class BasicUser extends User {
 
     @ManyToMany
     @JoinTable(
-            name = "basicUser_surveyAnswers",
+            name = "answers_basic_users",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "answer_id")
     )

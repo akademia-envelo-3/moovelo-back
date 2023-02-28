@@ -71,7 +71,6 @@ public class EventService<I extends Event> {
         }
     }
 
-
     public void updateEventById(Long eventId, I eventFromDto, EventType eventType, Long userId) {
         log.info("EventService - updateEventById() - eventId = {}", eventId);
         I eventInDb = getEventById(eventId, eventType);
@@ -349,6 +348,11 @@ public class EventService<I extends Event> {
 
         EventSurvey newEventSurvey = eventSurveyService.createNewSurvey(eventSurvey, event);
         return newEventSurvey;
+    }
+
+    public void voteInEventSurvey(List<Long> userAnswersIds, Long surveyId, Long basicUserId) {
+        log.info("EventService - voteInEventSurvey()");
+        eventSurveyService.voteInSurvey(userAnswersIds, surveyId, basicUserId);
     }
 
     public List<Attachment> getEventAttachments(Long eventId) {
