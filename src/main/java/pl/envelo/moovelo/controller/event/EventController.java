@@ -290,7 +290,7 @@ public class EventController {
         }
 
         EventSurvey eventSurvey = EventSurveyMapper.mapEventSurveyRequestDtoToEventSurvey(eventSurveyRequestDto);
-        EventSurvey newEventSurvey = eventService.createEventSurvey(eventSurvey, eventId);
+        EventSurvey newEventSurvey = eventService.createEventSurvey(eventSurvey, eventId, eventType);
         EventSurveyDto newEventSurveyDto = EventSurveyMapper.mapEventSurveyToEventSurveyDto(newEventSurvey);
 
         URI uri = ServletUriComponentsBuilder
@@ -328,7 +328,7 @@ public class EventController {
             @PathVariable Long eventId
     ) {
         log.info("EventController - getEventAttachments(eventId = '{}')", eventId);
-        List<Attachment> attachments = eventService.getEventAttachments(eventId);
+        List<Attachment> attachments = eventService.getEventAttachments(eventId, eventType);
         List<AttachmentResponseDto> attachmentResponseDtos = attachments
                 .stream()
                 .map(AttachmentMapper::mapAttachmentToAttachmentResponseDto)
@@ -355,7 +355,7 @@ public class EventController {
     ) {
         log.info("EventController - addAttachmentToEvent(eventId = '{}')", eventId);
         List<Attachment> attachments = files.stream().map(AttachmentMapper::mapMultipartFileToAttachment).toList();
-        attachments = eventService.addAttachmentsToEvent(eventId, attachments);
+        attachments = eventService.addAttachmentsToEvent(eventId, attachments, eventType);
         List<AttachmentResponseDto> attachmentResponseDtos = attachments.stream().map(AttachmentMapper::mapAttachmentToAttachmentResponseDto).toList();
 
         attachmentResponseDtos.forEach(attachmentResponseDto -> attachmentResponseDto.setDownloadLink(

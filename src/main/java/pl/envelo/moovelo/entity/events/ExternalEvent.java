@@ -6,7 +6,7 @@ import lombok.Setter;
 import pl.envelo.moovelo.entity.actors.Visitor;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -20,7 +20,7 @@ public class ExternalEvent extends Event {
             joinColumns = @JoinColumn(name = "external_event_id"),
             inverseJoinColumns = @JoinColumn(name = "visitor_id")
     )
-    private List<Visitor> visitors;
+    private Set<Visitor> visitors;
 
     @Column(unique = true)
     private String invitationUuid;

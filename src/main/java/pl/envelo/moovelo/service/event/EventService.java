@@ -164,7 +164,7 @@ public class EventService<I extends Event> {
                 )
         );
 
-        Page<? extends Event> allEvents = eventRepositoryManager
+        Page<I> allEvents = eventRepositoryManager
                 .getRepositoryForSpecificEvent(eventType)
                 .findAll(
                         eventSearchSpecification.getEventsAvailableForUserSpecification(
@@ -342,12 +342,11 @@ public class EventService<I extends Event> {
         return surveys;
     }
 
-    public EventSurvey createEventSurvey(EventSurvey eventSurvey, Long eventId) {
+    public EventSurvey createEventSurvey(EventSurvey eventSurvey, Long eventId, EventType eventType) {
         log.info("EventService - createEventSurvey()");
-        Event event = getEventById(eventId, EventType.EVENT);
+        Event event = getEventById(eventId, eventType);
 
-        EventSurvey newEventSurvey = eventSurveyService.createNewSurvey(eventSurvey, event);
-        return newEventSurvey;
+        return eventSurveyService.createNewSurvey(eventSurvey, event);
     }
 
     public void voteInEventSurvey(List<Long> userAnswersIds, Long surveyId, Long basicUserId) {
@@ -355,18 +354,18 @@ public class EventService<I extends Event> {
         eventSurveyService.voteInSurvey(userAnswersIds, surveyId, basicUserId);
     }
 
-    public List<Attachment> getEventAttachments(Long eventId) {
+    public List<Attachment> getEventAttachments(Long eventId, EventType eventType) {
         log.info("EventService - getEventAttachments(eventId = '{}')", eventId);
-        Event event = getEventById(eventId, EventType.EVENT);
+        Event event = getEventById(eventId, eventType);
         List<Attachment> files = event.getEventInfo().getFiles();
         log.info("EventService - getEventAttachments(eventId = '{}') - return files = '{}'", eventId, files);
         return files;
     }
 
-    public List<Attachment> addAttachmentsToEvent(Long eventId, List<Attachment> attachments) {
+    public List<Attachment> addAttachmentsToEvent(Long eventId, List<Attachment> attachments, EventType eventType) {
         log.info("EventService - addAttachmentsToEvent(eventId = '{}', attachments = '{}')",
                 eventId, attachments);
-        EventInfo eventInfo = getEventById(eventId, EventType.EVENT).getEventInfo();
+        EventInfo eventInfo = getEventById(eventId, eventType).getEventInfo();
         attachments.forEach(attachment -> attachment.setEventInfo(eventInfo));
         List<Attachment> savedAttachments = attachmentService.saveAttachments(attachments);
         log.info("EventService - addAttachmentsToEvent(eventId = '{}', attachments = '{}') - return savedAttachments = '{}'",

@@ -2,13 +2,22 @@ package pl.envelo.moovelo.controller.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.envelo.moovelo.Constants;
 import pl.envelo.moovelo.controller.AuthenticatedUser;
 import pl.envelo.moovelo.controller.dto.actor.VisitorDto;
+import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
+import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
+import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
+import pl.envelo.moovelo.controller.mapper.event.EventListMapper;
+import pl.envelo.moovelo.controller.mapper.event.EventMapperInterface;
+import pl.envelo.moovelo.controller.mapper.event.manager.EventMapper;
+import pl.envelo.moovelo.controller.mapper.event.manager.EventMapperManager;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.actors.Visitor;
 import pl.envelo.moovelo.entity.events.EventType;
@@ -16,6 +25,7 @@ import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.exception.AvailablePlacesExceededException;
 import pl.envelo.moovelo.exception.EventDateException;
 import pl.envelo.moovelo.exception.UnauthorizedRequestException;
+import pl.envelo.moovelo.service.AuthorizationService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.VisitorService;
 import pl.envelo.moovelo.service.event.ExternalEventService;
@@ -24,6 +34,7 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,19 +51,55 @@ public class ExternalEventController {
     private VisitorService visitorService;
     private AuthenticatedUser authenticatedUser;
     private BasicUserService basicUserService;
+    private AuthorizationService authorizationService;
+    private EventMapperManager eventMapperManager;
 
-//    @GetMapping("/externalEvents")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
-//    public ResponseEntity<List<EventListResponseDto>> getAllExternalEvents() {
-//        log.info("ExternalEventController - getAllExternalEvents()");
-//        List<ExternalEvent> allExternalEvents = externalEventService.getAllExternalEvents();
-//
-//        List<EventListResponseDto> externalEventsDto = allExternalEvents.stream()
-//                .map(EventListResponseMapper::mapExternalEventToEventListResponseDto).toList();
-//
-//        log.info("ExternalEventController - getAllExternalEvents() return {}", externalEventsDto);
-//        return ResponseEntity.ok(externalEventsDto);
-//    }
+
+
+    @PostMapping("/externalEvents")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<EventResponseDto> createNewEvent(@RequestBody EventRequestDto eventRequestDto) {
+        log.info("InternalEventController - createNewEvent()");
+        EventMapperInterface eventMapperInterface = new EventMapper();
+        Long basicUserId = authorizationService.getLoggedBasicUserId();
+
+        ExternalEvent mappedExternalEventFromRequest = eventMapperManager.mapEventRequestDtoToEventByEventType(eventRequestDto, eventType);
+        ExternalEvent createdExternalEvent = externalEventService.createNewEvent(mappedExternalEventFromRequest, eventType, basicUserId, null);
+        EventResponseDto eventResponseDto = eventMapperManager.getMappedResponseForSpecificEvent(eventMapperInterface, createdExternalEvent);
+
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdExternalEvent.getId())
+                .toUri();
+
+        log.info("EventController - () return createNewEvent() - dto {}", eventResponseDto);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .location(uri)
+                .body(eventResponseDto);
+    }
+
+    @GetMapping("/externalEvents")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Page<EventListResponseDto>> getAllExternalEvents(
+            String privacy,
+            String group,
+            String cat,
+            Long groupId,
+            String sort,
+            String sortOrder,
+            @RequestParam(defaultValue = "0") Integer page) {
+        log.info("ExternalEventController - getAllExternalEvents()");
+        EventMapperInterface eventMapperInterface = new EventListMapper();
+
+        Page<ExternalEvent> events = externalEventService.getAllEvents(privacy, group, cat, groupId, sort, sortOrder, page, eventType);
+
+        Page<EventListResponseDto> externalEvents = eventMapperManager.mapEventToEventListResponseDto(events, eventMapperInterface);
+
+        log.info("ExternalEventController - getAllExternalEvents() return {}", externalEvents);
+        return ResponseEntity.ok(externalEvents);
+    }
 
     @PostMapping("/externalEvents/{id}/visitors")
     public ResponseEntity<?> sendConfirmationMailToVisitor(@RequestBody @Valid VisitorDto visitorDto, @PathVariable("id") Long externalEventId)
@@ -78,7 +125,7 @@ public class ExternalEventController {
         // visitorDetails contains information about visitor name, surname, email and event id
         Map<String, String> visitorDetails = visitorService.getVisitorDetailsFromConfirmationToken(token);
         Long externalEventId = Long.parseLong(visitorDetails.get("externalEventId"));
-        ExternalEvent externalEvent = externalEventService.getExternalEventById(externalEventId);
+        ExternalEvent externalEvent = externalEventService.getEventById(externalEventId, eventType);
 
         if (externalEvent.getEventInfo().getStartDate().isBefore(LocalDateTime.now())) {
             throw new EventDateException("Unable to sign up for an event that has taken place");
@@ -89,7 +136,7 @@ public class ExternalEventController {
         }
 
         Visitor visitor = visitorService.createOrGetExistingVisitor(visitorDetails);
-        externalEventService.addVisitorToExternalEvent(externalEvent, visitor);
+        externalEventService.addVisitorToExternalEvent(externalEvent, visitor, eventType);
         visitorService.sendCancellationLink(visitorDetails.get("email"), visitor.getId(), externalEvent);
 
         Map<String, String> result = new HashMap<>();
@@ -106,14 +153,14 @@ public class ExternalEventController {
         Map<String, String> visitorDetails = visitorService.getVisitorDetailsFromCancellationToken(token);
         Long externalEventId = Long.parseLong(visitorDetails.get("externalEventId"));
         Long visitorId = Long.parseLong(visitorDetails.get("visitorId"));
-        ExternalEvent externalEvent = externalEventService.getExternalEventById(externalEventId);
+        ExternalEvent externalEvent = externalEventService.getEventById(externalEventId, eventType);
 
         if (externalEvent.getEventInfo().getStartDate().isBefore(LocalDateTime.now())) {
             throw new EventDateException("You cannot sign out of an event that has already occurred");
         }
 
         Visitor visitor = visitorService.getVisitor(visitorId);
-        externalEventService.removeVisitorFromExternalEvent(externalEvent, visitor);
+        externalEventService.removeVisitorFromExternalEvent(externalEvent, visitor, eventType);
         visitorService.removeVisitorWithNoExternalEvents(visitor);
 
         Map<String, String> result = new HashMap<>();
@@ -126,14 +173,14 @@ public class ExternalEventController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> createInvitationLink(@PathVariable Long eventId) {
         log.info("ExternalEventController - createInvitationLink(eventId = '{}')", eventId);
-        ExternalEvent event = externalEventService.getExternalEventById(eventId);
+        ExternalEvent event = externalEventService.getEventById(eventId, eventType);
         User user = authenticatedUser.getAuthenticatedUser();
 
         if (basicUserService.isBasicUserOwner(user, event.getEventOwner().getUserId())) {
             throw new UnauthorizedRequestException("You are not the owner of this event!");
         }
 
-        String link = externalEventService.createInvitationLink(event);
+        String link = externalEventService.createInvitationLink(event, eventType);
         log.info("ExternalEventController - createInvitationLink(eventId = '{}') - return link = '{}'", eventId, link);
         return ResponseEntity.status(HttpStatus.CREATED).body(link);
     }
@@ -142,7 +189,7 @@ public class ExternalEventController {
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<?> getInvitationLink(@PathVariable Long eventId) {
         log.info("ExternalEventController - getInvitationLink(eventId = '{}')", eventId);
-        String link = externalEventService.getInvitationLink(eventId);
+        String link = externalEventService.getInvitationLink(eventId, eventType);
         log.info("ExternalEventController - getInvitationLink(eventId = '{}') - return link = '{}'", eventId, link);
         return ResponseEntity.ok(link);
     }

@@ -12,6 +12,7 @@ import pl.envelo.moovelo.Constants;
 import pl.envelo.moovelo.config.security.JwtTokens;
 import pl.envelo.moovelo.controller.dto.actor.VisitorDto;
 import pl.envelo.moovelo.entity.actors.Visitor;
+import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.entity.events.ExternalEvent;
 import pl.envelo.moovelo.exception.NoContentException;
 import pl.envelo.moovelo.exception.VisitorAlreadyExistsException;
@@ -76,7 +77,7 @@ public class VisitorService {
     public void sendConfirmationLink(VisitorDto visitorDto, Long externalEventId) throws MessagingException {
         String token = JwtTokens.createConfirmationToken(visitorDto.getFirstname(), visitorDto.getLastname(), visitorDto.getEmail(), externalEventId);
         String url = Constants.URL + "/api/v1/externalEvents/visitor/" + token;
-        ExternalEvent externalEvent = externalEventService.getExternalEventById(externalEventId);
+        ExternalEvent externalEvent = externalEventService.getEventById(externalEventId, EventType.EXTERNAL_EVENT);
         Context context = new Context();
         context.setVariable("url", url);
         context.setVariable("event", externalEvent.getEventInfo().getName());
