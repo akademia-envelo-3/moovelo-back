@@ -14,6 +14,7 @@ import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
 import pl.envelo.moovelo.controller.dto.OwnershipRequestDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
+import pl.envelo.moovelo.controller.dto.survey.AnswerRequestDto;
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyRequestDto;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
@@ -266,8 +267,7 @@ public class EventController {
                             authorizationService.isLoggedUserEventOwner(eventId)) {
                         return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto);
                     } else {
-                        //TODO: 24.02.2023 zmiana na metodę authorizationService.getLoggedBasicUser()
-                        BasicUser basicUser = (BasicUser) authorizationService.getLoggedUser();
+                        BasicUser basicUser = authorizationService.getLoggedBasicUser();
                         return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto, basicUser);
                     }
                 })
@@ -299,5 +299,23 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(uri)
                 .body(newEventSurveyDto);
+    }
+
+    @PutMapping("events/{eventId}/surveys/{surveyId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<String> voteInEventSurvey(@RequestBody AnswerRequestDto answerRequestDto,
+                                                    @PathVariable Long eventId,
+                                                    @PathVariable Long surveyId
+    ) {
+        log.info("EventController - voteInEventSurvey");
+
+        authorizationService.checkIfLoggedUserHasAccessToEvent(eventId, eventType);
+
+        Long basicUserId = authorizationService.getLoggedBasicUserId();
+
+        List<Long> userAnswersIds = answerRequestDto.getUserAnswersIds();
+        eventService.voteInEventSurvey(userAnswersIds, surveyId, basicUserId);
+
+        return ResponseEntity.ok().build();
     }
 }

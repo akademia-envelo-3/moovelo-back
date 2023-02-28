@@ -19,7 +19,12 @@ public class EventSurvey {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany
+    @JoinTable(
+            name = "eventSurvey_surveyees",
+            joinColumns = @JoinColumn(name = "event_survey_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private List<BasicUser> surveyees;
 
     @ManyToOne

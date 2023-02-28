@@ -5,11 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.actors.User;
 import pl.envelo.moovelo.entity.groups.Group;
+import pl.envelo.moovelo.entity.surveys.Answer;
 import pl.envelo.moovelo.repository.actors.BasicUserRepository;
 import pl.envelo.moovelo.service.group.GroupService;
+import pl.envelo.moovelo.service.survey.AnswerService;
 
 import java.util.*;
 
@@ -19,6 +22,8 @@ import java.util.*;
 public class BasicUserService {
 
     private BasicUserRepository basicUserRepository;
+
+    private AnswerService answerService;
 
     public List<BasicUser> getAllBasicUsers() {
         return basicUserRepository.findAll();
@@ -54,6 +59,19 @@ public class BasicUserService {
 
     public BasicUser updateBasicUser(BasicUser basicUser) {
         return basicUserRepository.save(basicUser);
+    }
+
+    @Transactional
+    public void voteForAnswers(List<Long> answers, Long basicUserId) {
+        log.info("BasicUserService - voteForAnswers()");
+        BasicUser basicUser = getBasicUserById(basicUserId);
+        List<Answer> surveyAnswers = basicUser.getSurveyAnswers();
+
+        answers.stream()
+                .map(answerService::getAnswerById)
+                .forEach(surveyAnswers::add);
+
+        basicUser.setSurveyAnswers(surveyAnswers);
     }
 }
 
