@@ -65,21 +65,23 @@ public class EventMapper implements EventMapperInterface {
     }
 
     public EventResponseDto mapInternalEventToEventResponseDto(InternalEvent internalEvent) {
-        EventResponseDto eventResponseDto = mapEventToEventResponseDto(internalEvent);
-        eventResponseDto.setGroup(GroupMapper.mapGroupToGroupResponseDtoForEvent(internalEvent.getGroup()));
-        eventResponseDto.setPrivate(internalEvent.isPrivate());
-        return eventResponseDto;
+        EventResponseDto InternalEventResponseDto = mapEventToEventResponseDto(internalEvent);
+        InternalEventResponseDto.setGroup(GroupMapper.mapGroupToGroupResponseDtoForEvent(internalEvent.getGroup()));
+        InternalEventResponseDto.setPrivate(internalEvent.isPrivate());
+        return InternalEventResponseDto;
     }
 
     public EventResponseDto mapCyclicEventToEventResponseDto(CyclicEvent cyclicEvent) {
-        EventResponseDto eventResponseDto = mapInternalEventToEventResponseDto(cyclicEvent);
-        eventResponseDto.setFrequencyInDays(cyclicEvent.getFrequencyInDays());
-        eventResponseDto.setNumberOfRepeats(cyclicEvent.getNumberOfRepeats());
-        return eventResponseDto;
+        EventResponseDto CyclicEventResponseDto = mapInternalEventToEventResponseDto(cyclicEvent);
+        CyclicEventResponseDto.setFrequencyInDays(cyclicEvent.getFrequencyInDays());
+        CyclicEventResponseDto.setNumberOfRepeats(cyclicEvent.getNumberOfRepeats());
+        return CyclicEventResponseDto;
     }
 
     public EventResponseDto mapExternalEventToEventResponseDto(ExternalEvent externalEvent) {
-        // TODO: 22.02.2023 mappaer dla externl event z EventPArticipationStats
-        return mapEventToEventResponseDto(externalEvent);
+        EventResponseDto externalEventResponseDto = mapEventToEventResponseDto(externalEvent);
+        externalEventResponseDto.setEventParticipationStats(EventParticipationStatsMapper
+                .mapExternalEventToEventParticipationStatsDto(externalEvent));
+        return externalEventResponseDto;
     }
 }
