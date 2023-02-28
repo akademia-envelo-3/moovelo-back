@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.controller.searchutils.EventSearchSpecification;
 import pl.envelo.moovelo.entity.events.CyclicEvent;
 import pl.envelo.moovelo.repository.event.EventRepositoryManager;
+import pl.envelo.moovelo.service.AttachmentService;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
@@ -21,9 +22,10 @@ public class CyclicEventService extends InternalEventService<CyclicEvent> {
                               BasicUserService basicUserService,
                               EventSearchSpecification eventSearchSpecification,
                               GroupService groupService,
-                              EventSurveyService eventSurveyService) {
+                              EventSurveyService eventSurveyService,
+                              AttachmentService attachmentService) {
         super(eventRepositoryManager, eventInfoService, eventOwnerService, hashTagService,
-                basicUserService, eventSearchSpecification, groupService, eventSurveyService);
+                basicUserService, eventSearchSpecification, groupService, eventSurveyService, attachmentService);
     }
 
     @Override

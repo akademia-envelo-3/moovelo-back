@@ -21,10 +21,6 @@ public interface EventRepository<I extends Event> extends JpaRepository<I, Long>
 
     Optional<I> findById(Long id);
 
-    List<I> findAllByEventType(EventType eventType);
-
     Page<I> findByEventOwner_UserId(Long userId, Pageable pageable);
-
-    List<I> findAllByEventOwnerId(Long eventOwnerId);
 
 }

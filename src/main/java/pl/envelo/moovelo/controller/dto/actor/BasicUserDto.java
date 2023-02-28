@@ -2,11 +2,15 @@ package pl.envelo.moovelo.controller.dto.actor;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Objects;
 
 @Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class BasicUserDto {
     private long id;
     private String firstname;
