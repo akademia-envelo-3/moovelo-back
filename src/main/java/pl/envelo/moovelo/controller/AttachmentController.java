@@ -29,27 +29,6 @@ public class AttachmentController {
 
     private AttachmentService attachmentService;
 
-    @PostMapping
-    public ResponseEntity<AttachmentResponseDto> uploadFile(@RequestParam MultipartFile file) {
-        log.info("AttachmentController - uploadFile() - file name = '{}'", file.getName());
-        Attachment attachment = AttachmentMapper.mapMultipartFileToAttachment(file);
-        attachment = attachmentService.saveAttachment(attachment);
-
-        AttachmentResponseDto attachmentResponseDto = AttachmentMapper.mapAttachmentToAttachmentResponseDto(attachment);
-        URI path = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(attachmentResponseDto.getId())
-                .toUri();
-        attachmentResponseDto.setDownloadLink(path.toString());
-
-        log.info("AttachmentController - uploadFile() - file = '{}' saved", attachmentResponseDto);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .location(path)
-                .body(attachmentResponseDto);
-    }
-
     @GetMapping("{id}")
     public ResponseEntity<Resource> downloadFile(@PathVariable("id") String fileId) {
         log.info("AttachmentController - downloadFile() - file id = '{}'", fileId);

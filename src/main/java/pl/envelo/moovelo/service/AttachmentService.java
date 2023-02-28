@@ -13,6 +13,7 @@ import pl.envelo.moovelo.model.SortingAndPagingCriteria;
 import pl.envelo.moovelo.repository.AttachmentRepository;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -50,5 +51,10 @@ public class AttachmentService {
         log.info("AttachmentService - getAttachments(sortingAndPagingCriteria = '{}') - return attachments = '{}'",
                 sortingAndPagingCriteria, attachments);
         return attachments;
+    }
+
+    public List<Attachment> saveAttachments(List<Attachment> attachments) {
+        log.info("AttachmentService - saveAttachments(attachments = '{}')", attachments);
+        return attachmentRepository.saveAll(attachments);
     }
 }

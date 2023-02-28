@@ -10,16 +10,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import pl.envelo.moovelo.controller.dto.OwnershipRequestDto;
 import pl.envelo.moovelo.controller.dto.actor.BasicUserDto;
 import pl.envelo.moovelo.controller.dto.attachment.AttachmentResponseDto;
-import pl.envelo.moovelo.controller.dto.comment.CommentResponseDto;
 import pl.envelo.moovelo.controller.dto.event.EventRequestDto;
-import pl.envelo.moovelo.controller.dto.OwnershipRequestDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventListResponseDto;
 import pl.envelo.moovelo.controller.dto.event.response.EventResponseDto;
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyDto;
 import pl.envelo.moovelo.controller.dto.survey.EventSurveyRequestDto;
-import pl.envelo.moovelo.controller.mapper.CommentMapper;
 import pl.envelo.moovelo.controller.mapper.actor.BasicUserMapper;
 import pl.envelo.moovelo.controller.mapper.attachment.AttachmentMapper;
 import pl.envelo.moovelo.controller.mapper.event.EventListMapper;
@@ -28,7 +26,6 @@ import pl.envelo.moovelo.controller.mapper.event.manager.EventMapper;
 import pl.envelo.moovelo.controller.mapper.event.manager.EventMapperManager;
 import pl.envelo.moovelo.controller.mapper.survey.EventSurveyMapper;
 import pl.envelo.moovelo.entity.Attachment;
-import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventType;
@@ -108,18 +105,18 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-//    @GetMapping("events/eventOwners/{userId}")
-//    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-//    public ResponseEntity<Page<EventListResponseDto>> getAllEventsByEventOwnerBasicUserId(@PathVariable("userId") Long basicUserId) {
-//        log.info("EventController - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
-//
-//        if (!authorizationService.authorizeGetByOwnerBasicUserId(basicUserId) && !authorizationService.isLoggedUserAdmin()) {
-//            throw new UnauthorizedRequestException("Access denied");
-//        }
-//        Page<? extends Event> allEvents = eventService.getAllEventsByEventOwnerBasicUserId(basicUserId, eventType);
-//        Page<EventListResponseDto> eventsDto = eventMapperManager.mapEventToEventListResponseDto(allEvents, eventMapperInterface);
-//        return ResponseEntity.ok(eventsDto);
-//    }
+    @GetMapping("events/eventOwners/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Page<EventListResponseDto>> getAllEventsByEventOwnerBasicUserId(
+            @PathVariable("userId") Long basicUserId,
+            SortingAndPagingCriteria sortingAndPagingCriteria
+    ) {
+        log.info("EventController - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
+
+        Page<? extends Event> allEvents = eventService.getAllEventsByEventOwnerBasicUserId(basicUserId, eventType, sortingAndPagingCriteria);
+        Page<EventListResponseDto> eventsDto = eventMapperManager.mapEventToEventListResponseDto(allEvents, eventMapperInterface);
+        return ResponseEntity.ok(eventsDto);
+    }
 
     @DeleteMapping("/events/{eventId}")
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -199,8 +196,6 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-
-    // TODO: 22.02.2023 sprawdzic, czy User ma dostep do Eventu
     @GetMapping("/events/{eventId}/users")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<Page<BasicUserDto>> getUsersWithAccess(
@@ -209,6 +204,9 @@ public class EventController {
             @RequestParam(defaultValue = "10") Integer size
     ) {
         log.info("EventController - getUsersWithAccess");
+
+        authorizationService.checkIfLoggedUserHasAccessToEvent(eventId, eventType);
+
         Page<BasicUser> usersWithAccess = eventService.getUsersWithAccess(eventId, page, size, eventType);
 
         Page<BasicUserDto> usersWithAccessDto = usersWithAccess.map(BasicUserMapper::map);
@@ -246,10 +244,9 @@ public class EventController {
 
         log.info("EventController - setStatus()");
 
-        //TODO: 24.02.2023 zmiana na metodę authorizationService.isLoggedUserIdEqualToBasicUserIdParam()
         authorizationService.checkIfLoggedUserHasAccessToEvent(eventId, eventType);
 
-        if (authorizationService.getLoggedBasicUserId().equals(userId)) {
+        if (authorizationService.isLoggedUserIdEqualToBasicUserIdParam(userId)) {
             eventService.setStatus(eventId, userId, status, eventType);
         } else {
             log.error("EventController - setStatus()", new UnauthorizedRequestException("Unauthorized request"));
@@ -273,8 +270,7 @@ public class EventController {
                             authorizationService.isLoggedUserEventOwner(eventId)) {
                         return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto);
                     } else {
-                        //TODO: 24.02.2023 zmiana na metodę authorizationService.getLoggedBasicUser()
-                        BasicUser basicUser = (BasicUser) authorizationService.getLoggedUser();
+                        BasicUser basicUser = authorizationService.getLoggedBasicUser();
                         return EventSurveyMapper.mapEventSurveyToEventSurveyDto(surveyDto, basicUser);
                     }
                 })
@@ -334,16 +330,25 @@ public class EventController {
     }
 
     @PostMapping("events/{eventId}/files")
-    public ResponseEntity<AttachmentResponseDto> addAttachmentToEvent(
+    public ResponseEntity<List<AttachmentResponseDto>> addAttachmentsToEvent(
             @PathVariable Long eventId,
-            @RequestParam MultipartFile file
+            @RequestParam List<MultipartFile> files
     ) {
-        log.info("EventController - addAttachmentToEvent(eventId = '{}', file = '{}'", eventId, file.getName());
-        Attachment attachment = AttachmentMapper.mapMultipartFileToAttachment(file);
-        attachment = eventService.addAttachmentToEvent(eventId, attachment);
-        AttachmentResponseDto attachmentResponseDto = AttachmentMapper.mapAttachmentToAttachmentResponseDto(attachment);
-        log.info("EventController - addAttachmentToEvent(eventId = '{}', file = '{}') - return attachmentResponseDto = '{}'",
-                eventId, file.getName(), attachmentResponseDto);
-        return ResponseEntity.ok(attachmentResponseDto);
+        log.info("EventController - addAttachmentToEvent(eventId = '{}')", eventId);
+        List<Attachment> attachments = files.stream().map(AttachmentMapper::mapMultipartFileToAttachment).toList();
+        attachments = eventService.addAttachmentsToEvent(eventId, attachments);
+        List<AttachmentResponseDto> attachmentResponseDtos = attachments.stream().map(AttachmentMapper::mapAttachmentToAttachmentResponseDto).toList();
+
+        attachmentResponseDtos.forEach(attachmentResponseDto -> attachmentResponseDto.setDownloadLink(
+                ServletUriComponentsBuilder
+                        .fromCurrentContextPath()
+                        .path("/api/v1/files/{id}")
+                        .buildAndExpand(attachmentResponseDto.getId())
+                        .toUri()
+                        .toString()
+        ));
+
+        log.info("EventController - addAttachmentToEvent(eventId = '{}')", eventId);
+        return ResponseEntity.ok(attachmentResponseDtos);
     }
 }

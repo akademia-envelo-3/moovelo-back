@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.envelo.moovelo.controller.searchutils.EventSearchSpecification;
 import pl.envelo.moovelo.controller.searchutils.PagingUtils;
 import pl.envelo.moovelo.entity.Attachment;
-import pl.envelo.moovelo.entity.Comment;
 import pl.envelo.moovelo.entity.Hashtag;
 import pl.envelo.moovelo.entity.Location;
 import pl.envelo.moovelo.entity.actors.BasicUser;
@@ -23,7 +22,6 @@ import pl.envelo.moovelo.model.EventsForUserCriteria;
 import pl.envelo.moovelo.model.SortingAndPagingCriteria;
 import pl.envelo.moovelo.repository.event.EventRepositoryManager;
 import pl.envelo.moovelo.service.AttachmentService;
-import pl.envelo.moovelo.service.CommentService;
 import pl.envelo.moovelo.service.HashTagService;
 import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.actors.EventOwnerService;
@@ -61,7 +59,6 @@ public class EventService<I extends Event> {
             eventAfterFieldValidation.setHashtags(hashtagsToAssign);
             eventAfterFieldValidation.setEventInfo(validatedEventInfo);
 
-            // TODO: 23.02.2023 Rzeźba z grupą
             if ((eventType.equals(EventType.INTERNAL_EVENT) || eventType.equals(EventType.CYCLIC_EVENT))
                     && (groupId != null)) {
                 setGroupToEventIfEventIsInternal(eventAfterFieldValidation, groupId);
@@ -73,7 +70,6 @@ public class EventService<I extends Event> {
                     .save(eventAfterFieldValidation);
         }
     }
-
 
 
     public void updateEventById(Long eventId, I eventFromDto, EventType eventType, Long userId) {
@@ -98,7 +94,8 @@ public class EventService<I extends Event> {
 
     protected void validateFieldsForExtendedEvents(I eventInDb, I eventFromDto) {
     }
-    protected  void setGroupToEventIfEventIsInternal(I eventAfterFieldValidation, Long groupId) {
+
+    protected void setGroupToEventIfEventIsInternal(I eventAfterFieldValidation, Long groupId) {
     }
 
     public I getEventById(Long id, EventType eventType) {
@@ -184,17 +181,23 @@ public class EventService<I extends Event> {
         return allEvents;
     }
 
-    // TODO: 21.02.2023 Z List dziala, Page trzeba powalczyc
-//    public Page<I> getAllEventsByEventOwnerBasicUserId(Long basicUserId, EventType eventType) {
-//        log.info("EventService - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
-//        Page<I> events = eventRepositoryManager
-//                .getRepositoryForSpecificEvent(eventType)
-//                .findByEventOwner_UserId(basicUserId);
-//
-//        log.info("EventService - getAllEventsByEventOwnerBasicUserId() return {}", events);
-//
-//        return events;
-//    }
+    public Page<I> getAllEventsByEventOwnerBasicUserId(Long basicUserId, EventType eventType, SortingAndPagingCriteria sortingAndPagingCriteria) {
+        log.info("EventService - getAllEventsByEventOwnerBasicUserId() - basicUserId = {}", basicUserId);
+
+        Pageable pageable = PageRequest.of(
+                sortingAndPagingCriteria.getPageNumber(),
+                sortingAndPagingCriteria.getPageSize(),
+                Sort.by(new Sort.Order(sortingAndPagingCriteria.getSortDirection(), sortingAndPagingCriteria.getSortBy()))
+                );
+
+        Page<I> events = eventRepositoryManager
+                .getRepositoryForSpecificEvent(eventType)
+                .findByEventOwner_UserId(basicUserId, pageable);
+
+        log.info("EventService - getAllEventsByEventOwnerBasicUserId() return {}", events);
+
+        return events;
+    }
 
     I validateAggregatedEntitiesForCreateEvent(I event, EventType eventType, Long userId) {
         I eventWithFieldsAfterValidation = getEventByEventType(eventType);
@@ -356,10 +359,14 @@ public class EventService<I extends Event> {
         return files;
     }
 
-    public Attachment addAttachmentToEvent(Long eventId, Attachment attachment) {
+    public List<Attachment> addAttachmentsToEvent(Long eventId, List<Attachment> attachments) {
+        log.info("EventService - addAttachmentsToEvent(eventId = '{}', attachments = '{}')",
+                eventId, attachments);
         EventInfo eventInfo = getEventById(eventId, EventType.EVENT).getEventInfo();
-        attachment.setEventInfo(eventInfo);
-        Attachment savedAttachment = attachmentService.saveAttachment(attachment);
-        return savedAttachment;
+        attachments.forEach(attachment -> attachment.setEventInfo(eventInfo));
+        List<Attachment> savedAttachments = attachmentService.saveAttachments(attachments);
+        log.info("EventService - addAttachmentsToEvent(eventId = '{}', attachments = '{}') - return savedAttachments = '{}'",
+                eventId, attachments, savedAttachments);
+        return savedAttachments;
     }
 }

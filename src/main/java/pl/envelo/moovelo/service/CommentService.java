@@ -8,10 +8,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import pl.envelo.moovelo.entity.Comment;
+import pl.envelo.moovelo.entity.actors.BasicUser;
 import pl.envelo.moovelo.entity.events.Event;
 import pl.envelo.moovelo.entity.events.EventType;
 import pl.envelo.moovelo.model.SortingAndPagingCriteria;
 import pl.envelo.moovelo.repository.CommentRepository;
+import pl.envelo.moovelo.service.actors.BasicUserService;
 import pl.envelo.moovelo.service.event.EventService;
 
 @AllArgsConstructor
@@ -20,12 +22,15 @@ import pl.envelo.moovelo.service.event.EventService;
 public class CommentService {
 
     private CommentRepository commentRepository;
+    private BasicUserService basicUserService;
     private EventService eventService;
 
     public Comment addCommentToEvent(Comment comment, Long eventId) {
         log.info("CommentService - addCommentToEvent(comment = '{}', eventId = '{}')", comment, eventId);
         Event event = eventService.getEventById(eventId, EventType.EVENT);
+        BasicUser basicUser = basicUserService.getBasicUserById(comment.getBasicUser().getId());
         comment.setEvent(event);
+        comment.setBasicUser(basicUser);
         Comment savedComment = commentRepository.save(comment);
         log.info("CommentService - addCommentToEvent(comment = '{}', eventId = '{}') - return savedComment = '{}'",
                 comment, event, savedComment);
